@@ -164,6 +164,8 @@ impl Discoverable for Tabs {
                     constraints: vec![],
                 },
             ],
+            actions: vec![],
+
             usage_hint: Some("Tabs::new([\"Tab 1\", \"Tab 2\"]).select(0)".into()),
             tags: vec!["tabs".into(), "navigation".into(), "header".into()],
         }

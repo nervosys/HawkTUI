@@ -133,6 +133,8 @@ impl Discoverable for Sparkline {
                     constraints: vec![PropertyConstraint::Min(1.0)],
                 },
             ],
+            actions: vec![],
+
             usage_hint: Some("Sparkline::new(vec![0, 1, 3, 7, 5, 2])".into()),
             tags: vec!["sparkline".into(), "chart".into(), "trend".into(), "data".into()],
         }

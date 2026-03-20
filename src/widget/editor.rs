@@ -318,6 +318,8 @@ impl Discoverable for Editor {
                     constraints: vec![],
                 },
             ],
+            actions: vec![],
+
             usage_hint: Some("Editor::new().show_line_numbers(true)".into()),
             tags: vec!["editor".into(), "text".into(), "input".into(), "multiline".into(), "code".into()],
         }

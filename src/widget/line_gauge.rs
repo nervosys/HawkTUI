@@ -179,6 +179,8 @@ impl Discoverable for LineGauge {
                     constraints: vec![],
                 },
             ],
+            actions: vec![],
+
             usage_hint: Some(r#"LineGauge::new().percent(65).label("Progress")"#.into()),
             tags: vec![
                 "gauge".into(),

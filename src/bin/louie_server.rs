@@ -29,14 +29,16 @@
 //! ```
 
 use std::io::{self, BufRead, Write};
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 use louie::agent::driver::HeadlessDriver;
-use louie::agent::protocol::RequestEnvelope;
+use louie::agent::protocol::{AgentRequest, RequestEnvelope};
 
-// Security limits (see docs/SECURITY-AUDIT.md INP-1, INP-2)
+// Security limits (see docs/SECURITY-AUDIT.md INP-1, INP-2, INP-4)
 const MAX_LINE_BYTES: usize = 1_048_576; // 1 MB max request size
 const MAX_WIDTH: u16 = 1024;
 const MAX_HEIGHT: u16 = 512;
+const MAX_REQUESTS_PER_SEC: u32 = 1000; // Rate limit (INP-4)
 use louie::ontology::registry::OntologyRegistry;
 use louie::prelude::*;
 use louie::runtime::{Command, Model};
@@ -178,11 +180,37 @@ impl Model for DemoApp {
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+/// Structured log entry to stderr with ISO-ish timestamp (LOG-1).
+fn log_event(level: &str, event: &str, detail: &str) {
+    let secs = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+    eprintln!("[{secs}] [{level}] {event}: {detail}");
+}
+
+/// Extract a human-readable name for the request type.
+fn request_type_name(req: &AgentRequest) -> &'static str {
+    match req {
+        AgentRequest::Ping => "ping",
+        AgentRequest::Quit => "quit",
+        AgentRequest::QueryOntology { .. } => "query_ontology",
+        AgentRequest::GetSchema { .. } => "get_schema",
+        AgentRequest::GetTree => "get_tree",
+        AgentRequest::GetState { .. } => "get_state",
+        AgentRequest::ExecuteAction { .. } => "execute_action",
+        AgentRequest::InjectEvent { .. } => "inject_event",
+        AgentRequest::Subscribe { .. } => "subscribe",
+        AgentRequest::Unsubscribe { .. } => "unsubscribe",
+    }
+}
+
 struct Args {
     width: u16,
     height: u16,
     show_help: bool,
     show_version: bool,
+    auth_token: Option<String>,
 }
 
 fn parse_args() -> Args {
@@ -191,6 +219,7 @@ fn parse_args() -> Args {
         height: 40,
         show_help: false,
         show_version: false,
+        auth_token: None,
     };
 
     let mut iter = std::env::args().skip(1);
@@ -206,6 +235,11 @@ fn parse_args() -> Args {
             "--height" | "-H" => {
                 if let Some(val) = iter.next() {
                     args.height = val.parse().unwrap_or(40);
+                }
+            }
+            "--auth-token" => {
+                if let Some(val) = iter.next() {
+                    args.auth_token = Some(val);
                 }
             }
             _ => {
@@ -233,6 +267,7 @@ USAGE:
 OPTIONS:
     -w, --width <W>     Virtual terminal width  [default: 120]
     -H, --height <H>    Virtual terminal height [default: 40]
+    --auth-token <T>    Require agent to authenticate with this token
     -h, --help          Show this help message
     -V, --version       Show version
 
@@ -293,9 +328,9 @@ fn main() -> io::Result<()> {
         return Ok(());
     }
 
-    eprintln!("louie-server v{VERSION}");
-    eprintln!("Virtual terminal: {}x{}", args.width, args.height);
-    eprintln!("Listening on stdin for JSON Lines requests...");
+    log_event("INFO", "startup", &format!("louie-server v{VERSION}"));
+    log_event("INFO", "config", &format!("terminal={}x{} max_req/s={MAX_REQUESTS_PER_SEC}", args.width, args.height));
+    log_event("INFO", "ready", "Listening on stdin for JSON Lines requests");
 
     let app = DemoApp::new();
     let mut driver = HeadlessDriver::new(app, args.width, args.height)?;
@@ -305,16 +340,83 @@ fn main() -> io::Result<()> {
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut out = stdout.lock();
+    let locked_stdin = stdin.lock();
+    let mut lines = locked_stdin.lines();
 
-    for line in stdin.lock().lines() {
+    // Optional auth handshake (AUTH-1)
+    if let Some(ref expected_token) = args.auth_token {
+        log_event("INFO", "auth", "Waiting for auth handshake");
+        let authenticated = loop {
+            let Some(Ok(line)) = lines.next() else {
+                break false;
+            };
+            let trimmed = line.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
+            match serde_json::from_str::<serde_json::Value>(trimmed) {
+                Ok(val) if val.get("type").and_then(|t| t.as_str()) == Some("auth") => {
+                    if val.get("token").and_then(|t| t.as_str()) == Some(expected_token) {
+                        let resp = serde_json::json!({"success": true, "data": {"status": "authenticated"}});
+                        writeln!(out, "{}", serde_json::to_string(&resp).unwrap())?;
+                        out.flush()?;
+                        log_event("INFO", "auth", "authenticated");
+                        break true;
+                    } else {
+                        let resp = serde_json::json!({"success": false, "error": "Invalid auth token"});
+                        writeln!(out, "{}", serde_json::to_string(&resp).unwrap())?;
+                        out.flush()?;
+                        log_event("WARN", "auth", "invalid token");
+                        break false;
+                    }
+                }
+                _ => {
+                    let resp = serde_json::json!({"success": false, "error": "Authentication required. Send {\"type\":\"auth\",\"token\":\"...\"}"});
+                    writeln!(out, "{}", serde_json::to_string(&resp).unwrap())?;
+                    out.flush()?;
+                    log_event("WARN", "auth", "non-auth message before handshake");
+                    break false;
+                }
+            }
+        };
+        if !authenticated {
+            log_event("ERROR", "auth", "Authentication failed, exiting");
+            return Ok(());
+        }
+    }
+
+    // Rate limiter state (INP-4)
+    let mut window_start = Instant::now();
+    let mut request_count: u32 = 0;
+
+    for line in lines {
         let line = line?;
         let trimmed = line.trim();
         if trimmed.is_empty() {
             continue;
         }
 
+        // Rate limiting (INP-4): reset counter every second, reject excess
+        let elapsed = window_start.elapsed();
+        if elapsed.as_secs() >= 1 {
+            window_start = Instant::now();
+            request_count = 0;
+        }
+        request_count += 1;
+        if request_count > MAX_REQUESTS_PER_SEC {
+            log_event("WARN", "rate_limit", "exceeded");
+            let err_resp = serde_json::json!({
+                "success": false,
+                "error": format!("Rate limit exceeded ({MAX_REQUESTS_PER_SEC} req/s)")
+            });
+            writeln!(out, "{}", serde_json::to_string(&err_resp).unwrap())?;
+            out.flush()?;
+            continue;
+        }
+
         // Reject oversized requests (INP-1)
         if trimmed.len() > MAX_LINE_BYTES {
+            log_event("WARN", "oversized", &format!("bytes={}", trimmed.len()));
             let err_resp = serde_json::json!({
                 "success": false,
                 "error": format!("Request too large ({} bytes, max {})", trimmed.len(), MAX_LINE_BYTES)
@@ -327,6 +429,7 @@ fn main() -> io::Result<()> {
         let envelope: RequestEnvelope = match serde_json::from_str(trimmed) {
             Ok(e) => e,
             Err(err) => {
+                log_event("WARN", "parse_error", &err.to_string());
                 let err_resp = serde_json::json!({
                     "success": false,
                     "error": format!("parse error: {err}")
@@ -337,18 +440,29 @@ fn main() -> io::Result<()> {
             }
         };
 
+        // Log the request type and optional ID (LOG-1)
+        let req_type = request_type_name(&envelope.request);
+        let id_str = envelope.id.as_deref().unwrap_or("-");
+        log_event("INFO", "request", &format!("type={req_type} id={id_str}"));
+
         let response = driver.process_envelope(&envelope);
         let _ = driver.render();
+
+        if !response.success {
+            if let Some(ref e) = response.error {
+                log_event("WARN", "response_err", e);
+            }
+        }
 
         writeln!(out, "{}", serde_json::to_string(&response).unwrap())?;
         out.flush()?;
 
         if !driver.is_running() {
-            eprintln!("Agent requested quit. Shutting down.");
+            log_event("INFO", "quit", "Agent requested quit");
             break;
         }
     }
 
-    eprintln!("louie-server exiting.");
+    log_event("INFO", "shutdown", "louie-server exiting");
     Ok(())
 }

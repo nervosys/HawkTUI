@@ -68,6 +68,26 @@ impl OntologyRegistry {
         serde_json::to_value(&self.schemas).unwrap_or_default()
     }
 
+    /// Look up a declared action and validate params against its schema.
+    ///
+    /// Returns `Ok(())` if the action is unknown (pass-through) or if params
+    /// match the declared types. Returns `Err` only when the action exists in
+    /// the schema and the supplied params violate its constraints (INJ-2).
+    pub fn validate_action_params(
+        &self,
+        widget_type: &str,
+        action: &str,
+        params: &serde_json::Value,
+    ) -> Result<(), String> {
+        let Some(schema) = self.schemas.get(widget_type) else {
+            return Ok(()); // unknown type — allow pass-through
+        };
+        let Some(declared) = schema.actions.iter().find(|a| a.name == action) else {
+            return Ok(()); // unknown action — allow pass-through
+        };
+        declared.validate_params(params)
+    }
+
     // ── Live UI Tree ─────────────────────────────────────────────────
 
     /// Set the current UI tree snapshot.

@@ -208,6 +208,8 @@ impl Discoverable for Paragraph {
                     constraints: vec![],
                 },
             ],
+            actions: vec![],
+
             usage_hint: Some("Paragraph::new(\"Hello, world!\").centered()".into()),
             tags: vec!["text".into(), "display".into(), "paragraph".into()],
         }

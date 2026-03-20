@@ -270,6 +270,8 @@ impl Discoverable for Markdown {
                 default_value: None,
                 constraints: vec![],
             }],
+            actions: vec![],
+
             usage_hint: Some("Markdown::new(\"# Hello\\n\\nSome **bold** text\")".into()),
             tags: vec!["markdown".into(), "text".into(), "display".into(), "rich-text".into()],
         }

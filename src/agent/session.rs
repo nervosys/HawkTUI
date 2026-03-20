@@ -112,11 +112,24 @@ impl AgentSession {
                 params,
             } => {
                 // The actual execution is delegated to the runtime/model.
-                // The session just validates the request and returns a command.
+                // The session validates the request against the ontology first (INJ-2).
                 match registry.find_node(agent_id) {
-                    Some(_node) => {
-                        // Return a response indicating the action will be dispatched.
-                        // The runtime will handle the actual execution.
+                    Some(node) => {
+                        // Validate params against the widget schema's declared action, if any.
+                        if let Err(e) = registry.validate_action_params(
+                            &node.widget_type,
+                            action,
+                            params,
+                        ) {
+                            return (
+                                AgentResponse::err(format!(
+                                    "Invalid params for {}.{}: {e}",
+                                    node.widget_type, action
+                                )),
+                                false,
+                            );
+                        }
+
                         let data = serde_json::json!({
                             "status": "dispatched",
                             "agent_id": agent_id,

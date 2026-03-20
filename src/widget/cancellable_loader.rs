@@ -142,6 +142,8 @@ impl Discoverable for CancellableLoader {
                     constraints: vec![],
                 },
             ],
+            actions: vec![],
+
             usage_hint: Some("CancellableLoader::new(\"Processing...\").tick(n)".into()),
             tags: vec![
                 "loader".into(),

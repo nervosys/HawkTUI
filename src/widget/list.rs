@@ -273,6 +273,8 @@ impl Discoverable for List {
                     constraints: vec![],
                 },
             ],
+            actions: vec![],
+
             usage_hint: Some(
                 "List::new([\"Item 1\", \"Item 2\"]).highlight_symbol(\">> \")".into(),
             ),

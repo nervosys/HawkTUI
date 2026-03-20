@@ -126,6 +126,8 @@ impl Discoverable for Loader {
                     constraints: vec![],
                 },
             ],
+            actions: vec![],
+
             usage_hint: Some(
                 "Loader::new(\"Loading...\").spinner_style(SpinnerStyle::Braille).tick(n)".into(),
             ),

@@ -397,6 +397,8 @@ impl Discoverable for Canvas {
                     constraints: vec![],
                 },
             ],
+            actions: vec![],
+
             usage_hint: Some(
                 "Canvas::new().x_bounds([0.0, 100.0]).line(CanvasLine { .. })".into(),
             ),

@@ -3,8 +3,8 @@ use crate::core::rect::Rect;
 use crate::core::style::Style;
 use crate::core::text::Span;
 use crate::ontology::{
-    AgentAction, AgentCapability, Discoverable, PropertyConstraint, PropertySchema, PropertyType,
-    SemanticRole, WidgetSchema,
+    ActionParam, ActionParamType, AgentAction, AgentCapability, Discoverable, PropertyConstraint,
+    PropertySchema, PropertyType, SemanticRole, WidgetSchema,
 };
 use crate::widget::block::Block;
 use crate::widget::Widget;
@@ -142,6 +142,33 @@ impl Discoverable for Gauge {
                     constraints: vec![],
                 },
             ],
+            actions: vec![
+                AgentAction {
+                    name: "set_ratio".into(),
+                    description: "Set the gauge progress ratio.".into(),
+                    params: vec![ActionParam {
+                        name: "ratio".into(),
+                        description: "Value between 0.0 and 1.0.".into(),
+                        param_type: ActionParamType::Float,
+                        required: true,
+                        default_value: None,
+                    }],
+                    returns: None,
+                    mutates: true,
+                    idempotent: true,
+                    shortcut: None,
+                },
+                AgentAction {
+                    name: "get_ratio".into(),
+                    description: "Get the current progress ratio.".into(),
+                    params: vec![],
+                    returns: Some("Current ratio as float.".into()),
+                    mutates: false,
+                    idempotent: true,
+                    shortcut: None,
+                },
+            ],
+
             usage_hint: Some("Gauge::new().percent(42).label(\"Loading...\")".into()),
             tags: vec!["gauge".into(), "progress".into(), "bar".into(), "loading".into()],
         }
@@ -160,10 +187,10 @@ impl Discoverable for Gauge {
             AgentAction {
                 name: "set_ratio".into(),
                 description: "Set the gauge progress ratio.".into(),
-                params: vec![crate::ontology::ActionParam {
+                params: vec![ActionParam {
                     name: "ratio".into(),
                     description: "Value between 0.0 and 1.0.".into(),
-                    param_type: crate::ontology::ActionParamType::Float,
+                    param_type: ActionParamType::Float,
                     required: true,
                     default_value: None,
                 }],

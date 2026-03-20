@@ -78,29 +78,31 @@ fn show_response_compact(json: &str) {
 }
 
 fn main() {
-    // Find the server binary
-    let server_path = if cfg!(target_os = "windows") {
-        let release = "target/release/louie-server.exe";
-        let debug = "target/debug/louie-server.exe";
-        if std::path::Path::new(release).exists() {
-            release.to_string()
-        } else if std::path::Path::new(debug).exists() {
-            debug.to_string()
+    // Resolve the server binary relative to our own executable (BIN-1).
+    let server_path = {
+        let self_dir = std::env::current_exe()
+            .ok()
+            .and_then(|p| p.parent().map(|d| d.to_path_buf()));
+
+        let sibling = self_dir.as_ref().map(|d| {
+            let name = if cfg!(target_os = "windows") {
+                "louie-server.exe"
+            } else {
+                "louie-server"
+            };
+            d.join(name)
+        });
+
+        if let Some(ref p) = sibling {
+            if p.exists() {
+                p.to_string_lossy().to_string()
+            } else {
+                eprintln!("{BOLD}Error:{RESET} louie-server not found at {}", p.display());
+                eprintln!("Run: cargo build --bin louie-server");
+                std::process::exit(1);
+            }
         } else {
-            eprintln!("{BOLD}Error:{RESET} louie-server not found.");
-            eprintln!("Run: cargo build --bin louie-server");
-            std::process::exit(1);
-        }
-    } else {
-        let release = "target/release/louie-server";
-        let debug = "target/debug/louie-server";
-        if std::path::Path::new(release).exists() {
-            release.to_string()
-        } else if std::path::Path::new(debug).exists() {
-            debug.to_string()
-        } else {
-            eprintln!("{BOLD}Error:{RESET} louie-server not found.");
-            eprintln!("Run: cargo build --bin louie-server");
+            eprintln!("{BOLD}Error:{RESET} Could not determine executable directory.");
             std::process::exit(1);
         }
     };

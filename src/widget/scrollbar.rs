@@ -276,6 +276,8 @@ impl Discoverable for Scrollbar {
                 default_value: Some(serde_json::json!("Vertical")),
                 constraints: vec![],
             }],
+            actions: vec![],
+
             usage_hint: Some(
                 "Scrollbar::new(ScrollbarOrientation::Vertical)".into(),
             ),

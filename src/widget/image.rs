@@ -268,6 +268,8 @@ impl Discoverable for Image {
                     constraints: vec![],
                 },
             ],
+            actions: vec![],
+
             usage_hint: Some("Use Image::detect_protocol() to auto-select the best rendering method.".into()),
             tags: vec!["image".into(), "graphics".into(), "visual".into(), "media".into()],
         }

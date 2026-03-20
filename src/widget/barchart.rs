@@ -450,6 +450,8 @@ impl Discoverable for BarChart {
                     constraints: vec![],
                 },
             ],
+            actions: vec![],
+
             usage_hint: Some("Use for categorical comparisons. Each group can have multiple bars for multi-series data.".into()),
             tags: vec!["chart".into(), "bar".into(), "data".into(), "visualization".into()],
         }

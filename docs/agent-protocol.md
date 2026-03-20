@@ -435,3 +435,52 @@ driver.render()?;
 | **Louie Protocol** | **Full ontology** | **Robust**  | **Low** | **Low**     |
 
 Screen-scraping requires the agent to parse terminal ANSI escape sequences, guess at widget boundaries, and break whenever the layout changes. The Louie protocol provides typed, versioned access to every widget's schema, state, and actions — the UI is self-describing.
+
+## Security Considerations
+
+### Request Size Limits
+
+All JSON messages are capped at **1 MB** (1,048,576 bytes). Messages exceeding this limit are rejected before parsing.
+
+### Rate Limiting
+
+The server enforces a maximum of **1,000 requests per second**. Excess requests receive an error response and are not processed.
+
+### Authentication
+
+When the server is started with `--auth-token <TOKEN>`, the agent **must** send an authentication message as its very first request:
+
+```json
+{"type": "auth", "token": "your-shared-secret"}
+```
+
+On success the server responds:
+
+```json
+{"success": true, "data": {"status": "authenticated"}}
+```
+
+If the token is wrong or the first message is not an auth request, the server returns an error and terminates the connection.
+
+When no `--auth-token` flag is provided, no authentication is required (backward compatible).
+
+### Action Parameter Validation
+
+All `execute_action` requests are validated against the widget's declared action schema before dispatch. If an action name is unknown or a required parameter is missing or has the wrong type, the server returns an error without executing the action.
+
+### Paste Content Sanitization
+
+Applications that use `inject_event` with `kind: "paste"` **must** validate and sanitize paste content before passing it to sensitive operations. The protocol transmits paste text verbatim; it is the responsibility of the receiving widget or application to:
+
+1. **Limit length** — reject or truncate paste payloads that exceed a reasonable size for the target field.
+2. **Strip control characters** — remove ANSI escape sequences, null bytes, and non-printable characters that could alter terminal behavior.
+3. **Validate encoding** — ensure text is valid UTF-8 before processing.
+4. **Context-aware filtering** — when paste targets a structured input (e.g., a file path or command field), validate the content against the expected format.
+
+### Terminal Dimension Clamping
+
+Terminal width and height are clamped to a maximum of **1,024** cells in each dimension. Resize events beyond this range are silently clamped.
+
+### Subscription Limits
+
+A maximum of **100** event subscriptions per session is enforced. Attempts to exceed this limit are rejected.

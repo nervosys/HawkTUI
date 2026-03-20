@@ -11,6 +11,9 @@ pub struct WidgetSchema {
     pub default_role: SemanticRole,
     /// Properties that can be configured on this widget.
     pub properties: Vec<PropertySchema>,
+    /// Actions that agents can invoke on this widget type (INJ-2).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub actions: Vec<super::AgentAction>,
     /// Brief usage example for agents.
     pub usage_hint: Option<String>,
     /// Tags for fuzzy search (e.g., ["text", "display", "paragraph"]).

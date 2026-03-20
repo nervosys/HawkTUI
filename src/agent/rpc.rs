@@ -9,6 +9,7 @@
 //! - Lines are delimited by `\n`
 
 use std::io::{self, BufRead, Write};
+use std::time::Instant;
 
 use super::protocol::{AgentResponse, RequestEnvelope};
 use super::session::AgentSession;
@@ -19,6 +20,9 @@ use crate::terminal::Terminal;
 
 /// Maximum allowed size for a single JSON request line (1 MB).
 const MAX_LINE_BYTES: usize = 1_048_576;
+
+/// Maximum requests per second before throttling (INP-4).
+const MAX_REQUESTS_PER_SEC: u32 = 1000;
 
 /// Runs a Louie application over stdin/stdout JSON Lines protocol.
 ///
@@ -68,10 +72,31 @@ impl<M: Model> RpcTransport<M> {
         let mut stdout = io::stdout();
         let reader = stdin.lock();
 
+        // Rate limiter state (INP-4)
+        let mut window_start = Instant::now();
+        let mut request_count: u32 = 0;
+
         for line in reader.lines() {
             let line = line?;
             let trimmed = line.trim();
             if trimmed.is_empty() {
+                continue;
+            }
+
+            // Rate limiting (INP-4)
+            let elapsed = window_start.elapsed();
+            if elapsed.as_secs() >= 1 {
+                window_start = Instant::now();
+                request_count = 0;
+            }
+            request_count += 1;
+            if request_count > MAX_REQUESTS_PER_SEC {
+                let resp = AgentResponse::err(format!(
+                    "Rate limit exceeded ({MAX_REQUESTS_PER_SEC} req/s)"
+                ));
+                let json = serde_json::to_string(&resp).unwrap_or_default();
+                writeln!(stdout, "{json}")?;
+                stdout.flush()?;
                 continue;
             }
 

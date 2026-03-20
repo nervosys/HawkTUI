@@ -343,6 +343,8 @@ impl Discoverable for SettingsList {
                 default_value: None,
                 constraints: vec![],
             }],
+            actions: vec![],
+
             usage_hint: Some(
                 "Navigate with up/down, cycle values with Enter or left/right.".into(),
             ),
