@@ -17,6 +17,9 @@ use crate::ontology::OntologyRegistry;
 use crate::runtime::{Command, Model};
 use crate::terminal::Terminal;
 
+/// Maximum allowed size for a single JSON request line (1 MB).
+const MAX_LINE_BYTES: usize = 1_048_576;
+
 /// Runs a Louie application over stdin/stdout JSON Lines protocol.
 ///
 /// The agent sends [`RequestEnvelope`] JSON objects (one per line) on stdin.
@@ -69,6 +72,19 @@ impl<M: Model> RpcTransport<M> {
             let line = line?;
             let trimmed = line.trim();
             if trimmed.is_empty() {
+                continue;
+            }
+
+            // Reject oversized requests (INP-1)
+            if trimmed.len() > MAX_LINE_BYTES {
+                let resp = AgentResponse::err(format!(
+                    "Request too large ({} bytes, max {})",
+                    trimmed.len(),
+                    MAX_LINE_BYTES
+                ));
+                let json = serde_json::to_string(&resp).unwrap_or_default();
+                writeln!(stdout, "{json}")?;
+                stdout.flush()?;
                 continue;
             }
 

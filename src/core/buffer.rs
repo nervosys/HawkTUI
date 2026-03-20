@@ -195,14 +195,20 @@ impl Buffer {
 impl std::ops::Index<(u16, u16)> for Buffer {
     type Output = Cell;
     fn index(&self, (x, y): (u16, u16)) -> &Self::Output {
-        let idx = self.index_of(x, y).expect("position out of bounds");
-        &self.content[idx]
+        /// Sentinel cell returned when indexing out of bounds, preventing panics (MEM-1).
+        static OOB_CELL: std::sync::LazyLock<Cell> = std::sync::LazyLock::new(Cell::default);
+        match self.index_of(x, y) {
+            Some(i) => &self.content[i],
+            None => &OOB_CELL,
+        }
     }
 }
 
 impl std::ops::IndexMut<(u16, u16)> for Buffer {
     fn index_mut(&mut self, (x, y): (u16, u16)) -> &mut Self::Output {
-        let idx = self.index_of(x, y).expect("position out of bounds");
+        let idx = self
+            .index_of(x, y)
+            .expect("Buffer::index_mut out of bounds");
         &mut self.content[idx]
     }
 }

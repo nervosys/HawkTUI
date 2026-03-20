@@ -32,6 +32,11 @@ use std::io::{self, BufRead, Write};
 
 use louie::agent::driver::HeadlessDriver;
 use louie::agent::protocol::RequestEnvelope;
+
+// Security limits (see docs/SECURITY-AUDIT.md INP-1, INP-2)
+const MAX_LINE_BYTES: usize = 1_048_576; // 1 MB max request size
+const MAX_WIDTH: u16 = 1024;
+const MAX_HEIGHT: u16 = 512;
 use louie::ontology::registry::OntologyRegistry;
 use louie::prelude::*;
 use louie::runtime::{Command, Model};
@@ -210,6 +215,11 @@ fn parse_args() -> Args {
             }
         }
     }
+
+    // Clamp terminal dimensions to safe bounds (INP-2)
+    args.width = args.width.clamp(1, MAX_WIDTH);
+    args.height = args.height.clamp(1, MAX_HEIGHT);
+
     args
 }
 
@@ -300,6 +310,17 @@ fn main() -> io::Result<()> {
         let line = line?;
         let trimmed = line.trim();
         if trimmed.is_empty() {
+            continue;
+        }
+
+        // Reject oversized requests (INP-1)
+        if trimmed.len() > MAX_LINE_BYTES {
+            let err_resp = serde_json::json!({
+                "success": false,
+                "error": format!("Request too large ({} bytes, max {})", trimmed.len(), MAX_LINE_BYTES)
+            });
+            writeln!(out, "{}", serde_json::to_string(&err_resp).unwrap())?;
+            out.flush()?;
             continue;
         }
 

@@ -9,6 +9,12 @@ use crate::ontology::registry::OntologyRegistry;
 
 use super::protocol::{AgentEvent, AgentRequest, AgentResponse, InjectedEvent};
 
+/// Maximum number of event subscriptions per agent session (INP-3).
+const MAX_SUBSCRIPTIONS: usize = 100;
+
+/// Maximum terminal dimension allowed via injected resize events (INP-2).
+const MAX_TERMINAL_DIM: u16 = 1024;
+
 /// Manages an agent's connection to a Louie application.
 ///
 /// The session processes incoming [`AgentRequest`]s, dispatches them against
@@ -136,6 +142,18 @@ impl AgentSession {
 
             AgentRequest::Subscribe { events } => {
                 for ev in events {
+                    if self.subscriptions.len() >= MAX_SUBSCRIPTIONS {
+                        return (
+                            AgentResponse::err(format!(
+                                "Subscription limit reached (max {MAX_SUBSCRIPTIONS})"
+                            )),
+                            false,
+                        );
+                    }
+                    // Reject oversized event type names
+                    if ev.len() > 256 {
+                        continue;
+                    }
                     self.subscriptions.insert(ev.clone());
                 }
                 let data = serde_json::json!({
@@ -198,7 +216,11 @@ impl AgentSession {
                 }))
             }
             InjectedEvent::Paste { text } => Some(Event::Paste(text.clone())),
-            InjectedEvent::Resize { width, height } => Some(Event::Resize(*width, *height)),
+            InjectedEvent::Resize { width, height } => {
+                let w = (*width).clamp(1, MAX_TERMINAL_DIM);
+                let h = (*height).clamp(1, MAX_TERMINAL_DIM);
+                Some(Event::Resize(w, h))
+            }
         }
     }
 

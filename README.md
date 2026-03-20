@@ -20,11 +20,11 @@ An agent connecting to a Louie app can ask: *"What widgets exist? What can I cli
 │                   Runtime (Elm)                  │
 │         Model → Update → View → Render           │
 ├──────────────────────────────────────────────────┤
-│  Agent Protocol  │  Ontology     │  Animation   │
-│  ├ RPC Transport │  ├ Schema     │  ├ Easing    │
-│  ├ HeadlessDriver│  ├ Capability │  ├ Tween     │
-│  ├ AgentSession  │  ├ Action     │  ├ Spring    │
-│  └ Protocol      │  └ Registry   │  └ Timeline  │
+│  Agent Protocol  │  Ontology     │  Animation    │
+│  ├ RPC Transport │  ├ Schema     │  ├ Easing     │
+│  ├ HeadlessDriver│  ├ Capability │  ├ Tween      │
+│  ├ AgentSession  │  ├ Action     │  ├ Spring     │
+│  └ Protocol      │  └ Registry   │  └ Timeline   │
 ├──────────────────────────────────────────────────┤
 │  Widgets          │  Focus & Overlay             │
 │  ├ Block          │  ├ FocusManager              │
@@ -32,21 +32,21 @@ An agent connecting to a Louie app can ask: *"What widgets exist? What can I cli
 │  ├ List           │  └ ModalBox                  │
 │  ├ Tabs           ├──────────────────────────────┤
 │  ├ Gauge          │  Layout                      │
-│  ├ LineGauge      │  ├ Constraint solver          │
-│  ├ Input          │  ├ Direction (V/H)            │
-│  ├ Table          │  └ Flex distribution           │
+│  ├ LineGauge      │  ├ Constraint solver         │
+│  ├ Input          │  ├ Direction (V/H)           │
+│  ├ Table          │  └ Flex distribution         │
 │  ├ Editor         ├──────────────────────────────┤
 │  ├ Markdown       │  Text Engine                 │
-│  ├ SelectList     │  ├ Word wrap                  │
-│  ├ Loader         │  ├ Char wrap                  │
-│  ├ Sparkline      │  └ Line truncation            │
+│  ├ SelectList     │  ├ Word wrap                 │
+│  ├ Loader         │  ├ Char wrap                 │
+│  ├ Sparkline      │  └ Line truncation           │
 │  ├ Scrollbar      ├──────────────────────────────┤
 │  ├ Canvas         │  Utilities                   │
-│  ├ BarChart       │  ├ Fuzzy matching             │
-│  ├ Chart          │  └ Undo stack                 │
+│  ├ BarChart       │  ├ Fuzzy matching            │
+│  ├ Chart          │  └ Undo stack                │
 │  ├ Image          ├──────────────────────────────┤
 │  ├ Calendar       │  Terminal                    │
-│  └ SettingsList   │  └ Synchronized output        │
+│  └ SettingsList   │  └ Synchronized output       │
 ├──────────────────────────────────────────────────┤
 │  Core: Buffer, Cell, Style, Text, Reflow, Rect   │
 ├──────────────────────────────────────────────────┤
