@@ -97,7 +97,10 @@ fn main() {
             if p.exists() {
                 p.to_string_lossy().to_string()
             } else {
-                eprintln!("{BOLD}Error:{RESET} louie-server not found at {}", p.display());
+                eprintln!(
+                    "{BOLD}Error:{RESET} louie-server not found at {}",
+                    p.display()
+                );
                 eprintln!("Run: cargo build --bin louie-server");
                 std::process::exit(1);
             }

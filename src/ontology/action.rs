@@ -61,16 +61,14 @@ impl AgentAction {
             match val {
                 None | Some(serde_json::Value::Null) => {
                     if param.required {
-                        return Err(format!(
-                            "Missing required parameter '{}'",
-                            param.name
-                        ));
+                        return Err(format!("Missing required parameter '{}'", param.name));
                     }
                 }
                 Some(v) => {
-                    param.param_type.check(v).map_err(|e| {
-                        format!("Parameter '{}': {}", param.name, e)
-                    })?;
+                    param
+                        .param_type
+                        .check(v)
+                        .map_err(|e| format!("Parameter '{}': {}", param.name, e))?;
                 }
             }
         }
@@ -104,7 +102,10 @@ impl ActionParamType {
             }
             ActionParamType::Index => {
                 if !value.is_u64() {
-                    return Err(format!("expected non-negative integer, got {}", json_type_name(value)));
+                    return Err(format!(
+                        "expected non-negative integer, got {}",
+                        json_type_name(value)
+                    ));
                 }
             }
             ActionParamType::Position { .. } => {
@@ -122,7 +123,10 @@ impl ActionParamType {
                         ));
                     }
                 } else {
-                    return Err(format!("expected string enum, got {}", json_type_name(value)));
+                    return Err(format!(
+                        "expected string enum, got {}",
+                        json_type_name(value)
+                    ));
                 }
             }
             ActionParamType::Any => {}

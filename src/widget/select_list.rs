@@ -194,9 +194,7 @@ impl StatefulWidget for SelectList {
                 if state.filter.is_empty() {
                     true
                 } else {
-                    item.label
-                        .to_lowercase()
-                        .contains(&filter_lower)
+                    item.label.to_lowercase().contains(&filter_lower)
                 }
             })
             .collect();
@@ -258,7 +256,9 @@ impl Discoverable for SelectList {
     fn schema() -> WidgetSchema {
         WidgetSchema {
             name: "SelectList".into(),
-            description: "An interactive select list supporting single or multi-select with filtering.".into(),
+            description:
+                "An interactive select list supporting single or multi-select with filtering."
+                    .into(),
             default_role: SemanticRole::Input,
             properties: vec![
                 PropertySchema {
@@ -321,7 +321,12 @@ impl Discoverable for SelectList {
             ],
 
             usage_hint: Some("SelectList::new(items).mode(SelectMode::Multi)".into()),
-            tags: vec!["select".into(), "list".into(), "input".into(), "menu".into()],
+            tags: vec![
+                "select".into(),
+                "list".into(),
+                "input".into(),
+                "menu".into(),
+            ],
         }
     }
 

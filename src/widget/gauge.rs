@@ -128,10 +128,7 @@ impl Discoverable for Gauge {
                     property_type: PropertyType::Float,
                     required: true,
                     default_value: Some(serde_json::json!(0.0)),
-                    constraints: vec![
-                        PropertyConstraint::Min(0.0),
-                        PropertyConstraint::Max(1.0),
-                    ],
+                    constraints: vec![PropertyConstraint::Min(0.0), PropertyConstraint::Max(1.0)],
                 },
                 PropertySchema {
                     name: "label".into(),
@@ -170,7 +167,12 @@ impl Discoverable for Gauge {
             ],
 
             usage_hint: Some("Gauge::new().percent(42).label(\"Loading...\")".into()),
-            tags: vec!["gauge".into(), "progress".into(), "bar".into(), "loading".into()],
+            tags: vec![
+                "gauge".into(),
+                "progress".into(),
+                "bar".into(),
+                "loading".into(),
+            ],
         }
     }
 

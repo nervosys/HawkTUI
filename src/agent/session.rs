@@ -116,11 +116,9 @@ impl AgentSession {
                 match registry.find_node(agent_id) {
                     Some(node) => {
                         // Validate params against the widget schema's declared action, if any.
-                        if let Err(e) = registry.validate_action_params(
-                            &node.widget_type,
-                            action,
-                            params,
-                        ) {
+                        if let Err(e) =
+                            registry.validate_action_params(&node.widget_type, action, params)
+                        {
                             return (
                                 AgentResponse::err(format!(
                                     "Invalid params for {}.{}: {e}",

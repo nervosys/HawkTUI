@@ -42,7 +42,7 @@ impl KeyEvent {
         }
     }
 
-    /// Convenience: is this a Ctrl+<key> press?
+    /// Convenience: is this a Ctrl+\<key\> press?
     pub fn is_ctrl(&self, code: KeyCode) -> bool {
         self.code == code && self.modifiers.contains(KeyModifiers::CONTROL)
     }
@@ -157,8 +157,7 @@ impl MouseEvent {
 
     /// Whether the given rect was clicked.
     pub fn clicked_in(&self, area: crate::core::rect::Rect) -> bool {
-        self.is_click()
-            && area.contains(Position::new(self.column, self.row))
+        self.is_click() && area.contains(Position::new(self.column, self.row))
     }
 }
 

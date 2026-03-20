@@ -329,8 +329,19 @@ fn main() -> io::Result<()> {
     }
 
     log_event("INFO", "startup", &format!("louie-server v{VERSION}"));
-    log_event("INFO", "config", &format!("terminal={}x{} max_req/s={MAX_REQUESTS_PER_SEC}", args.width, args.height));
-    log_event("INFO", "ready", "Listening on stdin for JSON Lines requests");
+    log_event(
+        "INFO",
+        "config",
+        &format!(
+            "terminal={}x{} max_req/s={MAX_REQUESTS_PER_SEC}",
+            args.width, args.height
+        ),
+    );
+    log_event(
+        "INFO",
+        "ready",
+        "Listening on stdin for JSON Lines requests",
+    );
 
     let app = DemoApp::new();
     let mut driver = HeadlessDriver::new(app, args.width, args.height)?;
@@ -363,7 +374,8 @@ fn main() -> io::Result<()> {
                         log_event("INFO", "auth", "authenticated");
                         break true;
                     } else {
-                        let resp = serde_json::json!({"success": false, "error": "Invalid auth token"});
+                        let resp =
+                            serde_json::json!({"success": false, "error": "Invalid auth token"});
                         writeln!(out, "{}", serde_json::to_string(&resp).unwrap())?;
                         out.flush()?;
                         log_event("WARN", "auth", "invalid token");

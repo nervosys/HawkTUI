@@ -5,7 +5,7 @@
 //!
 //! Protocol:
 //! - Each line on stdin is a JSON [`RequestEnvelope`]
-//! - Each line on stdout is a JSON [`AgentResponse`] or [`AgentEvent`]
+//! - Each line on stdout is a JSON [`AgentResponse`] or `AgentEvent`
 //! - Lines are delimited by `\n`
 
 use std::io::{self, BufRead, Write};

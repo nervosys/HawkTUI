@@ -58,7 +58,9 @@ impl OntologyRegistry {
             .filter(|s| {
                 s.name.to_lowercase().contains(&query_lower)
                     || s.description.to_lowercase().contains(&query_lower)
-                    || s.tags.iter().any(|t| t.to_lowercase().contains(&query_lower))
+                    || s.tags
+                        .iter()
+                        .any(|t| t.to_lowercase().contains(&query_lower))
             })
             .collect()
     }

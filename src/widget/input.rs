@@ -201,18 +201,17 @@ impl Discoverable for Input {
     fn schema() -> WidgetSchema {
         WidgetSchema {
             name: "Input".into(),
-            description: "A single-line text input field with cursor navigation and editing.".into(),
+            description: "A single-line text input field with cursor navigation and editing."
+                .into(),
             default_role: SemanticRole::Input,
-            properties: vec![
-                PropertySchema {
-                    name: "placeholder".into(),
-                    description: "Hint text shown when the input is empty.".into(),
-                    property_type: PropertyType::String,
-                    required: false,
-                    default_value: None,
-                    constraints: vec![],
-                },
-            ],
+            properties: vec![PropertySchema {
+                name: "placeholder".into(),
+                description: "Hint text shown when the input is empty.".into(),
+                property_type: PropertyType::String,
+                required: false,
+                default_value: None,
+                constraints: vec![],
+            }],
             actions: vec![
                 AgentAction {
                     name: "set_value".into(),
@@ -265,7 +264,12 @@ impl Discoverable for Input {
             ],
 
             usage_hint: Some("Input::new().placeholder(\"Type here...\")".into()),
-            tags: vec!["input".into(), "text".into(), "form".into(), "editable".into()],
+            tags: vec![
+                "input".into(),
+                "text".into(),
+                "form".into(),
+                "editable".into(),
+            ],
         }
     }
 
