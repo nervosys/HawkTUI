@@ -179,10 +179,8 @@ mod tests {
             let mut session = AgentSession::new();
             // Subscribe up to the limit (100)
             let events: Vec<String> = (0..100).map(|i| format!("evt_{i}")).collect();
-            let (resp, _) = session.process_request(
-                &AgentRequest::Subscribe { events },
-                &empty_registry(),
-            );
+            let (resp, _) =
+                session.process_request(&AgentRequest::Subscribe { events }, &empty_registry());
             assert!(resp.success);
 
             // Attempting to add one more should fail
@@ -525,9 +523,7 @@ mod tests {
 
     mod ontology_registry {
         use louie::ontology::registry::{OntologyRegistry, UiNode, UiTree};
-        use louie::ontology::{
-            AgentAction, AgentCapability, SemanticRole, WidgetSchema,
-        };
+        use louie::ontology::{AgentAction, AgentCapability, SemanticRole, WidgetSchema};
 
         fn make_schema(name: &str, role: SemanticRole, tags: &[&str]) -> WidgetSchema {
             WidgetSchema {
@@ -573,7 +569,11 @@ mod tests {
         #[test]
         fn search_by_tag() {
             let mut reg = OntologyRegistry::new();
-            reg.register_schema(make_schema("Paragraph", SemanticRole::Display, &["text", "display"]));
+            reg.register_schema(make_schema(
+                "Paragraph",
+                SemanticRole::Display,
+                &["text", "display"],
+            ));
             reg.register_schema(make_schema("Input", SemanticRole::Input, &["form"]));
             let results = reg.search("text");
             assert_eq!(results.len(), 1);
@@ -608,11 +608,7 @@ mod tests {
         #[test]
         fn validate_action_params_unknown_type_passes() {
             let reg = OntologyRegistry::new();
-            let result = reg.validate_action_params(
-                "NonExistent",
-                "click",
-                &serde_json::json!({}),
-            );
+            let result = reg.validate_action_params("NonExistent", "click", &serde_json::json!({}));
             assert!(result.is_ok());
         }
 
@@ -648,7 +644,8 @@ mod tests {
             reg.register_schema(schema);
 
             // Valid params
-            let ok = reg.validate_action_params("W", "set_value", &serde_json::json!({"value": "hi"}));
+            let ok =
+                reg.validate_action_params("W", "set_value", &serde_json::json!({"value": "hi"}));
             assert!(ok.is_ok());
 
             // Missing required param
@@ -657,7 +654,8 @@ mod tests {
             assert!(err.unwrap_err().contains("Missing required"));
 
             // Wrong type
-            let err = reg.validate_action_params("W", "set_value", &serde_json::json!({"value": 42}));
+            let err =
+                reg.validate_action_params("W", "set_value", &serde_json::json!({"value": 42}));
             assert!(err.is_err());
         }
 
@@ -695,10 +693,7 @@ mod tests {
                         .with_id("i1")
                         .with_capability(AgentCapability::Focusable),
                 )
-                .with_child(
-                    UiNode::new("Label", SemanticRole::Display)
-                        .with_id("l1"),
-                );
+                .with_child(UiNode::new("Label", SemanticRole::Display).with_id("l1"));
             let tree = UiTree::new(root);
             let focusable = tree.focusable_nodes();
             assert_eq!(focusable.len(), 1);
@@ -765,8 +760,12 @@ mod tests {
                 required: true,
                 default_value: None,
             }]);
-            assert!(action.validate_params(&serde_json::json!({"s": "hello"})).is_ok());
-            assert!(action.validate_params(&serde_json::json!({"s": 42})).is_err());
+            assert!(action
+                .validate_params(&serde_json::json!({"s": "hello"}))
+                .is_ok());
+            assert!(action
+                .validate_params(&serde_json::json!({"s": 42}))
+                .is_err());
         }
 
         #[test]
@@ -778,8 +777,12 @@ mod tests {
                 required: true,
                 default_value: None,
             }]);
-            assert!(action.validate_params(&serde_json::json!({"n": 42})).is_ok());
-            assert!(action.validate_params(&serde_json::json!({"n": "str"})).is_err());
+            assert!(action
+                .validate_params(&serde_json::json!({"n": 42}))
+                .is_ok());
+            assert!(action
+                .validate_params(&serde_json::json!({"n": "str"}))
+                .is_err());
         }
 
         #[test]
@@ -791,9 +794,15 @@ mod tests {
                 required: true,
                 default_value: None,
             }]);
-            assert!(action.validate_params(&serde_json::json!({"f": 2.5})).is_ok());
-            assert!(action.validate_params(&serde_json::json!({"f": 42})).is_ok()); // ints are numbers too
-            assert!(action.validate_params(&serde_json::json!({"f": "str"})).is_err());
+            assert!(action
+                .validate_params(&serde_json::json!({"f": 2.5}))
+                .is_ok());
+            assert!(action
+                .validate_params(&serde_json::json!({"f": 42}))
+                .is_ok()); // ints are numbers too
+            assert!(action
+                .validate_params(&serde_json::json!({"f": "str"}))
+                .is_err());
         }
 
         #[test]
@@ -805,8 +814,12 @@ mod tests {
                 required: true,
                 default_value: None,
             }]);
-            assert!(action.validate_params(&serde_json::json!({"b": true})).is_ok());
-            assert!(action.validate_params(&serde_json::json!({"b": 1})).is_err());
+            assert!(action
+                .validate_params(&serde_json::json!({"b": true}))
+                .is_ok());
+            assert!(action
+                .validate_params(&serde_json::json!({"b": 1}))
+                .is_err());
         }
 
         #[test]
@@ -819,7 +832,9 @@ mod tests {
                 default_value: None,
             }]);
             assert!(action.validate_params(&serde_json::json!({"i": 0})).is_ok());
-            assert!(action.validate_params(&serde_json::json!({"i": -1})).is_err());
+            assert!(action
+                .validate_params(&serde_json::json!({"i": -1}))
+                .is_err());
         }
 
         #[test]
@@ -831,9 +846,15 @@ mod tests {
                 required: true,
                 default_value: None,
             }]);
-            assert!(action.validate_params(&serde_json::json!({"e": "a"})).is_ok());
-            assert!(action.validate_params(&serde_json::json!({"e": "c"})).is_err());
-            assert!(action.validate_params(&serde_json::json!({"e": 42})).is_err());
+            assert!(action
+                .validate_params(&serde_json::json!({"e": "a"}))
+                .is_ok());
+            assert!(action
+                .validate_params(&serde_json::json!({"e": "c"}))
+                .is_err());
+            assert!(action
+                .validate_params(&serde_json::json!({"e": 42}))
+                .is_err());
         }
 
         #[test]
@@ -845,8 +866,12 @@ mod tests {
                 required: true,
                 default_value: None,
             }]);
-            assert!(action.validate_params(&serde_json::json!({"p": {"x": 1, "y": 2}})).is_ok());
-            assert!(action.validate_params(&serde_json::json!({"p": "bad"})).is_err());
+            assert!(action
+                .validate_params(&serde_json::json!({"p": {"x": 1, "y": 2}}))
+                .is_ok());
+            assert!(action
+                .validate_params(&serde_json::json!({"p": "bad"}))
+                .is_err());
         }
 
         #[test]
@@ -858,9 +883,15 @@ mod tests {
                 required: true,
                 default_value: None,
             }]);
-            assert!(action.validate_params(&serde_json::json!({"a": [1,2,3]})).is_ok());
-            assert!(action.validate_params(&serde_json::json!({"a": "text"})).is_ok());
-            assert!(action.validate_params(&serde_json::json!({"a": 42})).is_ok());
+            assert!(action
+                .validate_params(&serde_json::json!({"a": [1,2,3]}))
+                .is_ok());
+            assert!(action
+                .validate_params(&serde_json::json!({"a": "text"}))
+                .is_ok());
+            assert!(action
+                .validate_params(&serde_json::json!({"a": 42}))
+                .is_ok());
         }
 
         #[test]

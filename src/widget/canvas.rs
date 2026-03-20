@@ -164,12 +164,7 @@ impl BrailleGrid {
         // (0,1)=0x02  (1,1)=0x10
         // (0,2)=0x04  (1,2)=0x20
         // (0,3)=0x40  (1,3)=0x80
-        static DOT_MAP: [[u8; 2]; 4] = [
-            [0x01, 0x08],
-            [0x02, 0x10],
-            [0x04, 0x20],
-            [0x40, 0x80],
-        ];
+        static DOT_MAP: [[u8; 2]; 4] = [[0x01, 0x08], [0x02, 0x10], [0x04, 0x20], [0x40, 0x80]];
 
         let mut pattern: u8 = 0;
         let mut first_color = Color::Reset;
@@ -187,7 +182,10 @@ impl BrailleGrid {
             }
         }
 
-        (char::from_u32(0x2800 + pattern as u32).unwrap_or(' '), first_color)
+        (
+            char::from_u32(0x2800 + pattern as u32).unwrap_or(' '),
+            first_color,
+        )
     }
 }
 
@@ -399,9 +397,7 @@ impl Discoverable for Canvas {
             ],
             actions: vec![],
 
-            usage_hint: Some(
-                "Canvas::new().x_bounds([0.0, 100.0]).line(CanvasLine { .. })".into(),
-            ),
+            usage_hint: Some("Canvas::new().x_bounds([0.0, 100.0]).line(CanvasLine { .. })".into()),
             tags: vec![
                 "canvas".into(),
                 "draw".into(),

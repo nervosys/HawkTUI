@@ -134,7 +134,6 @@ pub mod widget;
 
 /// Prelude: import everything you need for a typical louie application.
 pub mod prelude {
-    pub use crate::error::{Error, Result};
     pub use crate::animation::{Animation, Easing, Spring, Timeline, Tween};
     #[cfg(feature = "crossterm")]
     pub use crate::backend::crossterm_backend::CrosstermBackend;
@@ -144,6 +143,7 @@ pub mod prelude {
     pub use crate::core::rect::Rect;
     pub use crate::core::style::{Color, Modifier, Style, Stylize};
     pub use crate::core::text::{Line, Span, Text};
+    pub use crate::error::{Error, Result};
     pub use crate::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent};
     pub use crate::layout::{Alignment, Constraint, Direction, Layout, Margin};
     pub use crate::ontology::{

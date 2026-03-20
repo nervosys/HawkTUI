@@ -169,11 +169,9 @@ impl Easing {
                 } else {
                     let c5 = (2.0 * std::f64::consts::PI) / 4.5;
                     if t < 0.5 {
-                        -((2.0f64).powf(20.0 * t - 10.0) * ((20.0 * t - 11.125) * c5).sin())
-                            / 2.0
+                        -((2.0f64).powf(20.0 * t - 10.0) * ((20.0 * t - 11.125) * c5).sin()) / 2.0
                     } else {
-                        ((2.0f64).powf(-20.0 * t + 10.0) * ((20.0 * t - 11.125) * c5).sin())
-                            / 2.0
+                        ((2.0f64).powf(-20.0 * t + 10.0) * ((20.0 * t - 11.125) * c5).sin()) / 2.0
                             + 1.0
                     }
                 }
@@ -514,7 +512,11 @@ impl Timeline {
         self
     }
 
-    pub fn add_labeled(mut self, label: impl Into<String>, animation: impl Animation + 'static) -> Self {
+    pub fn add_labeled(
+        mut self,
+        label: impl Into<String>,
+        animation: impl Animation + 'static,
+    ) -> Self {
         self.entries.push(TimelineEntry {
             animation: Box::new(animation),
             label: Some(label.into()),
@@ -621,8 +623,7 @@ impl Animator {
 
     /// Add a named animation.
     pub fn add(&mut self, name: impl Into<String>, animation: impl Animation + 'static) {
-        self.animations
-            .push((name.into(), Box::new(animation)));
+        self.animations.push((name.into(), Box::new(animation)));
     }
 
     /// Get the current value of a named animation.

@@ -13,8 +13,7 @@ use crate::widget::Widget;
 pub type DataPoint = (f64, f64);
 
 /// Marker style for data points.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Marker {
     /// Braille dot (sub-cell resolution, 2x4 grid per cell).
     #[default]
@@ -27,10 +26,8 @@ pub enum Marker {
     Char(char),
 }
 
-
 /// How to connect data points.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum GraphType {
     /// Connect points with lines.
     #[default]
@@ -38,7 +35,6 @@ pub enum GraphType {
     /// Show only individual points.
     Scatter,
 }
-
 
 /// A series of data points with styling.
 #[derive(Debug, Clone)]
