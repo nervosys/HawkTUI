@@ -1,0 +1,19 @@
+# Build artifacts
+/target/
+
+# Reference repos (third-party, not part of this project)
+/reference/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug output
+agent_demo_debug.txt
