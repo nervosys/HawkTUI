@@ -13,9 +13,6 @@ rust-version = "1.80"
 [features]
 default = ["crossterm"]
 crossterm = ["dep:crossterm"]
-all-widgets = []
-animation = []
-unstable-widget-ref = []
 
 [dependencies]
 crossterm = { version = "0.28", optional = true }

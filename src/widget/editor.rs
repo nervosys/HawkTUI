@@ -412,8 +412,6 @@ impl Discoverable for Editor {
         action: &str,
         _params: &serde_json::Value,
     ) -> Result<serde_json::Value, String> {
-        match action {
-            _ => Err(format!("Editor actions require EditorState; use stateful dispatch. Action: {action}")),
-        }
+        Err(format!("Editor actions require EditorState; use stateful dispatch. Action: {action}"))
     }
 }

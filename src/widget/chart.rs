@@ -14,8 +14,10 @@ pub type DataPoint = (f64, f64);
 
 /// Marker style for data points.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Default)]
 pub enum Marker {
     /// Braille dot (sub-cell resolution, 2x4 grid per cell).
+    #[default]
     Braille,
     /// Full block character.
     Block,
@@ -25,26 +27,18 @@ pub enum Marker {
     Char(char),
 }
 
-impl Default for Marker {
-    fn default() -> Self {
-        Self::Braille
-    }
-}
 
 /// How to connect data points.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Default)]
 pub enum GraphType {
     /// Connect points with lines.
+    #[default]
     Line,
     /// Show only individual points.
     Scatter,
 }
 
-impl Default for GraphType {
-    fn default() -> Self {
-        Self::Line
-    }
-}
 
 /// A series of data points with styling.
 #[derive(Debug, Clone)]
@@ -263,12 +257,12 @@ impl Chart {
         for cy in 0..chart_area.height {
             for cx in 0..chart_area.width {
                 let mut braille = 0x2800u32;
-                for dx in 0..2 {
-                    for dy in 0..4 {
+                for (dx, dot_col) in dot_map.iter().enumerate() {
+                    for (dy, &dot_val) in dot_col.iter().enumerate() {
                         let gx = cx as usize * 2 + dx;
                         let gy = cy as usize * 4 + dy;
                         if gx < grid_w && gy < grid_h && grid[gy][gx] {
-                            braille |= dot_map[dx][dy];
+                            braille |= dot_val;
                         }
                     }
                 }
@@ -316,6 +310,7 @@ impl Chart {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn bresenham_line(
         &self,
         grid: &mut [Vec<bool>],
@@ -353,6 +348,7 @@ impl Chart {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn bresenham_cells(
         &self,
         buf: &mut Buffer,

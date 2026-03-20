@@ -3,7 +3,9 @@ use std::fmt;
 
 /// Terminal color.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Default)]
 pub enum Color {
+    #[default]
     Reset,
     Black,
     Red,
@@ -27,11 +29,6 @@ pub enum Color {
     Rgb(u8, u8, u8),
 }
 
-impl Default for Color {
-    fn default() -> Self {
-        Self::Reset
-    }
-}
 
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

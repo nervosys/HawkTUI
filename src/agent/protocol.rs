@@ -5,6 +5,12 @@
 
 use serde::{Deserialize, Serialize};
 
+/// The current protocol version.
+///
+/// Agents should check this value in the ping response to verify compatibility.
+/// Incremented when breaking changes are made to the protocol format.
+pub const PROTOCOL_VERSION: u32 = 1;
+
 /// A request from an AI agent to the Louie application.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]

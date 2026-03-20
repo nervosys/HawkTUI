@@ -7,7 +7,7 @@ use crate::event::{
 };
 use crate::ontology::registry::OntologyRegistry;
 
-use super::protocol::{AgentEvent, AgentRequest, AgentResponse, InjectedEvent};
+use super::protocol::{AgentEvent, AgentRequest, AgentResponse, InjectedEvent, PROTOCOL_VERSION};
 
 /// Maximum number of event subscriptions per agent session (INP-3).
 const MAX_SUBSCRIPTIONS: usize = 100;
@@ -184,7 +184,10 @@ impl AgentSession {
             }
 
             AgentRequest::Ping => (
-                AgentResponse::ok(serde_json::json!({"status": "pong"})),
+                AgentResponse::ok(serde_json::json!({
+                    "status": "pong",
+                    "protocol_version": PROTOCOL_VERSION,
+                })),
                 false,
             ),
 

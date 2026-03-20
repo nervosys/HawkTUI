@@ -135,7 +135,7 @@ impl Model for App {
             .split(area);
 
         // Widget list
-        let list = List::new(self.items.iter().map(|s| s.clone()))
+        let list = List::new(self.items.iter().cloned())
             .block(
                 Block::default()
                     .title("Widgets (↑↓ to navigate)")

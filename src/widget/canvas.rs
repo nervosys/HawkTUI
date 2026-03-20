@@ -174,12 +174,12 @@ impl BrailleGrid {
         let mut pattern: u8 = 0;
         let mut first_color = Color::Reset;
 
-        for row in 0..4 {
-            for col in 0..2 {
+        for (row, dot_row) in DOT_MAP.iter().enumerate() {
+            for (col, &dot_val) in dot_row.iter().enumerate() {
                 let dx = cx * 2 + col;
                 let dy = cy * 4 + row;
                 if dy < self.dots.len() && dx < self.dots[dy].len() && self.dots[dy][dx] != 0 {
-                    pattern |= DOT_MAP[row][col];
+                    pattern |= dot_val;
                     if first_color == Color::Reset {
                         first_color = self.colors[dy][dx];
                     }

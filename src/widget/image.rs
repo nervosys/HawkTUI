@@ -134,7 +134,7 @@ impl Image {
         const CHARS: &[u8; 64] =
             b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-        let mut result = String::with_capacity((bytes.len() + 2) / 3 * 4);
+        let mut result = String::with_capacity(bytes.len().div_ceil(3) * 4);
         for chunk in bytes.chunks(3) {
             let b0 = chunk[0] as u32;
             let b1 = chunk.get(1).copied().unwrap_or(0) as u32;
@@ -215,7 +215,7 @@ impl Widget for Image {
                 buf[(inner.x, inner.y)].set_symbol(&seq);
             }
             ImageProtocol::Fallback => {
-                let text = self.fallback_text.as_deref().unwrap_or_else(|| {
+                let text = self.fallback_text.as_deref().unwrap_or({
                     // Can't return a reference to a temporary, so use a static
                     "[image]"
                 });

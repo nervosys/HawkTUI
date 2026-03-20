@@ -81,9 +81,6 @@
 //! | Flag | Default | Description |
 //! |------|---------|-------------|
 //! | `crossterm` | **yes** | Crossterm terminal backend (disable for headless/agent-only) |
-//! | `all-widgets` | no | Enable all optional widgets |
-//! | `animation` | no | Enable animation system |
-//! | `unstable-widget-ref` | no | Experimental widget reference support |
 //!
 //! ## Quick Start
 //!
@@ -123,6 +120,7 @@ pub mod agent;
 pub mod animation;
 pub mod backend;
 pub mod core;
+pub mod error;
 pub mod event;
 pub mod focus;
 pub mod layout;
@@ -136,6 +134,7 @@ pub mod widget;
 
 /// Prelude: import everything you need for a typical louie application.
 pub mod prelude {
+    pub use crate::error::{Error, Result};
     pub use crate::animation::{Animation, Easing, Spring, Timeline, Tween};
     #[cfg(feature = "crossterm")]
     pub use crate::backend::crossterm_backend::CrosstermBackend;

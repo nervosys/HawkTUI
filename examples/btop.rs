@@ -257,7 +257,7 @@ impl App {
         }
 
         let mut cpu_usage = [0.0; NUM_CORES];
-        for (_i, usage) in cpu_usage.iter_mut().enumerate() {
+        for usage in cpu_usage.iter_mut() {
             *usage = rng.next_range(5, 95) as f64;
         }
 
