@@ -28,12 +28,16 @@ pub enum Event {
 /// A keyboard event.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct KeyEvent {
+    /// The key that was pressed.
     pub code: KeyCode,
+    /// Active modifier keys (Shift, Ctrl, Alt, etc.).
     pub modifiers: KeyModifiers,
+    /// Whether this is a press, release, or repeat event.
     pub kind: KeyEventKind,
 }
 
 impl KeyEvent {
+    /// Create a new key-press event with the given code and modifiers.
     pub fn new(code: KeyCode, modifiers: KeyModifiers) -> Self {
         Self {
             code,
@@ -89,26 +93,37 @@ pub enum KeyCode {
 pub struct KeyModifiers(u8);
 
 impl KeyModifiers {
+    /// No modifiers active.
     pub const NONE: Self = Self(0);
+    /// Shift key.
     pub const SHIFT: Self = Self(1 << 0);
+    /// Control key.
     pub const CONTROL: Self = Self(1 << 1);
+    /// Alt / Option key.
     pub const ALT: Self = Self(1 << 2);
+    /// Super / Windows / Command key.
     pub const SUPER: Self = Self(1 << 3);
+    /// Hyper key.
     pub const HYPER: Self = Self(1 << 4);
+    /// Meta key.
     pub const META: Self = Self(1 << 5);
 
+    /// Create an empty modifier set.
     pub const fn empty() -> Self {
         Self(0)
     }
 
+    /// Whether `self` contains all bits in `other`.
     pub const fn contains(self, other: Self) -> bool {
         self.0 & other.0 == other.0
     }
 
+    /// Whether no modifiers are active.
     pub const fn is_empty(self) -> bool {
         self.0 == 0
     }
 
+    /// Combine two modifier sets.
     pub const fn union(self, other: Self) -> Self {
         Self(self.0 | other.0)
     }
@@ -130,9 +145,13 @@ impl std::ops::BitOrAssign for KeyModifiers {
 /// A mouse event.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct MouseEvent {
+    /// The kind of mouse action (click, drag, scroll, etc.).
     pub kind: MouseEventKind,
+    /// Column (x-coordinate) of the mouse.
     pub column: u16,
+    /// Row (y-coordinate) of the mouse.
     pub row: u16,
+    /// Active modifier keys during the mouse event.
     pub modifiers: KeyModifiers,
 }
 
@@ -186,7 +205,9 @@ pub enum MouseButton {
 /// Hit-test result: which widget (by agent_id) was targeted.
 #[derive(Debug, Clone)]
 pub struct HitTestResult {
+    /// The agent_id of the widget that was hit.
     pub agent_id: String,
+    /// Position relative to the widget's top-left corner.
     pub local_position: Position,
 }
 
@@ -207,6 +228,7 @@ struct HitRegion {
 }
 
 impl HitMap {
+    /// Create an empty hit map.
     pub fn new() -> Self {
         Self::default()
     }

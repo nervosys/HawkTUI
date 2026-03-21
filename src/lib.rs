@@ -129,6 +129,7 @@ pub mod overlay;
 pub mod runtime;
 pub mod terminal;
 pub mod theme;
+#[doc(hidden)]
 pub mod util;
 pub mod widget;
 

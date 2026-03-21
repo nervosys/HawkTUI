@@ -13,6 +13,23 @@ Traditional TUI frameworks are built for humans. Louie is built for both:
 
 An agent connecting to a Louie app can ask: *"What widgets exist? What can I click? What text fields accept input? What actions are available?"* — and get structured JSON answers.
 
+## Installation
+
+Add Louie to your `Cargo.toml`:
+
+```sh
+cargo add louie
+```
+
+Or add it manually:
+
+```toml
+[dependencies]
+louie = "1"
+```
+
+**Minimum supported Rust version:** 1.80
+
 ## Architecture
 
 ```

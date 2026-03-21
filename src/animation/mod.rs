@@ -257,6 +257,7 @@ pub enum RepeatMode {
 }
 
 impl Tween {
+    /// Create a new tween that interpolates from `from` to `to` over `duration`.
     pub fn new(from: f64, to: f64, duration: Duration) -> Self {
         Self {
             from,
@@ -270,16 +271,19 @@ impl Tween {
         }
     }
 
+    /// Set the easing function (default: `Linear`).
     pub fn easing(mut self, easing: Easing) -> Self {
         self.easing = easing;
         self
     }
 
+    /// Set a delay before the tween starts.
     pub fn delay(mut self, delay: Duration) -> Self {
         self.delay = delay;
         self
     }
 
+    /// Set the repeat mode (default: `Once`).
     pub fn repeat(mut self, mode: RepeatMode) -> Self {
         self.repeat = mode;
         self
@@ -386,6 +390,7 @@ pub struct Spring {
 }
 
 impl Spring {
+    /// Create a spring that starts at `initial` and settles toward `target`.
     pub fn new(initial: f64, target: f64) -> Self {
         Self {
             target,
@@ -398,16 +403,19 @@ impl Spring {
         }
     }
 
+    /// Set spring stiffness (default: 170). Higher = snappier.
     pub fn stiffness(mut self, stiffness: f64) -> Self {
         self.stiffness = stiffness;
         self
     }
 
+    /// Set damping coefficient (default: 26). Higher = less oscillation.
     pub fn damping(mut self, damping: f64) -> Self {
         self.damping = damping;
         self
     }
 
+    /// Set mass (default: 1). Higher = more sluggish.
     pub fn mass(mut self, mass: f64) -> Self {
         self.mass = mass;
         self
@@ -485,6 +493,7 @@ pub enum TimelineMode {
 }
 
 impl Timeline {
+    /// Create a timeline that plays animations one after another.
     pub fn sequential() -> Self {
         Self {
             entries: Vec::new(),
@@ -494,6 +503,7 @@ impl Timeline {
         }
     }
 
+    /// Create a timeline that plays all animations simultaneously.
     pub fn parallel() -> Self {
         Self {
             entries: Vec::new(),
@@ -504,6 +514,7 @@ impl Timeline {
     }
 
     #[allow(clippy::should_implement_trait)]
+    /// Append an animation to this timeline (builder pattern).
     pub fn add(mut self, animation: impl Animation + 'static) -> Self {
         self.entries.push(TimelineEntry {
             animation: Box::new(animation),
@@ -617,6 +628,7 @@ pub struct Animator {
 }
 
 impl Animator {
+    /// Create a new empty animator.
     pub fn new() -> Self {
         Self::default()
     }

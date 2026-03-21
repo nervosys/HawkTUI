@@ -37,12 +37,13 @@ pub trait Discoverable {
         Self: Sized;
 
     /// Returns the capabilities of this specific widget instance.
+    /// Returns the capabilities of this specific widget instance.
     fn capabilities(&self) -> Vec<AgentCapability>;
 
     /// Returns the actions available on this specific widget instance.
     fn actions(&self) -> Vec<AgentAction>;
 
-    /// Returns the semantic role of this widget.
+    /// Returns the semantic role of this widget (e.g., TextInput, Display, Navigation).
     fn semantic_role(&self) -> SemanticRole;
 
     /// Returns the current state as a JSON value for agent inspection.

@@ -125,6 +125,7 @@ pub struct AgentResponse {
 }
 
 impl AgentResponse {
+    /// Create a successful response with the given data payload.
     pub fn ok(data: serde_json::Value) -> Self {
         Self {
             success: true,
@@ -134,6 +135,7 @@ impl AgentResponse {
         }
     }
 
+    /// Create an error response with the given message.
     pub fn err(message: impl Into<String>) -> Self {
         Self {
             success: false,
@@ -143,6 +145,7 @@ impl AgentResponse {
         }
     }
 
+    /// Attach a request ID for correlation (echo-back to the agent).
     pub fn with_id(mut self, id: impl Into<String>) -> Self {
         self.id = Some(id.into());
         self

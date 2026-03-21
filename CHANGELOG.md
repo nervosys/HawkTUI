@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-07-17
+
+### Added
+
+- **Property-Based Tests**: 10 proptest-driven tests for agent protocol round-tripping and fuzz deserialization
+- **Structured Logging**: Replaced `eprintln` in `louie-server` with `tracing` + `tracing-subscriber` (LOG-1 upgrade)
+- **CONTRIBUTING.md**: Contributor guide with development workflow, commit conventions, and widget addition guide
+- **SECURITY.md**: Security policy with responsible disclosure process and hardening summary
+- **cargo-deny**: License auditing and advisory checks via `deny.toml` + CI job
+- **CI Coverage**: `cargo-tarpaulin` coverage reporting with Codecov upload
+- **CI Benchmarks**: `criterion` benchmark regression detection via `github-action-benchmark`
+- **README Install Section**: `cargo add louie` instructions and MSRV note
+
+### Changed
+
+- **API Stability**: `util` module marked `#[doc(hidden)]` — internal utilities are no longer part of the public API
+- **Buffer Safety**: `Buffer::IndexMut` no longer panics on out-of-bounds writes; uses a scratch cell for defense-in-depth (MEM-1)
+- **Dependencies**: Added `tracing` 0.1, `tracing-subscriber` 0.3; added `proptest` 1 (dev)
+
+### Security
+
+- Comprehensive doc comments added to all agent protocol types, event types, animation API, overlay system, runtime, terminal, focus, and widget traits
+
 ## [0.1.0] - 2025-07-16
 
 ### Added
@@ -37,4 +60,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auth handshake support in agent session (AUTH-1)
 - Binary path validation for external commands (BIN-1)
 
+[1.0.0]: https://github.com/nervosys/Louie/releases/tag/v1.0.0
 [0.1.0]: https://github.com/nervosys/Louie/releases/tag/v0.1.0

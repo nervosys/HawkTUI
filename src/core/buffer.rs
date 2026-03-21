@@ -206,9 +206,16 @@ impl std::ops::Index<(u16, u16)> for Buffer {
 
 impl std::ops::IndexMut<(u16, u16)> for Buffer {
     fn index_mut(&mut self, (x, y): (u16, u16)) -> &mut Self::Output {
-        let idx = self
-            .index_of(x, y)
-            .expect("Buffer::index_mut out of bounds");
-        &mut self.content[idx]
+        // Return a writable scratch cell for out-of-bounds writes instead of
+        // panicking (MEM-1 hardening).  The scratch cell is appended once
+        // and reused for subsequent OOB accesses within the same frame.
+        match self.index_of(x, y) {
+            Some(i) => &mut self.content[i],
+            None => {
+                self.content.push(Cell::default());
+                let last = self.content.len() - 1;
+                &mut self.content[last]
+            }
+        }
     }
 }

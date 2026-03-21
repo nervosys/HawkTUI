@@ -39,6 +39,7 @@ pub trait Widget {
 
 /// A stateful widget that maintains state between render calls.
 pub trait StatefulWidget {
+    /// The mutable state type for this widget.
     type State;
     fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State);
 }

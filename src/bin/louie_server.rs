@@ -29,7 +29,10 @@
 //! ```
 
 use std::io::{self, BufRead, Write};
-use std::time::{Instant, SystemTime, UNIX_EPOCH};
+use std::time::Instant;
+
+use tracing::{error, info, warn};
+use tracing_subscriber::EnvFilter;
 
 use louie::agent::driver::HeadlessDriver;
 use louie::agent::protocol::{AgentRequest, RequestEnvelope};
@@ -180,15 +183,6 @@ impl Model for DemoApp {
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-/// Structured log entry to stderr with ISO-ish timestamp (LOG-1).
-fn log_event(level: &str, event: &str, detail: &str) {
-    let secs = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs();
-    eprintln!("[{secs}] [{level}] {event}: {detail}");
-}
-
 /// Extract a human-readable name for the request type.
 fn request_type_name(req: &AgentRequest) -> &'static str {
     match req {
@@ -328,20 +322,22 @@ fn main() -> io::Result<()> {
         return Ok(());
     }
 
-    log_event("INFO", "startup", &format!("louie-server v{VERSION}"));
-    log_event(
-        "INFO",
-        "config",
-        &format!(
-            "terminal={}x{} max_req/s={MAX_REQUESTS_PER_SEC}",
-            args.width, args.height
-        ),
+    // Initialise tracing subscriber (writes to stderr, respects RUST_LOG)
+    tracing_subscriber::fmt()
+        .with_writer(io::stderr)
+        .with_env_filter(
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
+        )
+        .init();
+
+    info!(version = VERSION, "startup");
+    info!(
+        width = args.width,
+        height = args.height,
+        max_rps = MAX_REQUESTS_PER_SEC,
+        "config"
     );
-    log_event(
-        "INFO",
-        "ready",
-        "Listening on stdin for JSON Lines requests",
-    );
+    info!("Listening on stdin for JSON Lines requests");
 
     let app = DemoApp::new();
     let mut driver = HeadlessDriver::new(app, args.width, args.height)?;
@@ -356,7 +352,7 @@ fn main() -> io::Result<()> {
 
     // Optional auth handshake (AUTH-1)
     if let Some(ref expected_token) = args.auth_token {
-        log_event("INFO", "auth", "Waiting for auth handshake");
+        info!("Waiting for auth handshake");
         let authenticated = loop {
             let Some(Ok(line)) = lines.next() else {
                 break false;
@@ -371,14 +367,14 @@ fn main() -> io::Result<()> {
                         let resp = serde_json::json!({"success": true, "data": {"status": "authenticated"}});
                         writeln!(out, "{}", serde_json::to_string(&resp).unwrap())?;
                         out.flush()?;
-                        log_event("INFO", "auth", "authenticated");
+                        info!("authenticated");
                         break true;
                     } else {
                         let resp =
                             serde_json::json!({"success": false, "error": "Invalid auth token"});
                         writeln!(out, "{}", serde_json::to_string(&resp).unwrap())?;
                         out.flush()?;
-                        log_event("WARN", "auth", "invalid token");
+                        warn!("invalid auth token");
                         break false;
                     }
                 }
@@ -386,13 +382,13 @@ fn main() -> io::Result<()> {
                     let resp = serde_json::json!({"success": false, "error": "Authentication required. Send {\"type\":\"auth\",\"token\":\"...\"}"});
                     writeln!(out, "{}", serde_json::to_string(&resp).unwrap())?;
                     out.flush()?;
-                    log_event("WARN", "auth", "non-auth message before handshake");
+                    warn!("non-auth message before handshake");
                     break false;
                 }
             }
         };
         if !authenticated {
-            log_event("ERROR", "auth", "Authentication failed, exiting");
+            error!("Authentication failed, exiting");
             return Ok(());
         }
     }
@@ -416,7 +412,7 @@ fn main() -> io::Result<()> {
         }
         request_count += 1;
         if request_count > MAX_REQUESTS_PER_SEC {
-            log_event("WARN", "rate_limit", "exceeded");
+            warn!("rate limit exceeded");
             let err_resp = serde_json::json!({
                 "success": false,
                 "error": format!("Rate limit exceeded ({MAX_REQUESTS_PER_SEC} req/s)")
@@ -428,7 +424,7 @@ fn main() -> io::Result<()> {
 
         // Reject oversized requests (INP-1)
         if trimmed.len() > MAX_LINE_BYTES {
-            log_event("WARN", "oversized", &format!("bytes={}", trimmed.len()));
+            warn!(bytes = trimmed.len(), "oversized request");
             let err_resp = serde_json::json!({
                 "success": false,
                 "error": format!("Request too large ({} bytes, max {})", trimmed.len(), MAX_LINE_BYTES)
@@ -441,7 +437,7 @@ fn main() -> io::Result<()> {
         let envelope: RequestEnvelope = match serde_json::from_str(trimmed) {
             Ok(e) => e,
             Err(err) => {
-                log_event("WARN", "parse_error", &err.to_string());
+                warn!(%err, "parse error");
                 let err_resp = serde_json::json!({
                     "success": false,
                     "error": format!("parse error: {err}")
@@ -455,14 +451,14 @@ fn main() -> io::Result<()> {
         // Log the request type and optional ID (LOG-1)
         let req_type = request_type_name(&envelope.request);
         let id_str = envelope.id.as_deref().unwrap_or("-");
-        log_event("INFO", "request", &format!("type={req_type} id={id_str}"));
+        info!(r#type = req_type, id = id_str, "request");
 
         let response = driver.process_envelope(&envelope);
         let _ = driver.render();
 
         if !response.success {
             if let Some(ref e) = response.error {
-                log_event("WARN", "response_err", e);
+                warn!(error = %e, "response error");
             }
         }
 
@@ -470,11 +466,11 @@ fn main() -> io::Result<()> {
         out.flush()?;
 
         if !driver.is_running() {
-            log_event("INFO", "quit", "Agent requested quit");
+            info!("Agent requested quit");
             break;
         }
     }
 
-    log_event("INFO", "shutdown", "louie-server exiting");
+    info!("louie-server exiting");
     Ok(())
 }

@@ -17,6 +17,7 @@ pub struct FocusManager {
 }
 
 impl FocusManager {
+    /// Create a new empty focus manager.
     pub fn new() -> Self {
         Self::default()
     }

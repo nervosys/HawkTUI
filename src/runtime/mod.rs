@@ -123,6 +123,7 @@ pub struct Program<M: Model, B: Backend> {
 }
 
 impl<M: Model, B: Backend> Program<M, B> {
+    /// Create a new program with the given model and backend.
     pub fn new(model: M, backend: B) -> io::Result<Self> {
         Ok(Self {
             model,
@@ -134,6 +135,7 @@ impl<M: Model, B: Backend> Program<M, B> {
         })
     }
 
+    /// Override the default program options.
     pub fn with_options(mut self, options: ProgramOptions) -> Self {
         self.options = options;
         self

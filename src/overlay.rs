@@ -28,6 +28,7 @@ pub struct OverlayStack {
 }
 
 impl OverlayStack {
+    /// Create an empty overlay stack.
     pub fn new() -> Self {
         Self::default()
     }
@@ -98,6 +99,7 @@ pub struct ModalBox {
 }
 
 impl ModalBox {
+    /// Create a new modal box with the given title.
     pub fn new(title: impl Into<String>) -> Self {
         Self {
             title: title.into(),
@@ -108,21 +110,25 @@ impl ModalBox {
         }
     }
 
+    /// Set the content background style.
     pub fn style(mut self, style: Style) -> Self {
         self.style = style;
         self
     }
 
+    /// Set the border style.
     pub fn border_style(mut self, style: Style) -> Self {
         self.border_style = style;
         self
     }
 
+    /// Set width as a percentage of the parent area (0–100).
     pub fn width_percent(mut self, pct: u16) -> Self {
         self.width_percent = pct.min(100);
         self
     }
 
+    /// Set height as a percentage of the parent area (0–100).
     pub fn height_percent(mut self, pct: u16) -> Self {
         self.height_percent = pct.min(100);
         self

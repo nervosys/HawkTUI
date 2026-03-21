@@ -23,6 +23,7 @@ pub struct Terminal<B: Backend> {
 }
 
 impl<B: Backend> Terminal<B> {
+    /// Create a new terminal backed by the given backend.
     pub fn new(backend: B) -> io::Result<Self> {
         let size = backend.size()?;
         let area = Rect::new(0, 0, size.width, size.height);
