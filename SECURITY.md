@@ -17,7 +17,7 @@ Instead, please report them via GitHub's private vulnerability reporting:
 
 <https://github.com/nervosys/Louie/security/advisories/new>
 
-Or email: **security@nervosys.com**
+Or email: **security@nervosys.ai**
 
 We will acknowledge receipt within 48 hours and aim to publish a fix within
 7 days for critical issues.
