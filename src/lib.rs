@@ -81,6 +81,7 @@
 //! | Flag | Default | Description |
 //! |------|---------|-------------|
 //! | `crossterm` | **yes** | Crossterm terminal backend (disable for headless/agent-only) |
+//! | `bin` | no | Enables `louie-server` and `louie-demo` binaries (pulls in `tracing`) |
 //!
 //! ## Quick Start
 //!

@@ -6,13 +6,18 @@ authors = ["Nervosys"]
 description = "An agentic-first TUI framework with complete ontology for agent discoverability"
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/nervosys/louie"
+homepage = "https://github.com/nervosys/louie"
+documentation = "https://docs.rs/louie"
+readme = "README.md"
 keywords = ["tui", "terminal", "agent", "ontology", "ui"]
 categories = ["command-line-interface", "gui"]
 rust-version = "1.80"
+exclude = ["reference/", ".github/", "docs/", "scripts/"]
 
 [features]
 default = ["crossterm"]
 crossterm = ["dep:crossterm"]
+bin = ["dep:tracing", "dep:tracing-subscriber"]
 
 [dependencies]
 crossterm = { version = "0.28", optional = true }
@@ -21,8 +26,8 @@ unicode-segmentation = "1.12"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 compact_str = "0.8"
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
+tracing = { version = "0.1", optional = true }
+tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"], optional = true }
 
 [dev-dependencies]
 pretty_assertions = "1"
@@ -70,7 +75,9 @@ required-features = ["crossterm"]
 [[bin]]
 name = "louie-server"
 path = "src/bin/louie_server.rs"
+required-features = ["bin"]
 
 [[bin]]
 name = "louie-demo"
+required-features = ["bin"]
 path = "src/bin/louie_demo.rs"
