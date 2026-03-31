@@ -40,9 +40,7 @@ impl ScrollbarState {
     }
 
     pub fn scroll_down(&mut self, amount: usize) {
-        let max = self
-            .content_length
-            .saturating_sub(self.viewport_length);
+        let max = self.content_length.saturating_sub(self.viewport_length);
         self.position = (self.position + amount).min(max);
     }
 
@@ -60,9 +58,7 @@ impl ScrollbarState {
 
     /// Returns the fraction scrolled (0.0..=1.0).
     pub fn fraction(&self) -> f64 {
-        let max = self
-            .content_length
-            .saturating_sub(self.viewport_length);
+        let max = self.content_length.saturating_sub(self.viewport_length);
         if max == 0 {
             0.0
         } else {
@@ -278,9 +274,7 @@ impl Discoverable for Scrollbar {
             }],
             actions: vec![],
 
-            usage_hint: Some(
-                "Scrollbar::new(ScrollbarOrientation::Vertical)".into(),
-            ),
+            usage_hint: Some("Scrollbar::new(ScrollbarOrientation::Vertical)".into()),
             tags: vec!["scrollbar".into(), "scroll".into(), "indicator".into()],
         }
     }

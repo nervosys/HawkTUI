@@ -189,8 +189,8 @@ impl Discoverable for Calendar {
     fn schema() -> WidgetSchema {
         WidgetSchema {
             name: "Calendar".into(),
-            description: "A month-view calendar grid with day-of-week headers and day highlighting."
-                .into(),
+            description:
+                "A month-view calendar grid with day-of-week headers and day highlighting.".into(),
             default_role: SemanticRole::Display,
             properties: vec![
                 PropertySchema {
@@ -207,10 +207,7 @@ impl Discoverable for Calendar {
                     property_type: PropertyType::Integer,
                     required: true,
                     default_value: None,
-                    constraints: vec![
-                        PropertyConstraint::Min(1.0),
-                        PropertyConstraint::Max(12.0),
-                    ],
+                    constraints: vec![PropertyConstraint::Min(1.0), PropertyConstraint::Max(12.0)],
                 },
             ],
             actions: vec![],

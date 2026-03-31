@@ -45,10 +45,7 @@ pub fn fuzzy_match(pattern: &str, haystack: &str) -> Option<FuzzyMatch> {
 
     let pattern_lower: Vec<char> = pattern.chars().flat_map(|c| c.to_lowercase()).collect();
     let haystack_chars: Vec<char> = haystack.chars().collect();
-    let haystack_lower: Vec<char> = haystack
-        .chars()
-        .flat_map(|c| c.to_lowercase())
-        .collect();
+    let haystack_lower: Vec<char> = haystack.chars().flat_map(|c| c.to_lowercase()).collect();
 
     // Quick check: are all pattern chars present?
     {
@@ -88,7 +85,12 @@ pub fn fuzzy_match(pattern: &str, haystack: &str) -> Option<FuzzyMatch> {
         }
 
         // Word boundary bonus
-        if idx == 0 || is_word_boundary(haystack_chars.get(idx.wrapping_sub(1)).copied(), haystack_chars[idx]) {
+        if idx == 0
+            || is_word_boundary(
+                haystack_chars.get(idx.wrapping_sub(1)).copied(),
+                haystack_chars[idx],
+            )
+        {
             score -= 10.0;
         }
     }
@@ -122,9 +124,7 @@ fn best_match_indices(pattern: &[char], haystack: &[char]) -> Option<Vec<usize>>
             if haystack[hi] == pc {
                 let priority = if pi > 0 && hi == indices[pi - 1] + 1 {
                     0 // Consecutive — best
-                } else if hi == 0
-                    || is_word_boundary(Some(haystack[hi - 1]), haystack[hi])
-                {
+                } else if hi == 0 || is_word_boundary(Some(haystack[hi - 1]), haystack[hi]) {
                     1 // Word boundary — good
                 } else {
                     2 // Any other position
@@ -176,7 +176,11 @@ pub fn fuzzy_rank<'a>(pattern: &str, candidates: &'a [&str]) -> Vec<(&'a str, Fu
         .iter()
         .filter_map(|&c| fuzzy_match(pattern, c).map(|m| (c, m)))
         .collect();
-    results.sort_by(|a, b| a.1.score.partial_cmp(&b.1.score).unwrap_or(std::cmp::Ordering::Equal));
+    results.sort_by(|a, b| {
+        a.1.score
+            .partial_cmp(&b.1.score)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
     results
 }
 

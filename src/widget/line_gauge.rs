@@ -133,7 +133,10 @@ impl Widget for LineGauge {
 
         // Render label
         if let Some(ref text) = label_text {
-            let label_style = self.label.as_ref().map_or(self.style, |l| self.style.patch(l.style));
+            let label_style = self
+                .label
+                .as_ref()
+                .map_or(self.style, |l| self.style.patch(l.style));
             buf.set_string_truncated(x, y, text, label_width.saturating_sub(1), label_style);
             x += label_width;
         }
@@ -165,10 +168,7 @@ impl Discoverable for LineGauge {
                     property_type: PropertyType::Float,
                     required: true,
                     default_value: Some(serde_json::json!(0.0)),
-                    constraints: vec![
-                        PropertyConstraint::Min(0.0),
-                        PropertyConstraint::Max(1.0),
-                    ],
+                    constraints: vec![PropertyConstraint::Min(0.0), PropertyConstraint::Max(1.0)],
                 },
                 PropertySchema {
                     name: "label".into(),

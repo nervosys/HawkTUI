@@ -152,7 +152,10 @@ pub struct Text {
 impl Text {
     pub fn raw(content: impl Into<Cow<'static, str>>) -> Self {
         let content = content.into();
-        let lines = content.split('\n').map(|l| Line::raw(l.to_string())).collect();
+        let lines = content
+            .split('\n')
+            .map(|l| Line::raw(l.to_string()))
+            .collect();
         Self {
             lines,
             style: Style::default(),

@@ -1,5 +1,11 @@
 # Louie: the TUI framework for agentic AI
 
+[![CI](https://github.com/nervosys/Louie/actions/workflows/ci.yml/badge.svg)](https://github.com/nervosys/Louie/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/louie.svg)](https://crates.io/crates/louie)
+[![docs.rs](https://docs.rs/louie/badge.svg)](https://docs.rs/louie)
+[![MSRV](https://img.shields.io/badge/MSRV-1.80-blue.svg)](https://releases.rs/docs/1.80.0/)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+
 **An agentic-first TUI framework in Rust with a complete ontology for agent discoverability.**
 
 Louie combines the best of modern TUI frameworks (ratatui, bubbletea, ink, etc) with a structured metadata layer that lets AI agents discover, inspect, and interact with every widget in your application — no hardcoded assumptions, no trial-and-error.
@@ -102,7 +108,7 @@ pub trait Discoverable {
     fn actions(&self) -> Vec<AgentAction>;           // Named operations
     fn semantic_role(&self) -> SemanticRole;         // Purpose category
     fn agent_state(&self) -> serde_json::Value;      // Current state as JSON
-    fn execute_action(&mut self, action: &str, params: serde_json::Value) -> Result<(), String>;
+    fn execute_action(&mut self, action: &str, params: &serde_json::Value) -> Result<serde_json::Value, String>;
 }
 ```
 
@@ -167,6 +173,7 @@ let catalog = registry.export_catalog();
 | **Chart**        | XY line/scatter plot with braille dots   | —                                           |
 | **Image**        | Inline image (Kitty/iTerm2/fallback)     | —                                           |
 | **SettingsList** | Key-value settings with cycling values   | Focusable, Selectable                       |
+| **CancellableLoader** | Loader with cancel action           | Animated                                    |
 | **LineGauge**    | Thin single-line progress bar            | RangeEditable                               |
 | **Calendar**     | Month-view calendar grid with highlights | —                                           |
 
@@ -244,14 +251,12 @@ python3 scripts/louie-demo.py
 
 See [docs/agent-protocol.md](docs/agent-protocol.md) for the full protocol specification, and [docs/agent-integration.md](docs/agent-integration.md) for integration guides (Python, TypeScript, Rust).
 
-## Features
+## Feature Flags
 
-| Feature               | Default | Description                                   |
-| --------------------- | ------- | --------------------------------------------- |
-| `crossterm`           | ✓       | Crossterm terminal backend                    |
-| `all-widgets`         |         | Enable all widget types                       |
-| `animation`           |         | Animation system (easing, springs, timelines) |
-| `unstable-widget-ref` |         | Experimental reference-based widget rendering |
+| Feature    | Default | Description                                                       |
+| ---------- | ------- | ----------------------------------------------------------------- |
+| `crossterm`| ✓       | Crossterm terminal backend (disable for headless / agent-only)    |
+| `bin`      |         | Enables `louie-server` and `louie-demo` binaries (pulls in `tracing`) |
 
 ## Animation System
 
@@ -259,10 +264,10 @@ See [docs/agent-protocol.md](docs/agent-protocol.md) for the full protocol speci
 
 ```rust
 use louie::animation::{Tween, Easing, Spring, Timeline};
+use std::time::Duration;
 
-let tween = Tween::new(0.0, 1.0, Duration::from_millis(300), Easing::ease_in_out_cubic);
+let tween = Tween::new(0.0, 1.0, Duration::from_millis(300), Easing::EaseInOutCubic);
 let spring = Spring::new(0.0, 1.0, 170.0, 26.0);  // stiffness, damping
-let timeline = Timeline::sequential(vec![tween1, tween2]);
 ```
 
 ## Comparison

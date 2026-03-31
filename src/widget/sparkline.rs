@@ -74,7 +74,10 @@ impl Widget for Sparkline {
             return;
         }
 
-        let max = self.max.unwrap_or_else(|| self.data.iter().copied().max().unwrap_or(1)).max(1);
+        let max = self
+            .max
+            .unwrap_or_else(|| self.data.iter().copied().max().unwrap_or(1))
+            .max(1);
         let height = inner.height as u64;
 
         // Show the last `inner.width` data points
@@ -136,7 +139,12 @@ impl Discoverable for Sparkline {
             actions: vec![],
 
             usage_hint: Some("Sparkline::new(vec![0, 1, 3, 7, 5, 2])".into()),
-            tags: vec!["sparkline".into(), "chart".into(), "trend".into(), "data".into()],
+            tags: vec![
+                "sparkline".into(),
+                "chart".into(),
+                "trend".into(),
+                "data".into(),
+            ],
         }
     }
 

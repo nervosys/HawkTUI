@@ -276,7 +276,11 @@ impl StatefulWidget for Editor {
 
             // Line numbers
             if self.show_line_numbers {
-                let num = format!("{:>width$} ", line_idx + 1, width = (gutter_width - 1) as usize);
+                let num = format!(
+                    "{:>width$} ",
+                    line_idx + 1,
+                    width = (gutter_width - 1) as usize
+                );
                 buf.set_string(inner.x, y, &num, self.line_number_style);
             }
 
@@ -306,22 +310,27 @@ impl Discoverable for Editor {
     fn schema() -> WidgetSchema {
         WidgetSchema {
             name: "Editor".into(),
-            description: "A multi-line text editor with cursor movement, line editing, and scrolling.".into(),
+            description:
+                "A multi-line text editor with cursor movement, line editing, and scrolling.".into(),
             default_role: SemanticRole::Input,
-            properties: vec![
-                PropertySchema {
-                    name: "show_line_numbers".into(),
-                    description: "Whether to display line numbers in the gutter.".into(),
-                    property_type: PropertyType::Boolean,
-                    required: false,
-                    default_value: Some(serde_json::json!(true)),
-                    constraints: vec![],
-                },
-            ],
+            properties: vec![PropertySchema {
+                name: "show_line_numbers".into(),
+                description: "Whether to display line numbers in the gutter.".into(),
+                property_type: PropertyType::Boolean,
+                required: false,
+                default_value: Some(serde_json::json!(true)),
+                constraints: vec![],
+            }],
             actions: vec![],
 
             usage_hint: Some("Editor::new().show_line_numbers(true)".into()),
-            tags: vec!["editor".into(), "text".into(), "input".into(), "multiline".into(), "code".into()],
+            tags: vec![
+                "editor".into(),
+                "text".into(),
+                "input".into(),
+                "multiline".into(),
+                "code".into(),
+            ],
         }
     }
 
@@ -412,6 +421,8 @@ impl Discoverable for Editor {
         action: &str,
         _params: &serde_json::Value,
     ) -> Result<serde_json::Value, String> {
-        Err(format!("Editor actions require EditorState; use stateful dispatch. Action: {action}"))
+        Err(format!(
+            "Editor actions require EditorState; use stateful dispatch. Action: {action}"
+        ))
     }
 }

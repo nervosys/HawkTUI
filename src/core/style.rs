@@ -2,8 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 
 /// Terminal color.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 pub enum Color {
     #[default]
     Reset,
@@ -28,7 +27,6 @@ pub enum Color {
     /// True color (24-bit RGB).
     Rgb(u8, u8, u8),
 }
-
 
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

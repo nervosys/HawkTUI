@@ -166,10 +166,7 @@ impl Image {
         // Kitty: transmit image with direct data
         // a=T (transmit + display), f=100 (PNG), t=d (direct data)
         // c=cols, r=rows for display size
-        format!(
-            "\x1b_Ga=T,f=100,t=d,c={},r={};{}\x1b\\",
-            cols, rows, b64
-        )
+        format!("\x1b_Ga=T,f=100,t=d,c={},r={};{}\x1b\\", cols, rows, b64)
     }
 
     /// Generate an iTerm2 inline image escape sequence.
@@ -270,8 +267,15 @@ impl Discoverable for Image {
             ],
             actions: vec![],
 
-            usage_hint: Some("Use Image::detect_protocol() to auto-select the best rendering method.".into()),
-            tags: vec!["image".into(), "graphics".into(), "visual".into(), "media".into()],
+            usage_hint: Some(
+                "Use Image::detect_protocol() to auto-select the best rendering method.".into(),
+            ),
+            tags: vec![
+                "image".into(),
+                "graphics".into(),
+                "visual".into(),
+                "media".into(),
+            ],
         }
     }
 

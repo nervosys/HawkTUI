@@ -36,10 +36,7 @@ impl Model for App {
             Line::from(""),
             Line::from("An agentic-first TUI framework for Rust."),
             Line::from(""),
-            Line::from(Span::styled(
-                "Press 'q' to quit.",
-                Style::default().dim(),
-            )),
+            Line::from(Span::styled("Press 'q' to quit.", Style::default().dim())),
         ]))
         .block(block)
         .alignment(Alignment::Center);

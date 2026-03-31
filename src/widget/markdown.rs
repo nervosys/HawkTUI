@@ -80,10 +80,7 @@ impl Markdown {
 
             if in_code_block {
                 lines.push(Line {
-                    spans: vec![Span::styled(
-                        format!("  {raw_line}"),
-                        self.code_style,
-                    )],
+                    spans: vec![Span::styled(format!("  {raw_line}"), self.code_style)],
                     alignment: None,
                 });
                 continue;
@@ -106,10 +103,7 @@ impl Markdown {
             }
             if let Some(rest) = raw_line.strip_prefix("# ") {
                 lines.push(Line {
-                    spans: vec![Span::styled(
-                        rest.to_uppercase(),
-                        self.heading_style.bold(),
-                    )],
+                    spans: vec![Span::styled(rest.to_uppercase(), self.heading_style.bold())],
                     alignment: None,
                 });
                 continue;
@@ -163,10 +157,7 @@ impl Markdown {
                 }
                 remaining = &remaining[pos + 1..];
                 if let Some(end) = remaining.find('`') {
-                    spans.push(Span::styled(
-                        remaining[..end].to_string(),
-                        self.code_style,
-                    ));
+                    spans.push(Span::styled(remaining[..end].to_string(), self.code_style));
                     remaining = &remaining[end + 1..];
                     continue;
                 } else {
@@ -182,10 +173,7 @@ impl Markdown {
                 }
                 remaining = &remaining[pos + 2..];
                 if let Some(end) = remaining.find("**") {
-                    spans.push(Span::styled(
-                        remaining[..end].to_string(),
-                        self.bold_style,
-                    ));
+                    spans.push(Span::styled(remaining[..end].to_string(), self.bold_style));
                     remaining = &remaining[end + 2..];
                     continue;
                 } else {
@@ -260,7 +248,9 @@ impl Discoverable for Markdown {
     fn schema() -> WidgetSchema {
         WidgetSchema {
             name: "Markdown".into(),
-            description: "Renders Markdown text with headings, bold, italic, code, lists, and blockquotes.".into(),
+            description:
+                "Renders Markdown text with headings, bold, italic, code, lists, and blockquotes."
+                    .into(),
             default_role: SemanticRole::Display,
             properties: vec![PropertySchema {
                 name: "source".into(),
@@ -273,17 +263,20 @@ impl Discoverable for Markdown {
             actions: vec![],
 
             usage_hint: Some("Markdown::new(\"# Hello\\n\\nSome **bold** text\")".into()),
-            tags: vec!["markdown".into(), "text".into(), "display".into(), "rich-text".into()],
+            tags: vec![
+                "markdown".into(),
+                "text".into(),
+                "display".into(),
+                "rich-text".into(),
+            ],
         }
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {
-        vec![
-            AgentCapability::Scrollable {
-                vertical: true,
-                horizontal: false,
-            },
-        ]
+        vec![AgentCapability::Scrollable {
+            vertical: true,
+            horizontal: false,
+        }]
     }
 
     fn actions(&self) -> Vec<AgentAction> {
