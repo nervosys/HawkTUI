@@ -152,30 +152,30 @@ let catalog = registry.export_catalog();
 
 ## Widget Set
 
-| Widget           | Description                              | Agent Capabilities                          |
-| ---------------- | ---------------------------------------- | ------------------------------------------- |
-| **Block**        | Container with borders and title         | Focusable                                   |
-| **Paragraph**    | Styled text with wrapping and scrolling  | Scrollable                                  |
-| **List**         | Selectable list with highlight           | Focusable, Scrollable, Selectable           |
-| **Tabs**         | Tab bar navigation                       | Focusable, Selectable                       |
-| **Gauge**        | Progress bar (ratio/percentage)          | RangeEditable                               |
-| **Input**        | Single-line text input with cursor       | Focusable, TextInput                        |
-| **Editor**       | Multi-line text editor with line numbers | Focusable, TextInput, Scrollable, Copyable  |
-| **Table**        | Data table with columns and sorting      | Focusable, Scrollable, Selectable, Sortable |
-| **Markdown**     | Markdown renderer (headings, code, bold) | Scrollable                                  |
-| **SelectList**   | Interactive single/multi-select list     | Focusable, Selectable, Searchable           |
-| **Loader**       | Animated spinner with message            | Animated                                    |
-| **Sparkline**    | Inline data trend chart                  | —                                           |
-| **Scrollbar**    | Scrollbar indicator                      | Scrollable                                  |
-| **Canvas**       | Braille-resolution drawing surface       | —                                           |
-| **ModalBox**     | Centered modal overlay with dimmed bg    | Focusable (captures focus)                  |
-| **BarChart**     | Grouped bar chart (vertical/horizontal)  | —                                           |
-| **Chart**        | XY line/scatter plot with braille dots   | —                                           |
-| **Image**        | Inline image (Kitty/iTerm2/fallback)     | —                                           |
-| **SettingsList** | Key-value settings with cycling values   | Focusable, Selectable                       |
-| **CancellableLoader** | Loader with cancel action           | Animated                                    |
-| **LineGauge**    | Thin single-line progress bar            | RangeEditable                               |
-| **Calendar**     | Month-view calendar grid with highlights | —                                           |
+| Widget                | Description                              | Agent Capabilities                          |
+| --------------------- | ---------------------------------------- | ------------------------------------------- |
+| **Block**             | Container with borders and title         | Focusable                                   |
+| **Paragraph**         | Styled text with wrapping and scrolling  | Scrollable                                  |
+| **List**              | Selectable list with highlight           | Focusable, Scrollable, Selectable           |
+| **Tabs**              | Tab bar navigation                       | Focusable, Selectable                       |
+| **Gauge**             | Progress bar (ratio/percentage)          | RangeEditable                               |
+| **Input**             | Single-line text input with cursor       | Focusable, TextInput                        |
+| **Editor**            | Multi-line text editor with line numbers | Focusable, TextInput, Scrollable, Copyable  |
+| **Table**             | Data table with columns and sorting      | Focusable, Scrollable, Selectable, Sortable |
+| **Markdown**          | Markdown renderer (headings, code, bold) | Scrollable                                  |
+| **SelectList**        | Interactive single/multi-select list     | Focusable, Selectable, Searchable           |
+| **Loader**            | Animated spinner with message            | Animated                                    |
+| **Sparkline**         | Inline data trend chart                  | —                                           |
+| **Scrollbar**         | Scrollbar indicator                      | Scrollable                                  |
+| **Canvas**            | Braille-resolution drawing surface       | —                                           |
+| **ModalBox**          | Centered modal overlay with dimmed bg    | Focusable (captures focus)                  |
+| **BarChart**          | Grouped bar chart (vertical/horizontal)  | —                                           |
+| **Chart**             | XY line/scatter plot with braille dots   | —                                           |
+| **Image**             | Inline image (Kitty/iTerm2/fallback)     | —                                           |
+| **SettingsList**      | Key-value settings with cycling values   | Focusable, Selectable                       |
+| **CancellableLoader** | Loader with cancel action                | Animated                                    |
+| **LineGauge**         | Thin single-line progress bar            | RangeEditable                               |
+| **Calendar**          | Month-view calendar grid with highlights | —                                           |
 
 ## Quick Start
 
@@ -253,10 +253,10 @@ See [docs/agent-protocol.md](docs/agent-protocol.md) for the full protocol speci
 
 ## Feature Flags
 
-| Feature    | Default | Description                                                       |
-| ---------- | ------- | ----------------------------------------------------------------- |
-| `crossterm`| ✓       | Crossterm terminal backend (disable for headless / agent-only)    |
-| `bin`      |         | Enables `louie-server` and `louie-demo` binaries (pulls in `tracing`) |
+| Feature     | Default | Description                                                           |
+| ----------- | ------- | --------------------------------------------------------------------- |
+| `crossterm` | ✓       | Crossterm terminal backend (disable for headless / agent-only)        |
+| `bin`       |         | Enables `louie-server` and `louie-demo` binaries (pulls in `tracing`) |
 
 ## Animation System
 

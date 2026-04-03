@@ -12,7 +12,7 @@ readme = "README.md"
 keywords = ["tui", "terminal", "agent", "ontology", "ui"]
 categories = ["command-line-interface", "gui"]
 rust-version = "1.80"
-exclude = ["reference/", ".github/", "docs/", "scripts/"]
+exclude = ["reference/", ".github/", "docs/", "scripts/", "website/"]
 
 [features]
 default = ["crossterm"]
