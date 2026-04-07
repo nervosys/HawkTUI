@@ -15,5 +15,15 @@
 .DS_Store
 Thumbs.db
 
+# Secrets and environment
+.env
+.env.*
+*.pem
+*.key
+
+# Stray package manager files (website has its own)
+/package-lock.json
+/node_modules/
+
 # Debug output
 agent_demo_debug.txt

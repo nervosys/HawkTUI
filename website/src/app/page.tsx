@@ -84,7 +84,7 @@ export default function Home() {
               ["License", "AGPL-3.0", "MIT", "MIT", "MIT", "MIT", "MIT"],
             ].map((row, i) => (
               <tr key={i}>
-                <td style={{ fontWeight: 600, color: "#e0f0f0" }}>{row[0]}</td>
+                <td style={{ fontWeight: 600, color: "#fff" }}>{row[0]}</td>
                 {row.slice(1).map((cell, j) => (
                   <td key={j}>
                     {cell === "\u2713" ? (
