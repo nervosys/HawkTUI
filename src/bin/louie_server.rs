@@ -28,7 +28,7 @@
 //! my-agent | louie-server
 //! ```
 
-use std::io::{self, BufRead, Write};
+use std::io::{self, Write};
 use std::time::Instant;
 
 use tracing::{error, info, warn};
@@ -36,7 +36,7 @@ use tracing_subscriber::EnvFilter;
 
 use louie::agent::driver::HeadlessDriver;
 use louie::agent::protocol::{AgentRequest, RequestEnvelope};
-
+use louie::agent::read_capped_line;
 // Security limits (see docs/SECURITY-AUDIT.md INP-1, INP-2, INP-4)
 const MAX_LINE_BYTES: usize = 1_048_576; // 1 MB max request size
 const MAX_WIDTH: u16 = 1024;
@@ -347,16 +347,27 @@ fn main() -> io::Result<()> {
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut out = stdout.lock();
-    let locked_stdin = stdin.lock();
-    let mut lines = locked_stdin.lines();
+    let mut reader = stdin.lock();
 
     // Optional auth handshake (AUTH-1)
     if let Some(ref expected_token) = args.auth_token {
         info!("Waiting for auth handshake");
         let authenticated = loop {
-            let Some(Ok(line)) = lines.next() else {
-                break false;
+            let (raw, oversized) = match read_capped_line(&mut reader, MAX_LINE_BYTES)? {
+                Some(v) => v,
+                None => break false,
             };
+            // Cap buffering so an unauthenticated client cannot exhaust memory
+            // with an unbounded line before the handshake completes.
+            if oversized {
+                let resp =
+                    serde_json::json!({"success": false, "error": "Request too large"});
+                writeln!(out, "{}", serde_json::to_string(&resp).unwrap())?;
+                out.flush()?;
+                warn!("oversized request during auth handshake");
+                break false;
+            }
+            let line = String::from_utf8_lossy(&raw);
             let trimmed = line.trim();
             if trimmed.is_empty() {
                 continue;
@@ -397,10 +408,10 @@ fn main() -> io::Result<()> {
     let mut window_start = Instant::now();
     let mut request_count: u32 = 0;
 
-    for line in lines {
-        let line = line?;
+    while let Some((raw, oversized)) = read_capped_line(&mut reader, MAX_LINE_BYTES)? {
+        let line = String::from_utf8_lossy(&raw);
         let trimmed = line.trim();
-        if trimmed.is_empty() {
+        if !oversized && trimmed.is_empty() {
             continue;
         }
 
@@ -422,12 +433,14 @@ fn main() -> io::Result<()> {
             continue;
         }
 
-        // Reject oversized requests (INP-1)
-        if trimmed.len() > MAX_LINE_BYTES {
-            warn!(bytes = trimmed.len(), "oversized request");
+        // Reject oversized requests (INP-1). The reader caps buffering at
+        // MAX_LINE_BYTES, so an unbounded line can never exhaust memory before
+        // this guard fires.
+        if oversized {
+            warn!("oversized request");
             let err_resp = serde_json::json!({
                 "success": false,
-                "error": format!("Request too large ({} bytes, max {})", trimmed.len(), MAX_LINE_BYTES)
+                "error": format!("Request too large (max {MAX_LINE_BYTES} bytes)")
             });
             writeln!(out, "{}", serde_json::to_string(&err_resp).unwrap())?;
             out.flush()?;

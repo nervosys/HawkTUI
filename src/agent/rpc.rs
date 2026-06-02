@@ -8,7 +8,7 @@
 //! - Each line on stdout is a JSON [`AgentResponse`] or `AgentEvent`
 //! - Lines are delimited by `\n`
 
-use std::io::{self, BufRead, Write};
+use std::io::{self, Write};
 use std::time::Instant;
 
 use super::protocol::{AgentResponse, RequestEnvelope};
@@ -70,16 +70,16 @@ impl<M: Model> RpcTransport<M> {
 
         let stdin = io::stdin();
         let mut stdout = io::stdout();
-        let reader = stdin.lock();
+        let mut reader = stdin.lock();
 
         // Rate limiter state (INP-4)
         let mut window_start = Instant::now();
         let mut request_count: u32 = 0;
 
-        for line in reader.lines() {
-            let line = line?;
+        while let Some((raw, oversized)) = super::read_capped_line(&mut reader, MAX_LINE_BYTES)? {
+            let line = String::from_utf8_lossy(&raw);
             let trimmed = line.trim();
-            if trimmed.is_empty() {
+            if !oversized && trimmed.is_empty() {
                 continue;
             }
 
@@ -100,12 +100,12 @@ impl<M: Model> RpcTransport<M> {
                 continue;
             }
 
-            // Reject oversized requests (INP-1)
-            if trimmed.len() > MAX_LINE_BYTES {
+            // Reject oversized requests (INP-1). The reader caps buffering at
+            // MAX_LINE_BYTES, so an unbounded line can never exhaust memory
+            // before this guard fires.
+            if oversized {
                 let resp = AgentResponse::err(format!(
-                    "Request too large ({} bytes, max {})",
-                    trimmed.len(),
-                    MAX_LINE_BYTES
+                    "Request too large (max {MAX_LINE_BYTES} bytes)"
                 ));
                 let json = serde_json::to_string(&resp).unwrap_or_default();
                 writeln!(stdout, "{json}")?;
