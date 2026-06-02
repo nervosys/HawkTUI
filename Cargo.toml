@@ -1,5 +1,5 @@
 [package]
-name = "louie"
+name = "louietui"
 version = "1.0.0"
 edition = "2021"
 authors = ["Nervosys"]
@@ -7,12 +7,15 @@ description = "An agentic-first TUI framework with complete ontology for agent d
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/nervosys/louie"
 homepage = "https://github.com/nervosys/louie"
-documentation = "https://docs.rs/louie"
+documentation = "https://docs.rs/louietui"
 readme = "README.md"
 keywords = ["tui", "terminal", "agent", "ontology", "ui"]
 categories = ["command-line-interface", "gui"]
 rust-version = "1.80"
 exclude = ["reference/", ".github/", "docs/", "scripts/", "website/"]
+
+[lib]
+name = "louie"
 
 [features]
 default = ["crossterm"]
