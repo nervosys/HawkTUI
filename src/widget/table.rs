@@ -185,19 +185,17 @@ impl Table {
         }
 
         // Second pass: fill columns
-        if fill_count > 0 {
-            let per_fill = remaining / fill_count;
-            let mut extra = remaining % fill_count;
-            for (i, col) in self.columns.iter().enumerate() {
-                if matches!(col.width, TableColumnWidth::Fill) {
-                    widths[i] = per_fill
-                        + if extra > 0 {
-                            extra -= 1;
-                            1
-                        } else {
-                            0
-                        };
-                }
+        let per_fill = remaining.checked_div(fill_count).unwrap_or(0);
+        let mut extra = remaining.checked_rem(fill_count).unwrap_or(0);
+        for (i, col) in self.columns.iter().enumerate() {
+            if matches!(col.width, TableColumnWidth::Fill) {
+                widths[i] = per_fill
+                    + if extra > 0 {
+                        extra -= 1;
+                        1
+                    } else {
+                        0
+                    };
             }
         }
 

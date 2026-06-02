@@ -142,11 +142,7 @@ impl Layout {
                 Constraint::Min(m) => *m,
                 Constraint::Max(m) => (*m).min(available),
                 Constraint::Ratio(num, den) => {
-                    if *den == 0 {
-                        0
-                    } else {
-                        ((available as u32 * *num) / *den) as u16
-                    }
+                    (available as u32 * *num).checked_div(*den).unwrap_or(0) as u16
                 }
                 Constraint::Fill(_) => 0,
             })
@@ -222,16 +218,8 @@ impl Layout {
         // Phase 3: apply Min/Max constraint adjustments
         for (i, c) in self.constraints.iter().enumerate() {
             match c {
-                Constraint::Min(m) => {
-                    if sizes[i] < *m {
-                        sizes[i] = *m;
-                    }
-                }
-                Constraint::Max(m) => {
-                    if sizes[i] > *m {
-                        sizes[i] = *m;
-                    }
-                }
+                Constraint::Min(m) => sizes[i] = sizes[i].max(*m),
+                Constraint::Max(m) => sizes[i] = sizes[i].min(*m),
                 _ => {}
             }
         }
