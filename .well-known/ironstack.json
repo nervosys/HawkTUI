@@ -1,0 +1,75 @@
+{
+  "ironstack": "1",
+  "id": "louie",
+  "product": "Louie",
+  "layer": "tools",
+  "role": "TUI framework for agentic AI.",
+  "ontology": {
+    "api": "louie::OntologyRegistry -- the widget type catalog, its per-type schemas, and the actions each type publishes",
+    "document": "src/ontology/action.rs",
+    "schema": 1
+  },
+  "capabilities": [
+    {
+      "name": "query_ontology",
+      "description": "Return the ontology type catalog: every widget type an agent may encounter.",
+      "requires_grant": false,
+      "budgeted": false
+    },
+    {
+      "name": "get_schema",
+      "description": "Return the schema for one widget type: its properties and the actions it offers.",
+      "requires_grant": false,
+      "budgeted": false
+    },
+    {
+      "name": "get_tree",
+      "description": "Return a snapshot of the current UI tree.",
+      "requires_grant": false,
+      "budgeted": false
+    },
+    {
+      "name": "get_state",
+      "description": "Return the state of one widget, by its agent id.",
+      "requires_grant": false,
+      "budgeted": false
+    },
+    {
+      "name": "subscribe",
+      "description": "Begin receiving the named application events. Changes only the caller's own subscription set.",
+      "requires_grant": false,
+      "budgeted": false
+    },
+    {
+      "name": "unsubscribe",
+      "description": "Stop receiving the named application events.",
+      "requires_grant": false,
+      "budgeted": false
+    },
+    {
+      "name": "ping",
+      "description": "Keepalive and connection test.",
+      "requires_grant": false,
+      "budgeted": false
+    },
+    {
+      "name": "execute_action",
+      "description": "Invoke an action on a widget -- the primary way an agent drives the application.",
+      "requires_grant": true,
+      "budgeted": false
+    },
+    {
+      "name": "inject_event",
+      "description": "Synthesise an input event into the application, bypassing the widget action vocabulary.",
+      "requires_grant": true,
+      "budgeted": false
+    },
+    {
+      "name": "quit",
+      "description": "Ask the application to terminate.",
+      "requires_grant": true,
+      "budgeted": false
+    }
+  ],
+  "note": "Effects are read from the protocol's own semantics, not from a declared flag. The ontology here carries a `mutates` field, but it describes widget state -- whether clicking a control changes what the control shows -- which is a different question from whether an agent needs authority to do it. Mapping it would mark every button press as requiring a grant and say nothing useful. Grants go to the three operations that act on the application rather than describe it: execute_action, inject_event and quit. inject_event is granted separately from execute_action on purpose: execute_action is bounded by the action vocabulary a widget publishes, while inject_event synthesises raw input and is bounded by nothing the ontology declares. Nothing is budgeted. No operation's cost scales with a quantity the caller supplies; the event subscription is the only unbounded one, and its volume is set by the application's own event rate rather than by the request. Louie's protocol has no screenshot: a terminal frame is already text, and get_tree returns it as structure."
+}
