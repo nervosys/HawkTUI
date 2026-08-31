@@ -11,6 +11,7 @@ use crate::ontology::{
     PropertyType, SemanticRole, WidgetSchema,
 };
 use crate::widget::block::Block;
+use crate::widget::highlight::{HighlightTheme, Highlighter, Language};
 use crate::widget::{StatefulWidget, Widget};
 
 /// A multi-line text editor widget.
@@ -21,6 +22,8 @@ pub struct Editor {
     cursor_style: Style,
     line_number_style: Style,
     show_line_numbers: bool,
+    syntax: Option<&'static Language>,
+    highlight_theme: HighlightTheme,
 }
 
 impl Editor {
@@ -31,7 +34,37 @@ impl Editor {
             cursor_style: Style::default().reversed(),
             line_number_style: Style::default().dim(),
             show_line_numbers: true,
+            syntax: None,
+            highlight_theme: HighlightTheme::default(),
         }
+    }
+
+    /// Syntax-highlight the buffer as `language`.
+    ///
+    /// ```
+    /// use hawktui::widget::editor::Editor;
+    /// use hawktui::widget::highlight::RUST;
+    ///
+    /// let editor = Editor::new().syntax(&RUST);
+    /// ```
+    pub fn syntax(mut self, language: &'static Language) -> Self {
+        self.syntax = Some(language);
+        self
+    }
+
+    /// Syntax-highlight by language name, alias, or file extension.
+    ///
+    /// An unrecognized name leaves highlighting off rather than failing, so a
+    /// file browser can pass an arbitrary extension.
+    pub fn syntax_named(mut self, name: &str) -> Self {
+        self.syntax = Language::from_name(name);
+        self
+    }
+
+    /// Palette for syntax highlighting.
+    pub fn highlight_theme(mut self, theme: HighlightTheme) -> Self {
+        self.highlight_theme = theme;
+        self
     }
 
     pub fn block(mut self, block: Block) -> Self {
@@ -264,6 +297,18 @@ impl StatefulWidget for Editor {
 
         state.ensure_cursor_visible(visible_rows, text_width);
 
+        // Highlighting state runs forward from the top of the document, so the
+        // lines scrolled off the top still have to be lexed — a block comment
+        // opened above the viewport colors what is visible below it.
+        let theme = self.highlight_theme;
+        let mut highlighter = self.syntax.map(|language| {
+            let mut hl = Highlighter::new(language).theme(theme);
+            for prior in state.lines.iter().take(state.scroll_row) {
+                hl.tokens(prior);
+            }
+            hl
+        });
+
         for row_offset in 0..visible_rows {
             let line_idx = state.scroll_row + row_offset;
             let y = inner.y + row_offset as u16;
@@ -287,12 +332,43 @@ impl StatefulWidget for Editor {
             // Line content
             let line = &state.lines[line_idx];
             let text_x = inner.x + gutter_width;
-            let visible: String = line
-                .chars()
-                .skip(state.scroll_col)
-                .take(text_width)
-                .collect();
-            buf.set_string(text_x, y, &visible, self.style);
+            if let Some(hl) = highlighter.as_mut() {
+                let tokens = hl.tokens(line);
+                let mut skipped = 0usize;
+                let mut taken = 0usize;
+                let mut x = text_x;
+                for token in tokens {
+                    // Clip each token to the horizontal viewport, counting in
+                    // characters to match the unhighlighted path exactly.
+                    let mut piece = String::new();
+                    for ch in token.text(line).chars() {
+                        if skipped < state.scroll_col {
+                            skipped += 1;
+                            continue;
+                        }
+                        if taken >= text_width {
+                            break;
+                        }
+                        taken += 1;
+                        piece.push(ch);
+                    }
+                    if !piece.is_empty() {
+                        let style = self.style.patch(theme.style(token.kind));
+                        buf.set_string(x, y, &piece, style);
+                        x += piece.chars().count() as u16;
+                    }
+                    if taken >= text_width {
+                        break;
+                    }
+                }
+            } else {
+                let visible: String = line
+                    .chars()
+                    .skip(state.scroll_col)
+                    .take(text_width)
+                    .collect();
+                buf.set_string(text_x, y, &visible, self.style);
+            }
 
             // Cursor
             if line_idx == state.cursor_row {

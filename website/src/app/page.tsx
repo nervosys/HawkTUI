@@ -14,13 +14,13 @@ export default function Home() {
     <>
       <section className="hero">
         <div className="hero-tag">// AGENTIC TUI FRAMEWORK</div>
-        <h1>Louie: The TUI framework for agentic AI</h1>
+        <h1>Hawk TUI: The TUI framework for agentic AI</h1>
         <p>
-          Louie gives AI agents a complete, discoverable interface to terminal
+          Hawk TUI gives AI agents a complete, discoverable interface to terminal
           applications &mdash; with an Elm architecture, full widget ontology, and
           a JSON Lines protocol.
         </p>
-        <div className="install-block">cargo add louie</div>
+        <div className="install-block">cargo add hawktui</div>
         <div className="hero-buttons">
           <Link href="/docs/getting-started" className="btn btn-primary">
             Get Started
@@ -29,7 +29,7 @@ export default function Home() {
             Documentation
           </Link>
           <Link
-            href="https://github.com/nervosys/louie"
+            href="https://github.com/nervosys/HawkTUI"
             className="btn btn-secondary"
           >
             GitHub
@@ -52,12 +52,12 @@ export default function Home() {
       </div>
 
       <section className="comparison-section">
-        <h2>How Louie Compares</h2>
+        <h2>How Hawk TUI Compares</h2>
         <table>
           <thead>
             <tr>
               <th>Feature</th>
-              <th>Louie</th>
+              <th>Hawk TUI</th>
               <th>OpenTUI</th>
               <th>pi-tui</th>
               <th>ratatui</th>
@@ -110,7 +110,7 @@ export default function Home() {
             Read the Docs
           </Link>
           <Link
-            href="https://github.com/nervosys/louie"
+            href="https://github.com/nervosys/HawkTUI"
             className="btn btn-secondary"
           >
             View on GitHub

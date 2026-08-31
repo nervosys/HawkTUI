@@ -5,7 +5,7 @@ export default function Footer() {
         NERVOSYS // AGENTIC SOFTWARE
       </p>
       <p>
-        Louie is licensed under AGPL-3.0-or-later. Commercial licenses available
+        Hawk TUI is licensed under AGPL-3.0-or-later. Commercial licenses available
         from <a href="https://nervosys.ai">NERVOSYS</a>.
       </p>
       <p>&copy; {new Date().getFullYear()} Nervosys. All rights reserved.</p>

@@ -105,6 +105,8 @@ pub struct List {
     style: Style,
     highlight_style: Style,
     highlight_symbol: Option<String>,
+    /// Rows kept visible above and below the selection while scrolling.
+    scroll_padding: usize,
     direction: ListDirection,
 }
 
@@ -116,6 +118,7 @@ impl List {
             style: Style::default(),
             highlight_style: Style::default().reversed(),
             highlight_symbol: None,
+            scroll_padding: 0,
             direction: ListDirection::TopToBottom,
         }
     }
@@ -137,6 +140,13 @@ impl List {
 
     pub fn highlight_symbol(mut self, symbol: impl Into<String>) -> Self {
         self.highlight_symbol = Some(symbol.into());
+        self
+    }
+
+    /// Keep `padding` rows visible above and below the selection when
+    /// scrolling, so the cursor never sits flush against the edge.
+    pub fn scroll_padding(mut self, padding: usize) -> Self {
+        self.scroll_padding = padding;
         self
     }
 
@@ -178,13 +188,21 @@ impl StatefulWidget for List {
 
         let visible_height = inner.height as usize;
 
-        // Adjust scroll offset to keep selection visible
+        // Adjust the scroll offset to keep the selection visible, honoring the
+        // requested breathing room above and below it. The padding is capped so
+        // it can never demand more rows than the viewport has.
         if let Some(selected) = state.selected {
-            if selected < state.offset {
-                state.offset = selected;
-            } else if selected >= state.offset + visible_height {
-                state.offset = selected - visible_height + 1;
+            let pad = self
+                .scroll_padding
+                .min(visible_height.saturating_sub(1) / 2);
+            let max_offset = self.items.len().saturating_sub(visible_height);
+
+            if selected < state.offset + pad {
+                state.offset = selected.saturating_sub(pad);
+            } else if selected + pad >= state.offset + visible_height {
+                state.offset = (selected + pad + 1).saturating_sub(visible_height);
             }
+            state.offset = state.offset.min(max_offset);
         }
 
         let highlight_symbol_width = self.highlight_symbol.as_ref().map_or(0, |s| s.len() as u16);
@@ -239,11 +257,20 @@ impl StatefulWidget for List {
                 x += highlight_symbol_width;
             }
 
-            // Draw item content
+            // Draw item content. The row was already painted with `style`
+            // above, and writing a span only patches the fields its own style
+            // sets — so an item with no styling of its own needs no second
+            // pass over the row.
             let max_width = inner.right().saturating_sub(x);
             buf.set_line(x, y, &item.content, max_width);
-            // Apply style over content
-            buf.set_style(Rect::new(x, y, max_width, 1), style);
+            if item
+                .content
+                .spans
+                .iter()
+                .any(|s| s.style != Style::default())
+            {
+                buf.set_style(Rect::new(x, y, max_width, 1), style);
+            }
         }
     }
 }

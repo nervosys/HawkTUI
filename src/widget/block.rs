@@ -220,36 +220,44 @@ impl Widget for Block {
 
         let symbols = self.border_type.symbols();
 
-        // Draw borders
+        // Draw borders as runs. Box-drawing glyphs are not ASCII, so writing
+        // them one `set_string` at a time would re-run grapheme segmentation
+        // for every cell of the frame; `fill` converts the glyph once.
         if self.borders.contains(Borders::TOP) {
-            for x in area.left()..area.right() {
-                buf.set_string(x, area.top(), symbols.horizontal, self.border_style);
-            }
+            buf.fill(
+                Rect::new(area.left(), area.top(), area.width, 1),
+                symbols.horizontal,
+                self.border_style,
+            );
         }
         if self.borders.contains(Borders::BOTTOM) {
-            let y = area.bottom().saturating_sub(1);
-            for x in area.left()..area.right() {
-                buf.set_string(x, y, symbols.horizontal, self.border_style);
-            }
+            buf.fill(
+                Rect::new(area.left(), area.bottom().saturating_sub(1), area.width, 1),
+                symbols.horizontal,
+                self.border_style,
+            );
         }
         if self.borders.contains(Borders::LEFT) {
-            for y in area.top()..area.bottom() {
-                buf.set_string(area.left(), y, symbols.vertical, self.border_style);
-            }
+            buf.fill(
+                Rect::new(area.left(), area.top(), 1, area.height),
+                symbols.vertical,
+                self.border_style,
+            );
         }
         if self.borders.contains(Borders::RIGHT) {
-            let x = area.right().saturating_sub(1);
-            for y in area.top()..area.bottom() {
-                buf.set_string(x, y, symbols.vertical, self.border_style);
-            }
+            buf.fill(
+                Rect::new(area.right().saturating_sub(1), area.top(), 1, area.height),
+                symbols.vertical,
+                self.border_style,
+            );
         }
 
         // Draw corners
         if self.borders.contains(Borders::TOP) && self.borders.contains(Borders::LEFT) {
-            buf.set_string(area.left(), area.top(), symbols.top_left, self.border_style);
+            buf.set_grapheme(area.left(), area.top(), symbols.top_left, self.border_style);
         }
         if self.borders.contains(Borders::TOP) && self.borders.contains(Borders::RIGHT) {
-            buf.set_string(
+            buf.set_grapheme(
                 area.right().saturating_sub(1),
                 area.top(),
                 symbols.top_right,
@@ -257,7 +265,7 @@ impl Widget for Block {
             );
         }
         if self.borders.contains(Borders::BOTTOM) && self.borders.contains(Borders::LEFT) {
-            buf.set_string(
+            buf.set_grapheme(
                 area.left(),
                 area.bottom().saturating_sub(1),
                 symbols.bottom_left,
@@ -265,7 +273,7 @@ impl Widget for Block {
             );
         }
         if self.borders.contains(Borders::BOTTOM) && self.borders.contains(Borders::RIGHT) {
-            buf.set_string(
+            buf.set_grapheme(
                 area.right().saturating_sub(1),
                 area.bottom().saturating_sub(1),
                 symbols.bottom_right,

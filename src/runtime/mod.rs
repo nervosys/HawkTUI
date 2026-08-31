@@ -1,4 +1,4 @@
-//! Elm-architecture runtime for louie applications.
+//! Elm-architecture runtime for hawktui applications.
 //!
 //! Inspired by bubbletea / The Elm Architecture:
 //! - **Model**: Application state
@@ -282,7 +282,7 @@ impl<M: Model, B: Backend> Program<M, B> {
     }
 }
 
-/// Convert a crossterm event into a louie event.
+/// Convert a crossterm event into a hawktui event.
 fn convert_crossterm_event(event: crossterm::event::Event) -> Event {
     match event {
         crossterm::event::Event::Key(key) => Event::Key(KeyEvent {

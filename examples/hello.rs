@@ -1,9 +1,9 @@
-//! Minimal hello-world example for louie.
+//! Minimal hello-world example for hawktui.
 //!
 //! Displays a styled greeting and quits on 'q' or Esc.
 
-use louie::prelude::*;
-use louie::runtime::{Command, Model, Program, ProgramOptions};
+use hawktui::prelude::*;
+use hawktui::runtime::{Command, Model, Program, ProgramOptions};
 
 struct App;
 
@@ -24,13 +24,13 @@ impl Model for App {
         let area = frame.area();
 
         let block = Block::default()
-            .title("Hello Louie")
+            .title("Hello Hawk TUI")
             .borders(Borders::ALL)
             .border_type(BorderType::Rounded);
 
         let greeting = Paragraph::new(Text::from(vec![
             Line::from(Span::styled(
-                "Welcome to Louie!",
+                "Welcome to Hawk TUI!",
                 Style::default().bold().fg(Color::Cyan),
             )),
             Line::from(""),

@@ -1,7 +1,7 @@
 //! # Ontology — Agent Discoverability System
 //!
 //! The ontology module provides structured metadata for every component in a
-//! louie application. AI agents can introspect widget schemas, discover
+//! hawktui application. AI agents can introspect widget schemas, discover
 //! available actions, query capabilities, and navigate the UI tree
 //! programmatically.
 //!

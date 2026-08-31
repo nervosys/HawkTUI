@@ -1,8 +1,8 @@
-//! Headless agent driver: run a Louie app without a real terminal.
+//! Headless agent driver: run a Hawk TUI app without a real terminal.
 //!
 //! The driver uses a [`TestBackend`] to render frames in memory and exposes
 //! the full agent protocol for programmatic control. This enables:
-//! - Automated testing of Louie apps
+//! - Automated testing of Hawk TUI apps
 //! - Agent-only operation (no human at the terminal)
 //! - CI/CD pipeline integration
 
@@ -16,7 +16,7 @@ use crate::terminal::Terminal;
 use super::protocol::{AgentRequest, AgentResponse, RequestEnvelope};
 use super::session::AgentSession;
 
-/// Run a Louie application headlessly, driven entirely by agent protocol messages.
+/// Run a Hawk TUI application headlessly, driven entirely by agent protocol messages.
 pub struct HeadlessDriver<M: Model> {
     model: M,
     terminal: Terminal<TestBackend>,

@@ -242,7 +242,7 @@ impl Style {
 /// [Stylize] trait enables a fluent shorthand API.
 ///
 /// ```
-/// use louie::core::style::*;
+/// use hawktui::core::style::*;
 /// let style = Style::new().red().on_blue().bold();
 /// ```
 pub trait Stylize: Sized {

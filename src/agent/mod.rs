@@ -1,11 +1,11 @@
 //! Agent protocol and integration layer.
 //!
 //! This module provides the structured protocol for AI agents to connect to,
-//! inspect, and control Louie applications. It includes:
+//! inspect, and control Hawk TUI applications. It includes:
 //!
 //! - **Protocol messages**: JSON-based request/response/event types
 //! - **Agent session**: Manages agent connection lifecycle and request processing
-//! - **Headless driver**: Run a Louie app without a terminal for agent-only control
+//! - **Headless driver**: Run a Hawk TUI app without a terminal for agent-only control
 //! - **RPC transport**: stdin/stdout JSON Lines protocol for embedding
 
 pub mod driver;
@@ -53,7 +53,7 @@ pub fn read_capped_line<R: BufRead>(
         }
         saw_any = true;
         let newline = available.iter().position(|&b| b == b'\n');
-        let chunk_len = newline.map_or(available.len(), |idx| idx);
+        let chunk_len = newline.unwrap_or(available.len());
         let room = max_bytes.saturating_sub(buf.len());
         let take = room.min(chunk_len);
         buf.extend_from_slice(&available[..take]);

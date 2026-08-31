@@ -3,7 +3,7 @@ export default function ElmArchitecture() {
     <>
       <h1>Elm Architecture</h1>
       <p>
-        Louie uses <strong>The Elm Architecture</strong> (TEA), the same pattern
+        Hawk TUI uses <strong>The Elm Architecture</strong> (TEA), the same pattern
         used by Elm, bubbletea, and Iced. Your application is defined by three
         functions and a message type.
       </p>
@@ -71,8 +71,8 @@ export default function ElmArchitecture() {
       <p>
         The <code>Program</code> type ties everything together:
       </p>
-      <pre><code>{`use louie::runtime::{Program, ProgramOptions};
-use louie::backend::CrosstermBackend;
+      <pre><code>{`use hawktui::runtime::{Program, ProgramOptions};
+use hawktui::backend::CrosstermBackend;
 
 let backend = CrosstermBackend::new(std::io::stdout());
 let options = ProgramOptions::default()

@@ -3,12 +3,12 @@
 //! Displays widgets and their ontology metadata, demonstrating how an agent
 //! can discover, inspect, and interact with the UI.
 
-use louie::ontology::registry::OntologyRegistry;
-use louie::ontology::Discoverable;
-use louie::prelude::*;
-use louie::runtime::{Command, Model, Program, ProgramOptions};
-use louie::widget::gauge::Gauge;
-use louie::widget::list::{List, ListState};
+use hawktui::ontology::registry::OntologyRegistry;
+use hawktui::ontology::Discoverable;
+use hawktui::prelude::*;
+use hawktui::runtime::{Command, Model, Program, ProgramOptions};
+use hawktui::widget::gauge::Gauge;
+use hawktui::widget::list::{List, ListState};
 
 struct App {
     list_state: ListState,
@@ -74,13 +74,13 @@ fn schema_for_index(index: usize) -> String {
         0 => format_schema::<Block>(),
         1 => format_schema::<Paragraph>(),
         2 => format_schema::<List>(),
-        3 => format_schema::<louie::widget::tabs::Tabs>(),
+        3 => format_schema::<hawktui::widget::tabs::Tabs>(),
         4 => format_schema::<Gauge>(),
-        5 => format_schema::<louie::widget::input::Input>(),
-        6 => format_schema::<louie::widget::table::Table>(),
-        7 => format_schema::<louie::widget::canvas::Canvas>(),
-        8 => format_schema::<louie::widget::sparkline::Sparkline>(),
-        9 => format_schema::<louie::widget::scrollbar::Scrollbar>(),
+        5 => format_schema::<hawktui::widget::input::Input>(),
+        6 => format_schema::<hawktui::widget::table::Table>(),
+        7 => format_schema::<hawktui::widget::canvas::Canvas>(),
+        8 => format_schema::<hawktui::widget::sparkline::Sparkline>(),
+        9 => format_schema::<hawktui::widget::scrollbar::Scrollbar>(),
         _ => "Unknown widget".to_string(),
     }
 }
@@ -109,13 +109,13 @@ impl Model for App {
                 registry.register::<Block>();
                 registry.register::<Paragraph>();
                 registry.register::<List>();
-                registry.register::<louie::widget::tabs::Tabs>();
+                registry.register::<hawktui::widget::tabs::Tabs>();
                 registry.register::<Gauge>();
-                registry.register::<louie::widget::input::Input>();
-                registry.register::<louie::widget::table::Table>();
-                registry.register::<louie::widget::canvas::Canvas>();
-                registry.register::<louie::widget::sparkline::Sparkline>();
-                registry.register::<louie::widget::scrollbar::Scrollbar>();
+                registry.register::<hawktui::widget::input::Input>();
+                registry.register::<hawktui::widget::table::Table>();
+                registry.register::<hawktui::widget::canvas::Canvas>();
+                registry.register::<hawktui::widget::sparkline::Sparkline>();
+                registry.register::<hawktui::widget::scrollbar::Scrollbar>();
 
                 let catalog = registry.export_catalog();
                 self.selected_schema = serde_json::to_string_pretty(&catalog)
@@ -198,13 +198,13 @@ impl Model for App {
         registry.register::<Block>();
         registry.register::<Paragraph>();
         registry.register::<List>();
-        registry.register::<louie::widget::tabs::Tabs>();
+        registry.register::<hawktui::widget::tabs::Tabs>();
         registry.register::<Gauge>();
-        registry.register::<louie::widget::input::Input>();
-        registry.register::<louie::widget::table::Table>();
-        registry.register::<louie::widget::canvas::Canvas>();
-        registry.register::<louie::widget::sparkline::Sparkline>();
-        registry.register::<louie::widget::scrollbar::Scrollbar>();
+        registry.register::<hawktui::widget::input::Input>();
+        registry.register::<hawktui::widget::table::Table>();
+        registry.register::<hawktui::widget::canvas::Canvas>();
+        registry.register::<hawktui::widget::sparkline::Sparkline>();
+        registry.register::<hawktui::widget::scrollbar::Scrollbar>();
     }
 }
 

@@ -1,4 +1,4 @@
-# Louie Agent Protocol Specification
+# Hawk TUI Agent Protocol Specification
 
 **Version**: 0.1.0  
 **Transport**: JSON Lines (JSONL) over stdin/stdout  
@@ -6,16 +6,16 @@
 
 ## Overview
 
-The Louie Agent Protocol enables AI systems to programmatically discover, inspect, and control terminal user interfaces. Unlike screen-scraping approaches that interpret raw terminal output, this protocol provides structured access to every widget's type, capabilities, state, and available actions.
+The Hawk TUI Agent Protocol enables AI systems to programmatically discover, inspect, and control terminal user interfaces. Unlike screen-scraping approaches that interpret raw terminal output, this protocol provides structured access to every widget's type, capabilities, state, and available actions.
 
-An agent spawns a Louie application as a child process and communicates entirely through JSON messages — one per line, delimited by `\n`.
+An agent spawns a Hawk TUI application as a child process and communicates entirely through JSON messages — one per line, delimited by `\n`.
 
 ## Architecture
 
 ```
 ┌──────────────────┐     stdin (JSONL)      ┌──────────────────┐
 │                  │ ─────────────────────► │                  │
-│   AI Agent       │                        │   louie-server   │
+│   AI Agent       │                        │   hawktui-server   │
 │   (Claude, GPT,  │ ◄───────────────────── │   (headless)     │
 │    Codex, etc.)  │     stdout (JSONL)     │                  │
 └──────────────────┘                        └──────────────────┘
@@ -33,13 +33,13 @@ An agent spawns a Louie application as a child process and communicates entirely
 cargo install --path .
 
 # Test connectivity
-echo '{"type":"ping"}' | louie-server
+echo '{"type":"ping"}' | hawktui-server
 
 # Discover all widget types
-echo '{"type":"query_ontology"}' | louie-server
+echo '{"type":"query_ontology"}' | hawktui-server
 
 # Start with custom terminal size
-louie-server --width 160 --height 50
+hawktui-server --width 160 --height 50
 ```
 
 ## Message Format
@@ -238,7 +238,7 @@ Inject keyboard, mouse, paste, or resize events directly:
 
 ### Widget Schema
 
-Every Louie widget exposes a typed schema describing its properties, constraints, and usage:
+Every Hawk TUI widget exposes a typed schema describing its properties, constraints, and usage:
 
 ```json
 {
@@ -306,7 +306,7 @@ Widgets expose named operations that agents can invoke:
 ## Typical Agent Workflow
 
 ```
-1. Spawn louie-server as child process
+1. Spawn hawktui-server as child process
 2. ping                    → verify connection is alive
 3. query_ontology          → learn what widget types exist
 4. get_tree                → understand current UI structure
@@ -328,7 +328,7 @@ import subprocess
 import json
 
 proc = subprocess.Popen(
-    ["louie-server"],
+    ["hawktui-server"],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
@@ -380,7 +380,7 @@ proc.wait()
 import { spawn } from "child_process";
 import * as readline from "readline";
 
-const server = spawn("louie-server", [], {
+const server = spawn("hawktui-server", [], {
   stdio: ["pipe", "pipe", "pipe"],
 });
 
@@ -405,8 +405,8 @@ await send({ type: "quit" });
 ### Rust (In-Process)
 
 ```rust
-use louie::agent::HeadlessDriver;
-use louie::agent::protocol::AgentRequest;
+use hawktui::agent::HeadlessDriver;
+use hawktui::agent::protocol::AgentRequest;
 
 let mut driver = HeadlessDriver::new(MyApp::default(), 120, 40)?;
 driver.init();
@@ -432,9 +432,9 @@ driver.render()?;
 | Screen scraping    | None              | Fragile     | High    | High        |
 | Accessibility APIs | Partial           | Medium      | Medium  | Medium      |
 | Custom RPC         | Hardcoded         | Good        | Low     | High        |
-| **Louie Protocol** | **Full ontology** | **Robust**  | **Low** | **Low**     |
+| **Hawk TUI Protocol** | **Full ontology** | **Robust**  | **Low** | **Low**     |
 
-Screen-scraping requires the agent to parse terminal ANSI escape sequences, guess at widget boundaries, and break whenever the layout changes. The Louie protocol provides typed, versioned access to every widget's schema, state, and actions — the UI is self-describing.
+Screen-scraping requires the agent to parse terminal ANSI escape sequences, guess at widget boundaries, and break whenever the layout changes. The Hawk TUI protocol provides typed, versioned access to every widget's schema, state, and actions — the UI is self-describing.
 
 ## Security Considerations
 

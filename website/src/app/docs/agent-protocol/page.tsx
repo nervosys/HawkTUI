@@ -3,27 +3,27 @@ export default function AgentProtocol() {
     <>
       <h1>Agent Protocol Reference</h1>
       <p>
-        The Louie Agent Protocol enables AI systems to programmatically discover,
+        The Hawk TUI Agent Protocol enables AI systems to programmatically discover,
         inspect, and control terminal user interfaces via JSON Lines over
         stdin/stdout.
       </p>
 
       <div className="arch-diagram">{`┌──────────────────┐     stdin (JSONL)      ┌──────────────────┐
 │                  │ ─────────────────────► │                  │
-│   AI Agent       │                        │   louie-server   │
+│   AI Agent       │                        │   hawktui-server   │
 │   (Claude, GPT,  │ ◄───────────────────── │   (headless)     │
 │    Codex, etc.)  │     stdout (JSONL)     │                  │
 └──────────────────┘                        └──────────────────┘`}</div>
 
       <h2>Quick Start</h2>
       <pre><code>{`# Build the server
-cargo build --release --bin louie-server --features bin
+cargo build --release --bin hawktui-server --features bin
 
 # Test connectivity
-echo '{"type":"ping"}' | ./target/release/louie-server
+echo '{"type":"ping"}' | ./target/release/hawktui-server
 
 # Discover all widget types
-echo '{"type":"query_ontology"}' | ./target/release/louie-server`}</code></pre>
+echo '{"type":"query_ontology"}' | ./target/release/hawktui-server`}</code></pre>
 
       <h2>Message Format</h2>
 
@@ -113,7 +113,7 @@ echo '{"type":"query_ontology"}' | ./target/release/louie-server`}</code></pre>
 
       <h2>Typical Agent Workflow</h2>
       <ol>
-        <li>Spawn <code>louie-server</code> as a child process.</li>
+        <li>Spawn <code>hawktui-server</code> as a child process.</li>
         <li>Send <code>ping</code> to verify connectivity.</li>
         <li>Send <code>query_ontology</code> to discover available widget types.</li>
         <li>Send <code>get_tree</code> to get the live UI tree with widget IDs.</li>

@@ -1,4 +1,4 @@
-//! Agent RPC example: headless Louie app driven via JSON Lines on stdin/stdout.
+//! Agent RPC example: headless Hawk TUI app driven via JSON Lines on stdin/stdout.
 //!
 //! Run with: `echo '{"type":"ping"}' | cargo run --example agent_rpc`
 //!
@@ -17,12 +17,12 @@
 
 use std::io::{self, BufRead, Write};
 
-use louie::agent::driver::HeadlessDriver;
-use louie::agent::protocol::RequestEnvelope;
-use louie::ontology::registry::OntologyRegistry;
-use louie::prelude::*;
-use louie::runtime::{Command, Model};
-use louie::widget::gauge::Gauge;
+use hawktui::agent::driver::HeadlessDriver;
+use hawktui::agent::protocol::RequestEnvelope;
+use hawktui::ontology::registry::OntologyRegistry;
+use hawktui::prelude::*;
+use hawktui::runtime::{Command, Model};
+use hawktui::widget::gauge::Gauge;
 
 // ---------------------------------------------------------------------------
 // Application model
@@ -53,12 +53,12 @@ impl Model for CounterApp {
 
     fn view(&self, frame: &mut Frame) {
         let area = frame.area();
-        let chunks = louie::layout::Layout::default()
-            .direction(louie::layout::Direction::Vertical)
+        let chunks = hawktui::layout::Layout::default()
+            .direction(hawktui::layout::Direction::Vertical)
             .constraints([
-                louie::layout::Constraint::Length(3),
-                louie::layout::Constraint::Length(3),
-                louie::layout::Constraint::Fill(1),
+                hawktui::layout::Constraint::Length(3),
+                hawktui::layout::Constraint::Length(3),
+                hawktui::layout::Constraint::Fill(1),
             ])
             .split(area);
 

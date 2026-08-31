@@ -3,22 +3,22 @@ export default function AgentIntegration() {
     <>
       <h1>Agent Integration Guide</h1>
       <p>
-        This guide shows how to connect AI agents to a Louie application using
+        This guide shows how to connect AI agents to a Hawk TUI application using
         the JSON Lines protocol. Examples in Python, TypeScript, and Rust.
       </p>
 
       <h2>Launching the Server</h2>
       <pre><code>{`# Build the headless server
-cargo build --release --bin louie-server --features bin
+cargo build --release --bin hawktui-server --features bin
 
 # Start with custom terminal size
-./target/release/louie-server --width 160 --height 50`}</code></pre>
+./target/release/hawktui-server --width 160 --height 50`}</code></pre>
 
       <h2>Python Example</h2>
       <pre><code>{`import subprocess, json
 
 proc = subprocess.Popen(
-    ["./target/release/louie-server"],
+    ["./target/release/hawktui-server"],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
@@ -58,7 +58,7 @@ send({"type": "quit"})`}</code></pre>
       <pre><code>{`import { spawn } from "child_process";
 import * as readline from "readline";
 
-const proc = spawn("./target/release/louie-server", [], {
+const proc = spawn("./target/release/hawktui-server", [], {
   stdio: ["pipe", "pipe", "pipe"],
 });
 
@@ -81,11 +81,11 @@ await send({ type: "quit" });`}</code></pre>
 
       <h2>Rust In-Process (HeadlessDriver)</h2>
       <p>
-        For embedding Louie directly in a Rust agent, use the{" "}
+        For embedding Hawk TUI directly in a Rust agent, use the{" "}
         <code>HeadlessDriver</code> without spawning a separate process:
       </p>
-      <pre><code>{`use louie::agent::HeadlessDriver;
-use louie::backend::TestBackend;
+      <pre><code>{`use hawktui::agent::HeadlessDriver;
+use hawktui::backend::TestBackend;
 
 let backend = TestBackend::new(80, 24);
 let mut driver = HeadlessDriver::new(MyApp::new(), backend);
@@ -100,7 +100,7 @@ let tree = driver.handle_request(&AgentRequest::GetTree);`}</code></pre>
 
       <h2>Widget Discoverability</h2>
       <p>
-        Every widget in a Louie application exposes:
+        Every widget in a Hawk TUI application exposes:
       </p>
       <table>
         <thead><tr><th>Attribute</th><th>Description</th><th>Protocol Request</th></tr></thead>

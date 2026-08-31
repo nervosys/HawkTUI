@@ -36,9 +36,17 @@ impl Stylize for Span {
     }
 }
 
-impl From<&'static str> for Span {
-    fn from(s: &'static str) -> Self {
-        Span::raw(s)
+impl From<&str> for Span {
+    /// Borrowed text is copied into the span. `&'static str` is stored without
+    /// allocating; any shorter lifetime is promoted to an owned `String`.
+    fn from(s: &str) -> Self {
+        Span::raw(s.to_string())
+    }
+}
+
+impl From<&'static String> for Span {
+    fn from(s: &'static String) -> Self {
+        Span::raw(s.as_str())
     }
 }
 
@@ -111,9 +119,10 @@ impl Stylize for Line {
     }
 }
 
-impl From<&'static str> for Line {
-    fn from(s: &'static str) -> Self {
-        Line::raw(s)
+impl From<&str> for Line {
+    /// Borrowed text is copied into the line; see [`Span::from`].
+    fn from(s: &str) -> Self {
+        Line::raw(s.to_string())
     }
 }
 
@@ -199,9 +208,10 @@ impl Stylize for Text {
     }
 }
 
-impl From<&'static str> for Text {
-    fn from(s: &'static str) -> Self {
-        Text::raw(s)
+impl From<&str> for Text {
+    /// Borrowed text is copied into the text; see [`Span::from`].
+    fn from(s: &str) -> Self {
+        Text::raw(s.to_string())
     }
 }
 

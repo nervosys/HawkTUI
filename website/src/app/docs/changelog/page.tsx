@@ -3,7 +3,7 @@ export default function Changelog() {
     <>
       <h1>Changelog</h1>
       <p>
-        All notable changes to Louie are documented here. This project adheres to{" "}
+        All notable changes to Hawk TUI are documented here. This project adheres to{" "}
         <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a> and
         follows <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>.
       </p>
@@ -13,13 +13,13 @@ export default function Changelog() {
       <h3>Added</h3>
       <ul>
         <li><strong>Property-Based Tests</strong>: 10 proptest-driven tests for agent protocol round-tripping and fuzz deserialization</li>
-        <li><strong>Structured Logging</strong>: Replaced <code>eprintln</code> in <code>louie-server</code> with <code>tracing</code> + <code>tracing-subscriber</code></li>
+        <li><strong>Structured Logging</strong>: Replaced <code>eprintln</code> in <code>hawktui-server</code> with <code>tracing</code> + <code>tracing-subscriber</code></li>
         <li><strong>CONTRIBUTING.md</strong>: Contributor guide with development workflow, commit conventions, and widget addition guide</li>
         <li><strong>SECURITY.md</strong>: Security policy with responsible disclosure process and hardening summary</li>
         <li><strong>cargo-deny</strong>: License auditing and advisory checks via <code>deny.toml</code> + CI job</li>
         <li><strong>CI Coverage</strong>: <code>cargo-tarpaulin</code> coverage reporting with Codecov upload</li>
         <li><strong>CI Benchmarks</strong>: <code>criterion</code> benchmark regression detection via <code>github-action-benchmark</code></li>
-        <li><strong>README Install Section</strong>: <code>cargo add louie</code> instructions and MSRV note</li>
+        <li><strong>README Install Section</strong>: <code>cargo add hawktui</code> instructions and MSRV note</li>
       </ul>
 
       <h3>Changed</h3>
@@ -51,7 +51,7 @@ export default function Changelog() {
         <li><strong>Layout Engine</strong>: Constraint-based layout with 6 constraint types</li>
         <li><strong>Core Primitives</strong>: <code>Buffer</code>, <code>Cell</code>, <code>Rect</code>, <code>Style</code>, <code>Text</code>, <code>Color</code> (16 + RGB + indexed)</li>
         <li><strong>Theme System</strong>: <code>Theme</code> with token-based styling, built-in dark/light themes</li>
-        <li><strong>Error Types</strong>: Unified <code>louie::Error</code> enum with 6 variants</li>
+        <li><strong>Error Types</strong>: Unified <code>hawktui::Error</code> enum with 6 variants</li>
         <li><strong>Backend Abstraction</strong>: <code>Backend</code> trait with crossterm (optional) and test backends</li>
       </ul>
 

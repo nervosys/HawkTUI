@@ -114,7 +114,7 @@ impl Default for SettingsListState {
 /// # Example
 ///
 /// ```ignore
-/// use louie::widget::settings_list::{SettingsList, Setting, SettingsListState};
+/// use hawktui::widget::settings_list::{SettingsList, Setting, SettingsListState};
 ///
 /// let settings = vec![
 ///     Setting::new("Theme", vec!["Dark".into(), "Light".into(), "Auto".into()])

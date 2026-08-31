@@ -123,9 +123,15 @@ impl<B: Backend> Terminal<B> {
         // Begin synchronized output for flicker-free rendering
         self.backend.begin_sync()?;
 
-        // Diff the buffers and write changes
+        // Diff the buffers and write changes. Hyperlinks travel beside the
+        // cells, and cost nothing to check when the frame has none.
         let changes = self.buffers[self.current].diff(&self.buffers[back]);
-        self.backend.draw(changes.into_iter())?;
+        if self.buffers[back].has_hyperlinks() {
+            let linked = self.buffers[back].attach_hyperlinks(&changes);
+            self.backend.draw_linked(linked.into_iter())?;
+        } else {
+            self.backend.draw(changes.into_iter())?;
+        }
 
         // Handle cursor
         if let Some(pos) = cursor_position {

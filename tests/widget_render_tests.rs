@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use louie::core::buffer::Buffer;
-    use louie::core::rect::Rect;
-    use louie::core::style::Style;
-    use louie::core::text::{Line, Text};
-    use louie::widget::Widget;
+    use hawktui::core::buffer::Buffer;
+    use hawktui::core::rect::Rect;
+    use hawktui::core::style::Style;
+    use hawktui::core::text::{Line, Text};
+    use hawktui::widget::Widget;
 
     /// Helper: render a widget into a buffer and return row text.
     fn render_to_strings<W: Widget>(widget: W, width: u16, height: u16) -> Vec<String> {
@@ -15,8 +15,8 @@ mod tests {
             .map(|y| {
                 let mut row = String::new();
                 for x in 0..width {
-                    if let Some(cell) = buf.cell(louie::core::rect::Position::new(x, y)) {
-                        row.push_str(&cell.symbol);
+                    if let Some(cell) = buf.cell(hawktui::core::rect::Position::new(x, y)) {
+                        row.push_str(cell.symbol.as_str());
                     }
                 }
                 row.trim_end().to_string()
@@ -26,7 +26,7 @@ mod tests {
 
     mod paragraph {
         use super::*;
-        use louie::widget::paragraph::Paragraph;
+        use hawktui::widget::paragraph::Paragraph;
 
         #[test]
         fn renders_single_line() {
@@ -43,7 +43,7 @@ mod tests {
                     Line::from("Line 2"),
                     Line::from("Line 3"),
                 ],
-                alignment: Some(louie::layout::Alignment::Left),
+                alignment: Some(hawktui::layout::Alignment::Left),
                 style: Style::default(),
             };
             let rows = render_to_strings(Paragraph::new(text), 20, 5);
@@ -61,7 +61,7 @@ mod tests {
 
     mod block_widget {
         use super::*;
-        use louie::widget::block::{Block, Borders};
+        use hawktui::widget::block::{Block, Borders};
 
         #[test]
         fn renders_borders_with_title() {
@@ -86,7 +86,7 @@ mod tests {
 
     mod loader {
         use super::*;
-        use louie::widget::loader::{Loader, SpinnerStyle};
+        use hawktui::widget::loader::{Loader, SpinnerStyle};
 
         #[test]
         fn renders_spinner_and_message() {
@@ -108,7 +108,7 @@ mod tests {
 
     mod cancellable_loader {
         use super::*;
-        use louie::widget::cancellable_loader::CancellableLoader;
+        use hawktui::widget::cancellable_loader::CancellableLoader;
 
         #[test]
         fn renders_spinner_and_message() {
@@ -119,7 +119,7 @@ mod tests {
 
         #[test]
         fn cancel_action_sets_cancelled() {
-            use louie::ontology::Discoverable;
+            use hawktui::ontology::Discoverable;
             let mut loader = CancellableLoader::new("Working...");
             assert!(!loader.is_cancelled());
             let result = loader.execute_action("cancel", &serde_json::json!({}));
@@ -130,9 +130,9 @@ mod tests {
 
     mod editor_widget {
         use super::*;
-        use louie::widget::editor::Editor;
-        use louie::widget::editor::EditorState;
-        use louie::widget::StatefulWidget;
+        use hawktui::widget::editor::Editor;
+        use hawktui::widget::editor::EditorState;
+        use hawktui::widget::StatefulWidget;
 
         fn render_editor(editor: &Editor, state: &mut EditorState, w: u16, h: u16) -> Vec<String> {
             let area = Rect::new(0, 0, w, h);
@@ -142,8 +142,8 @@ mod tests {
                 .map(|y| {
                     let mut row = String::new();
                     for x in 0..w {
-                        if let Some(cell) = buf.cell(louie::core::rect::Position::new(x, y)) {
-                            row.push_str(&cell.symbol);
+                        if let Some(cell) = buf.cell(hawktui::core::rect::Position::new(x, y)) {
+                            row.push_str(cell.symbol.as_str());
                         }
                     }
                     row.trim_end().to_string()
@@ -177,9 +177,9 @@ mod tests {
 
     mod select_list_widget {
         use super::*;
-        use louie::widget::select_list::{SelectItem, SelectList, SelectListState, SelectMode};
+        use hawktui::widget::select_list::{SelectItem, SelectList, SelectListState, SelectMode};
         #[allow(unused_imports)]
-        use louie::widget::StatefulWidget;
+        use hawktui::widget::StatefulWidget;
 
         fn render_select(
             list: &SelectList,
@@ -194,8 +194,8 @@ mod tests {
                 .map(|y| {
                     let mut row = String::new();
                     for x in 0..w {
-                        if let Some(cell) = buf.cell(louie::core::rect::Position::new(x, y)) {
-                            row.push_str(&cell.symbol);
+                        if let Some(cell) = buf.cell(hawktui::core::rect::Position::new(x, y)) {
+                            row.push_str(cell.symbol.as_str());
                         }
                     }
                     row.trim_end().to_string()
@@ -234,8 +234,8 @@ mod tests {
     }
 
     mod theme {
-        use louie::core::style::{Color, Style};
-        use louie::theme::{Theme, ThemeToken};
+        use hawktui::core::style::{Color, Style};
+        use hawktui::theme::{Theme, ThemeToken};
 
         #[test]
         fn dark_theme_has_primary_color() {
@@ -269,7 +269,7 @@ mod tests {
 
     mod barchart {
         use super::*;
-        use louie::widget::barchart::{Bar, BarChart, BarGroup};
+        use hawktui::widget::barchart::{Bar, BarChart, BarGroup};
 
         #[test]
         fn renders_single_bar() {
@@ -303,7 +303,7 @@ mod tests {
 
         #[test]
         fn discoverable_schema() {
-            use louie::ontology::Discoverable;
+            use hawktui::ontology::Discoverable;
             let schema = BarChart::schema();
             assert_eq!(schema.name, "BarChart");
             assert!(schema.tags.contains(&"chart".to_string()));
@@ -312,7 +312,7 @@ mod tests {
 
     mod chart_widget {
         use super::*;
-        use louie::widget::chart::{Axis, Chart, Dataset, GraphType, Marker};
+        use hawktui::widget::chart::{Axis, Chart, Dataset, GraphType, Marker};
 
         #[test]
         fn renders_scatter_points() {
@@ -346,7 +346,7 @@ mod tests {
 
         #[test]
         fn discoverable_schema() {
-            use louie::ontology::Discoverable;
+            use hawktui::ontology::Discoverable;
             let schema = Chart::schema();
             assert_eq!(schema.name, "Chart");
             assert!(schema.tags.contains(&"plot".to_string()));
@@ -355,7 +355,7 @@ mod tests {
 
     mod image_widget {
         use super::*;
-        use louie::widget::image::{Image, ImageProtocol};
+        use hawktui::widget::image::{Image, ImageProtocol};
 
         #[test]
         fn fallback_renders_text() {
@@ -369,7 +369,7 @@ mod tests {
 
         #[test]
         fn discoverable_schema() {
-            use louie::ontology::Discoverable;
+            use hawktui::ontology::Discoverable;
             let schema = Image::schema();
             assert_eq!(schema.name, "Image");
             assert!(schema.tags.contains(&"image".to_string()));
@@ -378,7 +378,7 @@ mod tests {
 
     mod settings_list_widget {
         use super::*;
-        use louie::widget::settings_list::{Setting, SettingsList, SettingsListState};
+        use hawktui::widget::settings_list::{Setting, SettingsList, SettingsListState};
 
         fn render_stateful(
             widget: SettingsList,
@@ -386,7 +386,7 @@ mod tests {
             w: u16,
             h: u16,
         ) -> Vec<String> {
-            use louie::widget::StatefulWidget;
+            use hawktui::widget::StatefulWidget;
             let area = Rect::new(0, 0, w, h);
             let mut buf = Buffer::empty(area);
             StatefulWidget::render(widget, area, &mut buf, state);
@@ -394,8 +394,8 @@ mod tests {
                 .map(|y| {
                     let mut row = String::new();
                     for x in 0..w {
-                        if let Some(cell) = buf.cell(louie::core::rect::Position::new(x, y)) {
-                            row.push_str(&cell.symbol);
+                        if let Some(cell) = buf.cell(hawktui::core::rect::Position::new(x, y)) {
+                            row.push_str(cell.symbol.as_str());
                         }
                     }
                     row.trim_end().to_string()
@@ -426,7 +426,7 @@ mod tests {
 
         #[test]
         fn cycle_next_changes_value() {
-            use louie::ontology::Discoverable;
+            use hawktui::ontology::Discoverable;
             let settings = vec![Setting::new(
                 "Theme",
                 vec!["Dark".into(), "Light".into(), "Auto".into()],
@@ -439,7 +439,7 @@ mod tests {
 
         #[test]
         fn cycle_prev_wraps() {
-            use louie::ontology::Discoverable;
+            use hawktui::ontology::Discoverable;
             let settings = vec![Setting::new("Theme", vec!["Dark".into(), "Light".into()])];
             let mut widget = SettingsList::new(settings);
             // Current is 0 (Dark), cycle_prev should wrap to 1 (Light)
@@ -450,7 +450,7 @@ mod tests {
     }
 
     mod fuzzy_matching {
-        use louie::util::fuzzy::fuzzy_match;
+        use hawktui::util::fuzzy::fuzzy_match;
 
         #[test]
         fn consecutive_match_beats_scattered_same_context() {
@@ -475,7 +475,7 @@ mod tests {
     }
 
     mod undo_stack {
-        use louie::util::undo::UndoStack;
+        use hawktui::util::undo::UndoStack;
 
         #[test]
         fn undo_with_string_state() {
@@ -490,9 +490,9 @@ mod tests {
     // ── Phase 9 tests ────────────────────────────────────────────────────────
 
     mod reflow {
-        use louie::core::reflow::{CharWrapper, LineTruncator, WordWrapper};
-        use louie::core::style::{Color, Style};
-        use louie::core::text::{Line, Span};
+        use hawktui::core::reflow::{CharWrapper, LineTruncator, WordWrapper};
+        use hawktui::core::style::{Color, Style};
+        use hawktui::core::text::{Line, Span};
 
         fn line_text(line: &Line) -> String {
             line.spans.iter().map(|s| s.content.as_ref()).collect()
@@ -540,7 +540,7 @@ mod tests {
 
     mod paragraph_wrap {
         use super::*;
-        use louie::widget::paragraph::{Paragraph, Wrap};
+        use hawktui::widget::paragraph::{Paragraph, Wrap};
 
         #[test]
         fn word_wrap_renders_multiple_lines() {
@@ -562,8 +562,8 @@ mod tests {
 
     mod line_gauge_widget {
         use super::*;
-        use louie::ontology::Discoverable;
-        use louie::widget::line_gauge::LineGauge;
+        use hawktui::ontology::Discoverable;
+        use hawktui::widget::line_gauge::LineGauge;
 
         #[test]
         fn renders_filled_and_unfilled() {
@@ -592,8 +592,8 @@ mod tests {
 
     mod calendar_widget {
         use super::*;
-        use louie::ontology::Discoverable;
-        use louie::widget::calendar::Calendar;
+        use hawktui::ontology::Discoverable;
+        use hawktui::widget::calendar::Calendar;
 
         #[test]
         fn renders_day_headers() {
@@ -622,10 +622,10 @@ mod tests {
     }
 
     mod list_direction {
-        use louie::core::buffer::Buffer;
-        use louie::core::rect::{Position, Rect};
-        use louie::widget::list::{List, ListDirection, ListState};
-        use louie::widget::StatefulWidget;
+        use hawktui::core::buffer::Buffer;
+        use hawktui::core::rect::{Position, Rect};
+        use hawktui::widget::list::{List, ListDirection, ListState};
+        use hawktui::widget::StatefulWidget;
 
         #[test]
         fn bottom_to_top_renders_last_items_at_bottom() {
@@ -647,8 +647,8 @@ mod tests {
 
     mod block_title_alignment {
         use super::*;
-        use louie::core::text::Alignment;
-        use louie::widget::block::Block;
+        use hawktui::core::text::Alignment;
+        use hawktui::widget::block::Block;
 
         #[test]
         fn title_centered() {

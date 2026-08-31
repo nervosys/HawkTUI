@@ -1,0 +1,34 @@
+[workspace]
+
+[package]
+name = "hawktui-benchmarks"
+version = "0.0.0"
+edition = "2021"
+publish = false
+description = "Head-to-head benchmarks: Hawk TUI vs other terminal UI frameworks"
+
+[dependencies]
+hawktui = { path = "..", features = ["crossterm"] }
+ratatui = { version = "0.29", default-features = false, features = ["crossterm"] }
+
+[dev-dependencies]
+hawktui = { path = "..", features = ["crossterm"] }
+ratatui = { version = "0.29", default-features = false, features = ["crossterm"] }
+superlighttui = { version = "0.23", default-features = false }
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bin]]
+name = "frameloop"
+path = "src/bin/frameloop.rs"
+
+[[bench]]
+name = "shootout"
+harness = false
+
+[profile.release]
+lto = true
+codegen-units = 1
+
+[profile.bench]
+lto = true
+codegen-units = 1

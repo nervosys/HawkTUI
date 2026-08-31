@@ -25,7 +25,7 @@ pub struct FuzzyMatch {
 /// # Example
 ///
 /// ```
-/// use louie::util::fuzzy::fuzzy_match;
+/// use hawktui::util::fuzzy::fuzzy_match;
 ///
 /// let m = fuzzy_match("abc", "a_b_c").unwrap();
 /// assert_eq!(m.indices, vec![0, 2, 4]);
@@ -51,11 +51,8 @@ pub fn fuzzy_match(pattern: &str, haystack: &str) -> Option<FuzzyMatch> {
     {
         let mut hi = 0;
         for &pc in &pattern_lower {
-            let found = haystack_lower[hi..].iter().position(|&hc| hc == pc);
-            match found {
-                Some(pos) => hi += pos + 1,
-                None => return None,
-            }
+            let pos = haystack_lower[hi..].iter().position(|&hc| hc == pc)?;
+            hi += pos + 1;
         }
     }
 

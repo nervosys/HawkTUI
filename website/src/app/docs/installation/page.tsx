@@ -10,12 +10,12 @@ export default function Installation() {
       </ul>
 
       <h2>Add to Your Project</h2>
-      <p>The quickest way to add Louie:</p>
-      <pre><code>cargo add louie</code></pre>
+      <p>The quickest way to add Hawk TUI:</p>
+      <pre><code>cargo add hawktui</code></pre>
 
       <p>Or add it manually to your <code>Cargo.toml</code>:</p>
       <pre><code>{`[dependencies]
-louie = "1"`}</code></pre>
+hawktui = "1"`}</code></pre>
 
       <h2>Feature Flags</h2>
       <table>
@@ -35,7 +35,7 @@ louie = "1"`}</code></pre>
           <tr>
             <td><code>bin</code></td>
             <td>No</td>
-            <td>Enables <code>louie-server</code> and <code>louie-demo</code> binaries (pulls in <code>tracing</code>).</td>
+            <td>Enables <code>hawktui-server</code> and <code>hawktui-demo</code> binaries (pulls in <code>tracing</code>).</td>
           </tr>
         </tbody>
       </table>
@@ -46,20 +46,20 @@ louie = "1"`}</code></pre>
         the default crossterm backend:
       </p>
       <pre><code>{`[dependencies]
-louie = { version = "1", default-features = false }`}</code></pre>
+hawktui = { version = "1", default-features = false }`}</code></pre>
 
       <h3>Building the Server Binary</h3>
       <p>
-        The standalone <code>louie-server</code> binary lets AI agents spawn and
-        control a headless Louie application:
+        The standalone <code>hawktui-server</code> binary lets AI agents spawn and
+        control a headless Hawk TUI application:
       </p>
-      <pre><code>cargo build --release --bin louie-server --features bin</code></pre>
+      <pre><code>cargo build --release --bin hawktui-server --features bin</code></pre>
 
       <h2>Verify Installation</h2>
       <pre><code>{`cargo build
 cargo test`}</code></pre>
       <p>
-        If both commands succeed, Louie is ready to use. Continue to the{" "}
+        If both commands succeed, Hawk TUI is ready to use. Continue to the{" "}
         <a href="/docs/quick-start">Quick Start</a> guide.
       </p>
     </>

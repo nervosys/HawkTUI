@@ -15,7 +15,7 @@ const MAX_SUBSCRIPTIONS: usize = 100;
 /// Maximum terminal dimension allowed via injected resize events (INP-2).
 const MAX_TERMINAL_DIM: u16 = 1024;
 
-/// Manages an agent's connection to a Louie application.
+/// Manages an agent's connection to a Hawk TUI application.
 ///
 /// The session processes incoming [`AgentRequest`]s, dispatches them against
 /// the ontology registry and widget tree, and tracks event subscriptions.
@@ -198,7 +198,7 @@ impl AgentSession {
         }
     }
 
-    /// Convert an [`InjectedEvent`] into a louie [`Event`].
+    /// Convert an [`InjectedEvent`] into a hawktui [`Event`].
     pub fn convert_injected_event(injected: &InjectedEvent) -> Option<Event> {
         match injected {
             InjectedEvent::Key { code, modifiers } => {

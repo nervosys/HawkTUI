@@ -1,15 +1,15 @@
 export default function Contributing() {
   return (
     <>
-      <h1>Contributing to Louie</h1>
+      <h1>Contributing to Hawk TUI</h1>
       <p>
         Contributions are welcome! This guide covers the development workflow, code
         style, and how to add new widgets.
       </p>
 
       <h2>Development Setup</h2>
-      <pre><code>{`git clone https://github.com/nervosys/louie.git
-cd louie
+      <pre><code>{`git clone https://github.com/nervosys/HawkTUI.git
+cd hawktui
 cargo build
 cargo test`}</code></pre>
       <p>
@@ -70,7 +70,7 @@ cargo doc --no-deps`}</code></pre>
       <h2>License</h2>
       <p>
         By contributing, you agree that your contributions will be licensed under{" "}
-        <strong>AGPL-3.0-or-later</strong>. See the <a href="https://github.com/nervosys/Louie/blob/master/LICENSE">LICENSE</a> file.
+        <strong>AGPL-3.0-or-later</strong>. See the <a href="https://github.com/nervosys/HawkTUI/blob/master/LICENSE">LICENSE</a> file.
       </p>
     </>
   );

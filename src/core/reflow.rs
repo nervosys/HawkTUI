@@ -10,35 +10,62 @@
 //!
 //! All three operate on [`Line`]s of [`Span`]s, preserving per-span styling
 //! through the reflow process.
+//!
+//! Reflow borrows from the source text rather than copying it: a
+//! [`StyledGrapheme`] holds a `&str` into the input span, so wrapping a screen
+//! of text allocates once per output line instead of once per character.
 
 use crate::core::style::Style;
 use crate::core::text::{Line, Span};
 use unicode_segmentation::UnicodeSegmentation;
 use unicode_width::UnicodeWidthStr;
 
-/// A single styled grapheme (one visible character with its style).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct StyledGrapheme {
-    pub grapheme: String,
+/// A single styled grapheme (one visible character with its style), borrowed
+/// from the line it came from.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct StyledGrapheme<'a> {
+    pub grapheme: &'a str,
     pub style: Style,
 }
 
-impl StyledGrapheme {
+impl StyledGrapheme<'_> {
     pub fn width(&self) -> usize {
-        self.grapheme.width()
+        display_width(self.grapheme)
     }
 }
 
-/// Explode a `Line` into individual styled graphemes.
-fn line_to_graphemes(line: &Line, base_style: Style) -> Vec<StyledGrapheme> {
-    let mut out = Vec::new();
+/// Display width of one grapheme cluster.
+///
+/// Printable ASCII is always one column, which lets the common case skip the
+/// width tables entirely.
+#[inline]
+fn display_width(g: &str) -> usize {
+    let b = g.as_bytes();
+    if b.len() == 1 && (0x20..0x7F).contains(&b[0]) {
+        1
+    } else {
+        g.width()
+    }
+}
+
+/// Explode a `Line` into individual styled graphemes borrowed from its spans.
+fn line_to_graphemes<'a>(line: &'a Line, base_style: Style) -> Vec<StyledGrapheme<'a>> {
+    let mut out = Vec::with_capacity(line.spans.iter().map(|s| s.content.len()).sum());
     for span in &line.spans {
         let style = base_style.patch(span.style);
-        for g in UnicodeSegmentation::graphemes(span.content.as_ref(), true) {
-            out.push(StyledGrapheme {
-                grapheme: g.to_string(),
-                style,
-            });
+        let content: &'a str = span.content.as_ref();
+        if content.is_ascii() {
+            // One byte per grapheme: slice directly, no segmentation pass.
+            for i in 0..content.len() {
+                out.push(StyledGrapheme {
+                    grapheme: &content[i..i + 1],
+                    style,
+                });
+            }
+        } else {
+            for g in UnicodeSegmentation::graphemes(content, true) {
+                out.push(StyledGrapheme { grapheme: g, style });
+            }
         }
     }
     out
@@ -46,25 +73,25 @@ fn line_to_graphemes(line: &Line, base_style: Style) -> Vec<StyledGrapheme> {
 
 /// Reassemble a slice of styled graphemes into a `Line`, merging adjacent
 /// graphemes that share the same style into a single `Span`.
-fn graphemes_to_line(graphemes: &[StyledGrapheme]) -> Line {
+fn graphemes_to_line(graphemes: &[StyledGrapheme<'_>]) -> Line {
     if graphemes.is_empty() {
         return Line::default();
     }
     let mut spans = Vec::new();
-    let mut current_text = String::new();
+    let mut current_text = String::with_capacity(graphemes.len());
     let mut current_style = graphemes[0].style;
 
     for sg in graphemes {
-        if sg.style == current_style {
-            current_text.push_str(&sg.grapheme);
-        } else {
+        if sg.style != current_style {
             if !current_text.is_empty() {
-                spans.push(Span::styled(current_text.clone(), current_style));
-                current_text.clear();
+                spans.push(Span::styled(
+                    std::mem::take(&mut current_text),
+                    current_style,
+                ));
             }
             current_style = sg.style;
-            current_text.push_str(&sg.grapheme);
         }
+        current_text.push_str(sg.grapheme);
     }
     if !current_text.is_empty() {
         spans.push(Span::styled(current_text, current_style));
@@ -94,9 +121,9 @@ impl WordWrapper {
                 continue;
             }
 
-            let mut current_line: Vec<StyledGrapheme> = Vec::new();
+            let mut current_line: Vec<StyledGrapheme<'_>> = Vec::new();
             let mut current_width: usize = 0;
-            let mut word: Vec<StyledGrapheme> = Vec::new();
+            let mut word: Vec<StyledGrapheme<'_>> = Vec::new();
             let mut word_width: usize = 0;
 
             for sg in &graphemes {
@@ -132,7 +159,7 @@ impl WordWrapper {
                     }
                     // Add the space if it fits
                     if current_width + gw <= max {
-                        current_line.push(sg.clone());
+                        current_line.push(*sg);
                         current_width += gw;
                     } else {
                         // Space at end of line — consume it, start new line
@@ -141,7 +168,7 @@ impl WordWrapper {
                         current_width = 0;
                     }
                 } else {
-                    word.push(sg.clone());
+                    word.push(*sg);
                     word_width += gw;
                 }
             }
@@ -179,21 +206,20 @@ impl WordWrapper {
     }
 
     /// Break an oversized word into lines of at most `max` columns.
-    fn char_break_word(result: &mut Vec<Line>, word: &[StyledGrapheme], max: usize) {
-        let mut current: Vec<StyledGrapheme> = Vec::new();
+    fn char_break_word(result: &mut Vec<Line>, word: &[StyledGrapheme<'_>], max: usize) {
+        let mut start = 0usize;
         let mut w = 0usize;
-        for sg in word {
+        for (i, sg) in word.iter().enumerate() {
             let gw = sg.width();
-            if w + gw > max && !current.is_empty() {
-                result.push(graphemes_to_line(&current));
-                current.clear();
+            if w + gw > max && i > start {
+                result.push(graphemes_to_line(&word[start..i]));
+                start = i;
                 w = 0;
             }
-            current.push(sg.clone());
             w += gw;
         }
-        if !current.is_empty() {
-            result.push(graphemes_to_line(&current));
+        if start < word.len() {
+            result.push(graphemes_to_line(&word[start..]));
         }
     }
 }
@@ -218,21 +244,20 @@ impl CharWrapper {
                 continue;
             }
 
-            let mut current: Vec<StyledGrapheme> = Vec::new();
+            // Slice the grapheme run in place instead of copying it out.
+            let mut start = 0usize;
             let mut w = 0usize;
-
-            for sg in &graphemes {
+            for (i, sg) in graphemes.iter().enumerate() {
                 let gw = sg.width();
-                if w + gw > max && !current.is_empty() {
-                    result.push(graphemes_to_line(&current));
-                    current.clear();
+                if w + gw > max && i > start {
+                    result.push(graphemes_to_line(&graphemes[start..i]));
+                    start = i;
                     w = 0;
                 }
-                current.push(sg.clone());
                 w += gw;
             }
-            if !current.is_empty() {
-                result.push(graphemes_to_line(&current));
+            if start < graphemes.len() {
+                result.push(graphemes_to_line(&graphemes[start..]));
             }
         }
 
@@ -253,17 +278,17 @@ impl LineTruncator {
 
         for line in lines {
             let graphemes = line_to_graphemes(line, base_style);
-            let mut kept: Vec<StyledGrapheme> = Vec::new();
             let mut w = 0usize;
+            let mut end = 0usize;
             for sg in &graphemes {
                 let gw = sg.width();
                 if w + gw > max {
                     break;
                 }
-                kept.push(sg.clone());
                 w += gw;
+                end += 1;
             }
-            result.push(graphemes_to_line(&kept));
+            result.push(graphemes_to_line(&graphemes[..end]));
         }
 
         result

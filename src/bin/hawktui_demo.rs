@@ -1,14 +1,14 @@
-//! louie-demo — Self-running demo of the Louie Agent Protocol.
+//! hawktui-demo — Self-running demo of the Hawk TUI Agent Protocol.
 //!
-//! Spawns `louie-server` as a child process and walks through the full agent
+//! Spawns `hawktui-server` as a child process and walks through the full agent
 //! workflow: ping → discover → inspect → control → verify → quit.
 //!
 //! Produces color-coded terminal output with dramatic timing, suitable for
 //! recording with asciinema, Windows Terminal recording, or Screen Studio.
 //!
 //! Usage:
-//!     cargo build --release --bin louie-server --bin louie-demo
-//!     cargo run --bin louie-demo
+//!     cargo build --release --bin hawktui-server --bin hawktui-demo
+//!     cargo run --bin hawktui-demo
 
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
@@ -86,9 +86,9 @@ fn main() {
 
         let sibling = self_dir.as_ref().map(|d| {
             let name = if cfg!(target_os = "windows") {
-                "louie-server.exe"
+                "hawktui-server.exe"
             } else {
-                "louie-server"
+                "hawktui-server"
             };
             d.join(name)
         });
@@ -98,10 +98,10 @@ fn main() {
                 p.to_string_lossy().to_string()
             } else {
                 eprintln!(
-                    "{BOLD}Error:{RESET} louie-server not found at {}",
+                    "{BOLD}Error:{RESET} hawktui-server not found at {}",
                     p.display()
                 );
-                eprintln!("Run: cargo build --bin louie-server");
+                eprintln!("Run: cargo build --bin hawktui-server");
                 std::process::exit(1);
             }
         } else {
@@ -113,7 +113,7 @@ fn main() {
     // Title
     println!();
     slow_print(
-        &format!("{BOLD}{MAGENTA}  Louie Agent Protocol — Live Demo{RESET}"),
+        &format!("{BOLD}{MAGENTA}  Hawk TUI Agent Protocol — Live Demo{RESET}"),
         40,
     );
     println!();
@@ -123,7 +123,7 @@ fn main() {
 
     // Step 1 — Spawn the server
     section("1. Spawn the server");
-    slow_print(&format!("  {DIM}$ louie-server{RESET}"), 50);
+    slow_print(&format!("  {DIM}$ hawktui-server{RESET}"), 50);
     sleep_ms(500);
 
     let mut child = Command::new(&server_path)
@@ -131,7 +131,7 @@ fn main() {
         .stdout(Stdio::piped())
         .stderr(Stdio::null())
         .spawn()
-        .expect("Failed to spawn louie-server");
+        .expect("Failed to spawn hawktui-server");
 
     let mut stdin = child.stdin.take().expect("Failed to open stdin");
     let stdout = child.stdout.take().expect("Failed to open stdout");
@@ -284,7 +284,7 @@ fn main() {
     slow_print(&format!("{BOLD}  What just happened:{RESET}"), 30);
     println!();
     sleep_ms(300);
-    println!("  1. Agent spawned a Louie TUI app as a headless process");
+    println!("  1. Agent spawned a Hawk TUI app as a headless process");
     sleep_ms(200);
     println!("  2. Agent discovered all widgets via {YELLOW}query_ontology{RESET}");
     sleep_ms(200);
@@ -308,6 +308,6 @@ fn main() {
         30,
     );
     println!();
-    println!("  {DIM}github.com/nervosys/louie{RESET}");
+    println!("  {DIM}github.com/nervosys/HawkTUI{RESET}");
     println!();
 }

@@ -6,7 +6,7 @@
 /// # Example
 ///
 /// ```
-/// use louie::util::undo::UndoStack;
+/// use hawktui::util::undo::UndoStack;
 ///
 /// let mut undo: UndoStack<String> = UndoStack::new(50);
 /// undo.push("hello".to_string());

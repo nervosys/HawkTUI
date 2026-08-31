@@ -1,12 +1,12 @@
-# Contributing to Louie
+# Contributing to Hawk TUI
 
 Thank you for your interest in contributing! This document covers the basics.
 
 ## Getting Started
 
 ```sh
-git clone https://github.com/nervosys/Louie.git
-cd Louie
+git clone https://github.com/nervosys/HawkTUI.git
+cd Hawk TUI
 cargo test --lib --tests
 ```
 

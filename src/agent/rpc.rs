@@ -1,7 +1,7 @@
 //! RPC transport: JSON Lines over stdin/stdout.
 //!
 //! This implements the stdio-based JSON Lines protocol used by AI coding agents
-//! (like OpenCode/Pi, OpenClaw, etc.) to embed and control Louie applications.
+//! (like OpenCode/Pi, OpenClaw, etc.) to embed and control Hawk TUI applications.
 //!
 //! Protocol:
 //! - Each line on stdin is a JSON [`RequestEnvelope`]
@@ -24,7 +24,7 @@ const MAX_LINE_BYTES: usize = 1_048_576;
 /// Maximum requests per second before throttling (INP-4).
 const MAX_REQUESTS_PER_SEC: u32 = 1000;
 
-/// Runs a Louie application over stdin/stdout JSON Lines protocol.
+/// Runs a Hawk TUI application over stdin/stdout JSON Lines protocol.
 ///
 /// The agent sends [`RequestEnvelope`] JSON objects (one per line) on stdin.
 /// The transport responds with [`AgentResponse`] JSON objects on stdout.
@@ -104,9 +104,8 @@ impl<M: Model> RpcTransport<M> {
             // MAX_LINE_BYTES, so an unbounded line can never exhaust memory
             // before this guard fires.
             if oversized {
-                let resp = AgentResponse::err(format!(
-                    "Request too large (max {MAX_LINE_BYTES} bytes)"
-                ));
+                let resp =
+                    AgentResponse::err(format!("Request too large (max {MAX_LINE_BYTES} bytes)"));
                 let json = serde_json::to_string(&resp).unwrap_or_default();
                 writeln!(stdout, "{json}")?;
                 stdout.flush()?;

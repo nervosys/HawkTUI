@@ -1,13 +1,13 @@
-//! louie-server — Headless Louie RPC server for AI agents.
+//! hawktui-server — Headless Hawk TUI RPC server for AI agents.
 //!
-//! A standalone binary that exposes a Louie application over the JSON Lines
+//! A standalone binary that exposes a Hawk TUI application over the JSON Lines
 //! protocol on stdin/stdout. AI agents (Claude, GPT, Codex, or any LLM-based
 //! system) spawn this process and communicate through structured JSON messages.
 //!
 //! # Usage
 //!
 //! ```sh
-//! louie-server [--width W] [--height H] [--help] [--version]
+//! hawktui-server [--width W] [--height H] [--help] [--version]
 //! ```
 //!
 //! # Protocol
@@ -19,13 +19,13 @@
 //!
 //! ```sh
 //! # Test connectivity
-//! echo '{"type":"ping"}' | louie-server
+//! echo '{"type":"ping"}' | hawktui-server
 //!
 //! # Discover all widget types
-//! echo '{"type":"query_ontology"}' | louie-server
+//! echo '{"type":"query_ontology"}' | hawktui-server
 //!
 //! # Interactive session (pipe from agent)
-//! my-agent | louie-server
+//! my-agent | hawktui-server
 //! ```
 
 use std::io::{self, Write};
@@ -34,21 +34,21 @@ use std::time::Instant;
 use tracing::{error, info, warn};
 use tracing_subscriber::EnvFilter;
 
-use louie::agent::driver::HeadlessDriver;
-use louie::agent::protocol::{AgentRequest, RequestEnvelope};
-use louie::agent::read_capped_line;
+use hawktui::agent::driver::HeadlessDriver;
+use hawktui::agent::protocol::{AgentRequest, RequestEnvelope};
+use hawktui::agent::read_capped_line;
 // Security limits (see docs/SECURITY-AUDIT.md INP-1, INP-2, INP-4)
 const MAX_LINE_BYTES: usize = 1_048_576; // 1 MB max request size
 const MAX_WIDTH: u16 = 1024;
 const MAX_HEIGHT: u16 = 512;
 const MAX_REQUESTS_PER_SEC: u32 = 1000; // Rate limit (INP-4)
-use louie::ontology::registry::OntologyRegistry;
-use louie::prelude::*;
-use louie::runtime::{Command, Model};
-use louie::widget::gauge::Gauge;
-use louie::widget::input::Input;
-use louie::widget::list::{List, ListItem, ListState};
-use louie::widget::select_list::SelectList;
+use hawktui::ontology::registry::OntologyRegistry;
+use hawktui::prelude::*;
+use hawktui::runtime::{Command, Model};
+use hawktui::widget::gauge::Gauge;
+use hawktui::widget::input::Input;
+use hawktui::widget::list::{List, ListItem, ListState};
+use hawktui::widget::select_list::SelectList;
 
 // ---------------------------------------------------------------------------
 // Demo application: a multi-widget showcase for agent exploration
@@ -105,13 +105,13 @@ impl Model for DemoApp {
 
     fn view(&self, frame: &mut Frame) {
         let area = frame.area();
-        let main_layout = louie::layout::Layout::default()
-            .direction(louie::layout::Direction::Vertical)
+        let main_layout = hawktui::layout::Layout::default()
+            .direction(hawktui::layout::Direction::Vertical)
             .constraints([
-                louie::layout::Constraint::Length(3),
-                louie::layout::Constraint::Length(3),
-                louie::layout::Constraint::Fill(1),
-                louie::layout::Constraint::Length(5),
+                hawktui::layout::Constraint::Length(3),
+                hawktui::layout::Constraint::Length(3),
+                hawktui::layout::Constraint::Fill(1),
+                hawktui::layout::Constraint::Length(5),
             ])
             .split(area);
 
@@ -253,10 +253,10 @@ fn parse_args() -> Args {
 
 fn print_help() {
     eprintln!(
-        r#"louie-server v{VERSION} — Headless Louie RPC server for AI agents
+        r#"hawktui-server v{VERSION} — Headless Hawk TUI RPC server for AI agents
 
 USAGE:
-    louie-server [OPTIONS]
+    hawktui-server [OPTIONS]
 
 OPTIONS:
     -w, --width <W>     Virtual terminal width  [default: 120]
@@ -291,17 +291,17 @@ PROTOCOL:
 
 EXAMPLES:
     # Test connectivity
-    echo '{{"type":"ping"}}' | louie-server
+    echo '{{"type":"ping"}}' | hawktui-server
 
     # Discover widget ontology
-    echo '{{"type":"query_ontology"}}' | louie-server
+    echo '{{"type":"query_ontology"}}' | hawktui-server
 
     # Interactive session with an AI agent
-    my-agent | louie-server
+    my-agent | hawktui-server
 
     # Python agent example
     import subprocess, json
-    proc = subprocess.Popen(["louie-server"], stdin=PIPE, stdout=PIPE, text=True)
+    proc = subprocess.Popen(["hawktui-server"], stdin=PIPE, stdout=PIPE, text=True)
     proc.stdin.write(json.dumps({{"type":"ping"}}) + "\n")
     proc.stdin.flush()
     print(json.loads(proc.stdout.readline()))
@@ -314,7 +314,7 @@ fn main() -> io::Result<()> {
     let args = parse_args();
 
     if args.show_version {
-        eprintln!("louie-server v{VERSION}");
+        eprintln!("hawktui-server v{VERSION}");
         return Ok(());
     }
     if args.show_help {
@@ -360,8 +360,7 @@ fn main() -> io::Result<()> {
             // Cap buffering so an unauthenticated client cannot exhaust memory
             // with an unbounded line before the handshake completes.
             if oversized {
-                let resp =
-                    serde_json::json!({"success": false, "error": "Request too large"});
+                let resp = serde_json::json!({"success": false, "error": "Request too large"});
                 writeln!(out, "{}", serde_json::to_string(&resp).unwrap())?;
                 out.flush()?;
                 warn!("oversized request during auth handshake");
@@ -484,6 +483,6 @@ fn main() -> io::Result<()> {
         }
     }
 
-    info!("louie-server exiting");
+    info!("hawktui-server exiting");
     Ok(())
 }

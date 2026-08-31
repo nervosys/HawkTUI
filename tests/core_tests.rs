@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     mod rect {
-        use louie::core::rect::{Margin, Position, Rect};
+        use hawktui::core::rect::{Margin, Position, Rect};
 
         #[test]
         fn new_and_accessors() {
@@ -64,9 +64,9 @@ mod tests {
     }
 
     mod buffer {
-        use louie::core::buffer::Buffer;
-        use louie::core::rect::{Position, Rect};
-        use louie::core::style::Style;
+        use hawktui::core::buffer::Buffer;
+        use hawktui::core::rect::{Position, Rect};
+        use hawktui::core::style::Style;
 
         #[test]
         fn empty_buffer_dimensions() {
@@ -111,7 +111,7 @@ mod tests {
     }
 
     mod style {
-        use louie::core::style::{Color, Style};
+        use hawktui::core::style::{Color, Style};
 
         #[test]
         fn default_style_has_no_colors() {
@@ -129,10 +129,12 @@ mod tests {
                 .italic();
             assert_eq!(s.fg, Some(Color::Red));
             assert_eq!(s.bg, Some(Color::Blue));
-            assert!(s.add_modifier.contains(louie::core::style::Modifier::BOLD));
             assert!(s
                 .add_modifier
-                .contains(louie::core::style::Modifier::ITALIC));
+                .contains(hawktui::core::style::Modifier::BOLD));
+            assert!(s
+                .add_modifier
+                .contains(hawktui::core::style::Modifier::ITALIC));
         }
 
         #[test]
@@ -143,16 +145,16 @@ mod tests {
             assert_eq!(merged.fg, Some(Color::Green));
             assert!(merged
                 .add_modifier
-                .contains(louie::core::style::Modifier::BOLD));
+                .contains(hawktui::core::style::Modifier::BOLD));
             assert!(merged
                 .add_modifier
-                .contains(louie::core::style::Modifier::ITALIC));
+                .contains(hawktui::core::style::Modifier::ITALIC));
         }
     }
 
     mod layout {
-        use louie::core::rect::Rect;
-        use louie::layout::{Constraint, Direction, Layout};
+        use hawktui::core::rect::Rect;
+        use hawktui::layout::{Constraint, Direction, Layout};
 
         #[test]
         fn vertical_split_fixed() {
@@ -190,9 +192,9 @@ mod tests {
     }
 
     mod widget_rendering {
-        use louie::core::buffer::Buffer;
-        use louie::core::rect::Rect;
-        use louie::widget::Widget;
+        use hawktui::core::buffer::Buffer;
+        use hawktui::core::rect::Rect;
+        use hawktui::widget::Widget;
 
         #[test]
         fn str_renders_at_position() {
@@ -201,10 +203,11 @@ mod tests {
             "Hello".render(area, &mut buf);
             let text: String = (0..5)
                 .map(|x| {
-                    buf.cell(louie::core::rect::Position::new(x, 0))
+                    buf.cell(hawktui::core::rect::Position::new(x, 0))
                         .unwrap()
                         .symbol
-                        .clone()
+                        .as_str()
+                        .to_string()
                 })
                 .collect();
             assert_eq!(text, "Hello");
@@ -212,7 +215,7 @@ mod tests {
     }
 
     mod editor_state {
-        use louie::widget::editor::EditorState;
+        use hawktui::widget::editor::EditorState;
 
         #[test]
         fn new_has_one_empty_line() {
@@ -279,7 +282,7 @@ mod tests {
     }
 
     mod select_list_state {
-        use louie::widget::select_list::{SelectListState, SelectMode};
+        use hawktui::widget::select_list::{SelectListState, SelectMode};
 
         #[test]
         fn move_wraps_around() {
@@ -312,7 +315,7 @@ mod tests {
     }
 
     mod focus {
-        use louie::focus::FocusManager;
+        use hawktui::focus::FocusManager;
 
         #[test]
         fn focus_ring_navigation() {
@@ -359,7 +362,7 @@ mod tests {
     }
 
     mod agent_protocol {
-        use louie::agent::protocol::{AgentRequest, AgentResponse, RequestEnvelope};
+        use hawktui::agent::protocol::{AgentRequest, AgentResponse, RequestEnvelope};
 
         #[test]
         fn request_roundtrip_json() {
@@ -405,8 +408,8 @@ mod tests {
     }
 
     mod overlay {
-        use louie::core::rect::Rect;
-        use louie::overlay::{Overlay, OverlayStack};
+        use hawktui::core::rect::Rect;
+        use hawktui::overlay::{Overlay, OverlayStack};
 
         #[test]
         fn push_and_top() {

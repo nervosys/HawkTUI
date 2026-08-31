@@ -12,6 +12,7 @@ use crate::ontology::{
     WidgetSchema,
 };
 use crate::widget::block::Block;
+use crate::widget::highlight::{HighlightTheme, Highlighter, Language};
 use crate::widget::Widget;
 
 /// A widget that renders Markdown text with basic formatting.
@@ -25,6 +26,8 @@ pub struct Markdown {
     bold_style: Style,
     italic_style: Style,
     quote_style: Style,
+    highlight: bool,
+    highlight_theme: HighlightTheme,
 }
 
 impl Markdown {
@@ -38,7 +41,24 @@ impl Markdown {
             bold_style: Style::default().bold(),
             italic_style: Style::default().italic(),
             quote_style: Style::default().fg(Color::DarkGray).italic(),
+            highlight: true,
+            highlight_theme: HighlightTheme::default(),
         }
+    }
+
+    /// Syntax-highlight fenced code blocks whose fence names a known language.
+    ///
+    /// On by default. A fence with no language, or one this build does not
+    /// recognize, falls back to [`code_style`](Self::code_style).
+    pub fn highlight(mut self, highlight: bool) -> Self {
+        self.highlight = highlight;
+        self
+    }
+
+    /// Palette for highlighted code blocks.
+    pub fn highlight_theme(mut self, theme: HighlightTheme) -> Self {
+        self.highlight_theme = theme;
+        self
     }
 
     pub fn block(mut self, block: Block) -> Self {
@@ -65,24 +85,37 @@ impl Markdown {
     fn parse_lines(&self) -> Vec<Line> {
         let mut lines = Vec::new();
         let mut in_code_block = false;
+        // Set while inside a fence that named a language we can highlight.
+        let mut code_highlighter: Option<Highlighter> = None;
 
         for raw_line in self.source.lines() {
             if raw_line.starts_with("```") {
                 in_code_block = !in_code_block;
-                if in_code_block {
-                    // Code block start — skip the fence line
-                    continue;
+                code_highlighter = if in_code_block && self.highlight {
+                    let tag = raw_line.trim_start_matches('`').trim();
+                    Language::from_name(tag)
+                        .map(|lang| Highlighter::new(lang).theme(self.highlight_theme))
                 } else {
-                    // Code block end
-                    continue;
-                }
+                    None
+                };
+                // The fence line itself is not rendered.
+                continue;
             }
 
             if in_code_block {
-                lines.push(Line {
-                    spans: vec![Span::styled(format!("  {raw_line}"), self.code_style)],
-                    alignment: None,
-                });
+                if let Some(hl) = code_highlighter.as_mut() {
+                    let mut spans = vec![Span::styled("  ", self.code_style)];
+                    spans.extend(hl.spans(raw_line));
+                    lines.push(Line {
+                        spans,
+                        alignment: None,
+                    });
+                } else {
+                    lines.push(Line {
+                        spans: vec![Span::styled(format!("  {raw_line}"), self.code_style)],
+                        alignment: None,
+                    });
+                }
                 continue;
             }
 

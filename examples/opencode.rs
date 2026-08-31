@@ -1,4 +1,4 @@
-//! OpenCode-style AI coding assistant TUI — built with Louie.
+//! OpenCode-style AI coding assistant TUI — built with Hawk TUI.
 //!
 //! Demonstrates a chat interface with:
 //! - Model selector tabs
@@ -7,14 +7,14 @@
 //! - Token/cost tracking in the status bar
 //! - Agent ontology integration
 
-use louie::core::text::Alignment;
-use louie::ontology::registry::OntologyRegistry;
-use louie::prelude::*;
-use louie::runtime::{Command, Model, Program, ProgramOptions};
-use louie::widget::input::{Input, InputState};
-use louie::widget::markdown::Markdown;
-use louie::widget::scrollbar::{Scrollbar, ScrollbarOrientation, ScrollbarState};
-use louie::widget::tabs::Tabs;
+use hawktui::core::text::Alignment;
+use hawktui::ontology::registry::OntologyRegistry;
+use hawktui::prelude::*;
+use hawktui::runtime::{Command, Model, Program, ProgramOptions};
+use hawktui::widget::input::{Input, InputState};
+use hawktui::widget::markdown::Markdown;
+use hawktui::widget::scrollbar::{Scrollbar, ScrollbarOrientation, ScrollbarState};
+use hawktui::widget::tabs::Tabs;
 
 // ── Colour palette ──────────────────────────────────────────────────────────
 
@@ -122,7 +122,7 @@ impl App {
     fn new() -> Self {
         let welcome = ChatMessage {
             role: Role::System,
-            content: "Welcome to **Louie Chat** — an OpenCode-style AI assistant TUI.\n\
+            content: "Welcome to **Hawk TUI Chat** — an OpenCode-style AI assistant TUI.\n\
                       Type a message and press **Enter** to send.\n\
                       Use **Tab** to cycle models, **?** for help."
                 .into(),
@@ -177,7 +177,7 @@ impl App {
             "Great question about Rust! Here's a quick example:\n\n\
              ```rust\n\
              fn main() {\n\
-                 let greeting = \"Hello from Louie!\";\n\
+                 let greeting = \"Hello from Hawk TUI!\";\n\
                  println!(\"{greeting}\");\n\
              }\n\
              ```\n\n\
@@ -191,7 +191,7 @@ impl App {
             format!(
                 "I received your message ({} chars). In a real deployment, this \
                  would be sent to **{}** for processing.\n\n\
-                 This is a demo of the **Louie** TUI framework — \
+                 This is a demo of the **Hawk TUI** TUI framework — \
                  an agentic-first terminal UI library built in Rust.",
                 user_msg.len(),
                 model.name
@@ -420,10 +420,10 @@ impl Model for App {
     fn register_ontology(&self, registry: &mut OntologyRegistry) {
         registry.register::<Block>();
         registry.register::<Paragraph>();
-        registry.register::<louie::widget::input::Input>();
-        registry.register::<louie::widget::tabs::Tabs>();
-        registry.register::<louie::widget::markdown::Markdown>();
-        registry.register::<louie::widget::scrollbar::Scrollbar>();
+        registry.register::<hawktui::widget::input::Input>();
+        registry.register::<hawktui::widget::tabs::Tabs>();
+        registry.register::<hawktui::widget::markdown::Markdown>();
+        registry.register::<hawktui::widget::scrollbar::Scrollbar>();
     }
 }
 
@@ -436,7 +436,7 @@ impl App {
         let tabs = Tabs::new(titles)
             .block(
                 Block::default()
-                    .title(" Louie Chat ")
+                    .title(" Hawk TUI Chat ")
                     .title_alignment(Alignment::Left)
                     .borders(Borders::ALL)
                     .border_type(BorderType::Rounded)

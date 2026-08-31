@@ -1,8 +1,9 @@
 //! Terminal backend abstractions.
 //!
-//! The backend trait defines the interface between louie's rendering engine
+//! The backend trait defines the interface between hawktui's rendering engine
 //! and the actual terminal. The default implementation uses crossterm.
 
+pub mod ansi;
 pub mod test;
 
 #[cfg(feature = "crossterm")]
@@ -10,7 +11,6 @@ pub mod crossterm_backend;
 
 use crate::core::cell::Cell;
 use crate::core::rect::{Position, Size};
-use crate::core::style::{Color, Modifier};
 use std::io;
 
 /// Trait for terminal backends.
@@ -22,6 +22,17 @@ pub trait Backend {
     fn draw<'a, I>(&mut self, content: I) -> io::Result<()>
     where
         I: Iterator<Item = (u16, u16, &'a Cell)>;
+
+    /// Write changed cells, each with an optional OSC 8 hyperlink target.
+    ///
+    /// Backends that cannot render hyperlinks — or do not care to — inherit the
+    /// default, which drops the targets and draws the cells normally.
+    fn draw_linked<'a, I>(&mut self, content: I) -> io::Result<()>
+    where
+        I: Iterator<Item = (u16, u16, &'a Cell, Option<&'a str>)>,
+    {
+        self.draw(content.map(|(x, y, cell, _)| (x, y, cell)))
+    }
 
     /// Hide the cursor.
     fn hide_cursor(&mut self) -> io::Result<()>;
@@ -84,68 +95,4 @@ pub trait Backend {
     fn end_sync(&mut self) -> io::Result<()> {
         Ok(())
     }
-}
-
-/// Map louie Color to crossterm Color.
-#[cfg(feature = "crossterm")]
-pub(crate) fn to_crossterm_color(color: Color) -> crossterm::style::Color {
-    match color {
-        Color::Reset => crossterm::style::Color::Reset,
-        Color::Black => crossterm::style::Color::Black,
-        Color::Red => crossterm::style::Color::DarkRed,
-        Color::Green => crossterm::style::Color::DarkGreen,
-        Color::Yellow => crossterm::style::Color::DarkYellow,
-        Color::Blue => crossterm::style::Color::DarkBlue,
-        Color::Magenta => crossterm::style::Color::DarkMagenta,
-        Color::Cyan => crossterm::style::Color::DarkCyan,
-        Color::Gray => crossterm::style::Color::Grey,
-        Color::DarkGray => crossterm::style::Color::DarkGrey,
-        Color::LightRed => crossterm::style::Color::Red,
-        Color::LightGreen => crossterm::style::Color::Green,
-        Color::LightYellow => crossterm::style::Color::Yellow,
-        Color::LightBlue => crossterm::style::Color::Blue,
-        Color::LightMagenta => crossterm::style::Color::Magenta,
-        Color::LightCyan => crossterm::style::Color::Cyan,
-        Color::White => crossterm::style::Color::White,
-        Color::Indexed(i) => crossterm::style::Color::AnsiValue(i),
-        Color::Rgb(r, g, b) => crossterm::style::Color::Rgb { r, g, b },
-    }
-}
-
-/// Map louie Modifier to crossterm Attributes.
-#[cfg(feature = "crossterm")]
-pub(crate) fn to_crossterm_attributes(modifier: Modifier) -> Vec<crossterm::style::Attribute> {
-    use crossterm::style::Attribute;
-    let mut attrs = Vec::new();
-    if modifier.contains(Modifier::BOLD) {
-        attrs.push(Attribute::Bold);
-    }
-    if modifier.contains(Modifier::DIM) {
-        attrs.push(Attribute::Dim);
-    }
-    if modifier.contains(Modifier::ITALIC) {
-        attrs.push(Attribute::Italic);
-    }
-    if modifier.contains(Modifier::UNDERLINED) {
-        attrs.push(Attribute::Underlined);
-    }
-    if modifier.contains(Modifier::SLOW_BLINK) {
-        attrs.push(Attribute::SlowBlink);
-    }
-    if modifier.contains(Modifier::RAPID_BLINK) {
-        attrs.push(Attribute::RapidBlink);
-    }
-    if modifier.contains(Modifier::REVERSED) {
-        attrs.push(Attribute::Reverse);
-    }
-    if modifier.contains(Modifier::HIDDEN) {
-        attrs.push(Attribute::Hidden);
-    }
-    if modifier.contains(Modifier::CROSSED_OUT) {
-        attrs.push(Attribute::CrossedOut);
-    }
-    if modifier.contains(Modifier::OVERLINED) {
-        attrs.push(Attribute::OverLined);
-    }
-    attrs
 }

@@ -10,7 +10,7 @@ export default function FocusOverlays() {
         programmatic focus control.
       </p>
 
-      <pre><code>{`use louie::focus::FocusManager;
+      <pre><code>{`use hawktui::focus::FocusManager;
 
 let mut focus = FocusManager::new();
 focus.register("search-input");
@@ -45,7 +45,7 @@ let current = focus.focused_id();  // Option<&str>`}</code></pre>
         underlying widgets.
       </p>
 
-      <pre><code>{`use louie::overlay::{Overlay, OverlayStack};
+      <pre><code>{`use hawktui::overlay::{Overlay, OverlayStack};
 
 let mut overlays = OverlayStack::new();
 
@@ -69,7 +69,7 @@ overlays.remove("confirm-dialog");`}</code></pre>
         The built-in <code>ModalBox</code> widget renders a centered bordered box
         with a dimmed background:
       </p>
-      <pre><code>{`use louie::overlay::ModalBox;
+      <pre><code>{`use hawktui::overlay::ModalBox;
 
 let modal = ModalBox::new("Confirm Delete")
     .width_percent(50)

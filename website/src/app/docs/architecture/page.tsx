@@ -3,7 +3,7 @@ export default function Architecture() {
     <>
       <h1>Architecture</h1>
       <p>
-        Louie is organized as a layered architecture with clear separation of
+        Hawk TUI is organized as a layered architecture with clear separation of
         concerns. Every layer can be used by both human users and AI agents.
       </p>
 

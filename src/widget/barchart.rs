@@ -87,7 +87,7 @@ pub enum BarDirection {
 /// # Example
 ///
 /// ```ignore
-/// use louie::widget::barchart::{BarChart, Bar, BarGroup};
+/// use hawktui::widget::barchart::{BarChart, Bar, BarGroup};
 ///
 /// let chart = BarChart::new(vec![
 ///     BarGroup::new(vec![Bar::new(80), Bar::new(60)]).label("Q1"),

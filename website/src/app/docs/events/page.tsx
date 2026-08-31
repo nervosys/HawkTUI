@@ -3,7 +3,7 @@ export default function Events() {
     <>
       <h1>Events</h1>
       <p>
-        Louie&apos;s event system handles keyboard, mouse, resize, paste, and focus
+        Hawk TUI&apos;s event system handles keyboard, mouse, resize, paste, and focus
         events. Events are polled by the runtime and dispatched to your
         model&apos;s <code>handle_event()</code> method.
       </p>

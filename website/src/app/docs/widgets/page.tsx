@@ -138,7 +138,7 @@ export default function Widgets() {
     <>
       <h1>Widget Catalog</h1>
       <p>
-        Louie ships 22 widgets, each implementing both the <code>Widget</code> trait
+        Hawk TUI ships 22 widgets, each implementing both the <code>Widget</code> trait
         (for rendering) and the <code>Discoverable</code> trait (for agent
         discoverability).
       </p>

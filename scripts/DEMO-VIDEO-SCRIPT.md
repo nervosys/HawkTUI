@@ -10,10 +10,10 @@
 
 ```sh
 # Build the server
-cargo build --release --bin louie-server
+cargo build --release --bin hawktui-server
 
 # Record with asciinema
-asciinema rec demo.cast -c "python3 scripts/louie-demo.py"
+asciinema rec demo.cast -c "python3 scripts/hawktui-demo.py"
 
 # Convert to GIF or SVG for embedding
 # Option 1: agg (asciinema GIF generator)
@@ -23,7 +23,7 @@ agg demo.cast demo.gif --cols 100 --rows 35
 svg-term --in demo.cast --out demo.svg --window
 ```
 
-The `scripts/louie-demo.py` script runs the full demo automatically with dramatic timing and color-coded output. It walks through:
+The `scripts/hawktui-demo.py` script runs the full demo automatically with dramatic timing and color-coded output. It walks through:
 
 1. Spawning the server
 2. Pinging for connectivity
@@ -49,7 +49,7 @@ For a more polished video with voiceover or captions:
 
 ### Shot 2: The Alternative (0:15–0:25)
 
-**On screen**: `echo '{"type":"ping"}' | louie-server` — clean JSON response.
+**On screen**: `echo '{"type":"ping"}' | hawktui-server` — clean JSON response.
 
 **Caption**: 
 > "What if the UI could describe itself?"
@@ -80,7 +80,7 @@ For a more polished video with voiceover or captions:
 **On screen**: Side-by-side comparison table:
 
 ```
-              Screen Scraping    Louie Protocol
+              Screen Scraping    Hawk TUI Protocol
 Discovery     None               Full ontology
 Reliability   Fragile            Robust
 Maintenance   Break on change    Self-describing
@@ -91,7 +91,7 @@ Maintenance   Break on change    Self-describing
 
 ### Shot 7: Call to Action (1:20–1:30)
 
-**On screen**: `github.com/nervosys/louie`
+**On screen**: `github.com/nervosys/HawkTUI`
 
 **Caption**: 
 > "Open source under AGPL. Commercial licenses available."

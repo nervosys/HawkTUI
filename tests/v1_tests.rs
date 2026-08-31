@@ -7,10 +7,10 @@ mod tests {
     // ── Agent Session ────────────────────────────────────────────────
 
     mod agent_session {
-        use louie::agent::protocol::{AgentRequest, InjectedEvent, PROTOCOL_VERSION};
-        use louie::agent::session::AgentSession;
-        use louie::ontology::registry::{OntologyRegistry, UiNode, UiTree};
-        use louie::ontology::SemanticRole;
+        use hawktui::agent::protocol::{AgentRequest, InjectedEvent, PROTOCOL_VERSION};
+        use hawktui::agent::session::AgentSession;
+        use hawktui::ontology::registry::{OntologyRegistry, UiNode, UiTree};
+        use hawktui::ontology::SemanticRole;
 
         fn empty_registry() -> OntologyRegistry {
             OntologyRegistry::new()
@@ -275,7 +275,7 @@ mod tests {
 
         #[test]
         fn convert_resize_clamps_to_max() {
-            use louie::event::Event;
+            use hawktui::event::Event;
             let ev = InjectedEvent::Resize {
                 width: 9999,
                 height: 9999,
@@ -292,7 +292,7 @@ mod tests {
 
         #[test]
         fn convert_resize_clamps_to_min() {
-            use louie::event::Event;
+            use hawktui::event::Event;
             let ev = InjectedEvent::Resize {
                 width: 0,
                 height: 0,
@@ -362,11 +362,11 @@ mod tests {
     // ── Headless Driver ──────────────────────────────────────────────
 
     mod headless_driver {
-        use louie::agent::driver::HeadlessDriver;
-        use louie::agent::protocol::{AgentRequest, RequestEnvelope};
-        use louie::event::Event;
-        use louie::runtime::{Command, Model};
-        use louie::terminal::Frame;
+        use hawktui::agent::driver::HeadlessDriver;
+        use hawktui::agent::protocol::{AgentRequest, RequestEnvelope};
+        use hawktui::event::Event;
+        use hawktui::runtime::{Command, Model};
+        use hawktui::terminal::Frame;
 
         /// Minimal Model for driver tests.
         struct TestApp {
@@ -401,8 +401,8 @@ mod tests {
             fn handle_event(&self, event: Event) -> Option<TestMsg> {
                 match event {
                     Event::Key(ke) => match ke.code {
-                        louie::event::KeyCode::Char('q') => Some(TestMsg::Quit),
-                        louie::event::KeyCode::Up => Some(TestMsg::Increment),
+                        hawktui::event::KeyCode::Char('q') => Some(TestMsg::Quit),
+                        hawktui::event::KeyCode::Up => Some(TestMsg::Increment),
                         _ => None,
                     },
                     Event::Tick => Some(TestMsg::Increment),
@@ -464,7 +464,7 @@ mod tests {
         fn driver_inject_key_event() {
             let app = TestApp { counter: 0 };
             let mut driver = HeadlessDriver::new(app, 80, 24).unwrap();
-            use louie::agent::protocol::InjectedEvent;
+            use hawktui::agent::protocol::InjectedEvent;
             driver.process_request(&AgentRequest::InjectEvent {
                 event: InjectedEvent::Key {
                     code: "up".into(),
@@ -478,7 +478,7 @@ mod tests {
         fn driver_inject_quit_key() {
             let app = TestApp { counter: 0 };
             let mut driver = HeadlessDriver::new(app, 80, 24).unwrap();
-            use louie::agent::protocol::InjectedEvent;
+            use hawktui::agent::protocol::InjectedEvent;
             driver.process_request(&AgentRequest::InjectEvent {
                 event: InjectedEvent::Key {
                     code: "q".into(),
@@ -522,8 +522,8 @@ mod tests {
     // ── Ontology Registry ────────────────────────────────────────────
 
     mod ontology_registry {
-        use louie::ontology::registry::{OntologyRegistry, UiNode, UiTree};
-        use louie::ontology::{AgentAction, AgentCapability, SemanticRole, WidgetSchema};
+        use hawktui::ontology::registry::{OntologyRegistry, UiNode, UiTree};
+        use hawktui::ontology::{AgentAction, AgentCapability, SemanticRole, WidgetSchema};
 
         fn make_schema(name: &str, role: SemanticRole, tags: &[&str]) -> WidgetSchema {
             WidgetSchema {
@@ -622,7 +622,7 @@ mod tests {
 
         #[test]
         fn validate_action_params_checks_declared_actions() {
-            use louie::ontology::{ActionParam, ActionParamType};
+            use hawktui::ontology::{ActionParam, ActionParamType};
 
             let mut schema = make_schema("W", SemanticRole::Input, &[]);
             schema.actions.push(AgentAction {
@@ -737,7 +737,7 @@ mod tests {
     // ── Action Validation ────────────────────────────────────────────
 
     mod action_validation {
-        use louie::ontology::{ActionParam, ActionParamType, AgentAction};
+        use hawktui::ontology::{ActionParam, ActionParamType, AgentAction};
 
         fn make_action(params: Vec<ActionParam>) -> AgentAction {
             AgentAction {
@@ -922,7 +922,7 @@ mod tests {
     // ── Capability Names ─────────────────────────────────────────────
 
     mod capability_names {
-        use louie::ontology::AgentCapability;
+        use hawktui::ontology::AgentCapability;
 
         #[test]
         fn standard_capability_names() {
@@ -962,7 +962,7 @@ mod tests {
     // ── Focus Manager (extended) ─────────────────────────────────────
 
     mod focus_extended {
-        use louie::focus::FocusManager;
+        use hawktui::focus::FocusManager;
 
         #[test]
         fn empty_ring_focus_next_is_noop() {
@@ -1042,8 +1042,8 @@ mod tests {
     // ── Overlay Stack (extended) ─────────────────────────────────────
 
     mod overlay_extended {
-        use louie::core::rect::Rect;
-        use louie::overlay::{ModalBox, Overlay, OverlayStack};
+        use hawktui::core::rect::Rect;
+        use hawktui::overlay::{ModalBox, Overlay, OverlayStack};
 
         #[test]
         fn stack_len_and_is_empty() {
@@ -1155,8 +1155,8 @@ mod tests {
 
         #[test]
         fn modal_renders_without_panic() {
-            use louie::core::buffer::Buffer;
-            use louie::widget::Widget;
+            use hawktui::core::buffer::Buffer;
+            use hawktui::widget::Widget;
 
             let modal = ModalBox::new("Dialog").width_percent(60).height_percent(40);
             let area = Rect::new(0, 0, 80, 24);
@@ -1169,7 +1169,7 @@ mod tests {
     // ── Error Types ──────────────────────────────────────────────────
 
     mod error_types {
-        use louie::error::{Error, Result};
+        use hawktui::error::{Error, Result};
 
         #[test]
         fn display_io() {
@@ -1266,7 +1266,7 @@ mod tests {
     // ── Protocol Serde (extended) ────────────────────────────────────
 
     mod protocol_serde {
-        use louie::agent::protocol::{AgentEvent, AgentRequest, InjectedEvent};
+        use hawktui::agent::protocol::{AgentEvent, AgentRequest, InjectedEvent};
 
         #[test]
         fn all_request_variants_roundtrip() {

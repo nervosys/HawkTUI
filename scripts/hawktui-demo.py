@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
-louie-demo.py — Self-running demo of the Louie Agent Protocol.
+hawktui-demo.py — Self-running demo of the Hawk TUI Agent Protocol.
 
 Records a complete agent interaction session for demo/marketing purposes.
 Run this script, then use the output for video recording or documentation.
 
 Usage:
     # Build first
-    cargo build --release --bin louie-server
+    cargo build --release --bin hawktui-server
 
     # Run the demo
-    python3 scripts/louie-demo.py
+    python3 scripts/hawktui-demo.py
 
     # Or record with asciinema
-    asciinema rec demo.cast -c "python3 scripts/louie-demo.py"
+    asciinema rec demo.cast -c "python3 scripts/hawktui-demo.py"
 """
 
 import json
@@ -71,25 +71,25 @@ def show_response(resp, compact=False):
 def main():
     # Find the binary
     import os
-    binary = os.path.join("target", "release", "louie-server")
+    binary = os.path.join("target", "release", "hawktui-server")
     if sys.platform == "win32":
         binary += ".exe"
     if not os.path.exists(binary):
-        binary = os.path.join("target", "debug", "louie-server")
+        binary = os.path.join("target", "debug", "hawktui-server")
         if sys.platform == "win32":
             binary += ".exe"
     if not os.path.exists(binary):
-        print(f"{BOLD}Error:{RESET} louie-server not found. Run: cargo build --bin louie-server")
+        print(f"{BOLD}Error:{RESET} hawktui-server not found. Run: cargo build --bin hawktui-server")
         sys.exit(1)
 
-    slow_print(f"{BOLD}{MAGENTA}Louie Agent Protocol — Live Demo{RESET}", 0.04)
+    slow_print(f"{BOLD}{MAGENTA}Hawk TUI Agent Protocol — Live Demo{RESET}", 0.04)
     print(f"{DIM}Showing how an AI agent discovers and controls a TUI application{RESET}")
     print(f"{DIM}through structured JSON messages — no screen-scraping needed.{RESET}")
     time.sleep(1.5)
 
     # Start the server
     section("1. Spawn the server")
-    slow_print(f"  $ louie-server", 0.05)
+    slow_print(f"  $ hawktui-server", 0.05)
     time.sleep(0.5)
 
     proc = subprocess.Popen(
@@ -201,7 +201,7 @@ def main():
     print()
     slow_print(f"{BOLD}  What just happened:{RESET}", 0.03)
     print()
-    print(f"  1. Agent spawned a Louie TUI app as a headless process")
+    print(f"  1. Agent spawned a Hawk TUI app as a headless process")
     print(f"  2. Agent discovered all widgets via {YELLOW}query_ontology{RESET}")
     print(f"  3. Agent inspected widget schemas — types, constraints, actions")
     print(f"  4. Agent read the UI tree — positions, state, capabilities")
@@ -212,7 +212,7 @@ def main():
     slow_print(f"{BOLD}  No screen-scraping. No hardcoded selectors. No brittleness.{RESET}", 0.03)
     slow_print(f"{BOLD}  Just a self-describing UI ontology.{RESET}", 0.03)
     print()
-    print(f"  {DIM}github.com/nervosys/louie{RESET}")
+    print(f"  {DIM}github.com/nervosys/HawkTUI{RESET}")
     print()
 
 

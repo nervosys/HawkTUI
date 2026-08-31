@@ -7,7 +7,7 @@
 //! # Example
 //!
 //! ```ignore
-//! use louie::theme::{Theme, ThemeToken};
+//! use hawktui::theme::{Theme, ThemeToken};
 //!
 //! let theme = Theme::dark();
 //! let style = theme.get(ThemeToken::Primary);

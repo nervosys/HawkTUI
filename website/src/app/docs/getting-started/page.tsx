@@ -1,16 +1,16 @@
 export default function GettingStarted() {
   return (
     <>
-      <h1>Getting Started with Louie</h1>
+      <h1>Getting Started with Hawk TUI</h1>
       <p>
-        Louie is an agentic-first TUI framework in Rust. It combines a modern Elm
+        Hawk TUI is an agentic-first TUI framework in Rust. It combines a modern Elm
         architecture with a structured ontology that lets AI agents discover,
         inspect, and interact with every widget in your application.
       </p>
 
-      <h2>What is Louie?</h2>
+      <h2>What is Hawk TUI?</h2>
       <p>
-        Traditional TUI frameworks are built for humans. Louie is built for both:
+        Traditional TUI frameworks are built for humans. Hawk TUI is built for both:
       </p>
       <ul>
         <li>
@@ -39,10 +39,10 @@ export default function GettingStarted() {
 
       <h2>Next Steps</h2>
       <ul>
-        <li><a href="/docs/installation">Installation</a> &mdash; Add Louie to your project.</li>
-        <li><a href="/docs/quick-start">Quick Start</a> &mdash; Build your first Louie app in under 5 minutes.</li>
-        <li><a href="/docs/architecture">Architecture</a> &mdash; Understand how Louie is structured.</li>
-        <li><a href="/docs/agent-protocol">Agent Protocol</a> &mdash; Connect an AI agent to a Louie app.</li>
+        <li><a href="/docs/installation">Installation</a> &mdash; Add Hawk TUI to your project.</li>
+        <li><a href="/docs/quick-start">Quick Start</a> &mdash; Build your first Hawk TUI app in under 5 minutes.</li>
+        <li><a href="/docs/architecture">Architecture</a> &mdash; Understand how Hawk TUI is structured.</li>
+        <li><a href="/docs/agent-protocol">Agent Protocol</a> &mdash; Connect an AI agent to a Hawk TUI app.</li>
       </ul>
     </>
   );

@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Louie \u2014 TUI Framework for Agentic AI",
+  title: "Hawk TUI \u2014 TUI Framework for Agentic AI",
   description:
     "An agentic-first terminal UI framework in Rust with complete ontology for agent discoverability.",
   openGraph: {
-    title: "Louie \u2014 TUI Framework for Agentic AI",
+    title: "Hawk TUI \u2014 TUI Framework for Agentic AI",
     description:
       "An agentic-first terminal UI framework in Rust with complete ontology for agent discoverability.",
-    url: "https://nervosys.ai/louie",
-    siteName: "Louie",
+    url: "https://nervosys.ai/hawktui",
+    siteName: "Hawk TUI",
     type: "website",
   },
 };

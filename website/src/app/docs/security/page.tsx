@@ -16,7 +16,7 @@ export default function Security() {
       <div className="callout callout-warn">
         <p>
           <strong>Do not open a public issue.</strong> Report vulnerabilities via{" "}
-          <a href="https://github.com/nervosys/Louie/security/advisories/new">
+          <a href="https://github.com/nervosys/HawkTUI/security/advisories/new">
             GitHub Security Advisories
           </a>{" "}
           or email <strong>security@nervosys.ai</strong>.
@@ -29,7 +29,7 @@ export default function Security() {
 
       <h2>Hardening Measures</h2>
       <p>
-        Louie implements multiple layers of defense for the agent protocol:
+        Hawk TUI implements multiple layers of defense for the agent protocol:
       </p>
       <table>
         <thead><tr><th>Measure</th><th>Details</th></tr></thead>
@@ -57,14 +57,14 @@ export default function Security() {
       </ul>
       <p>
         The full audit report is available at{" "}
-        <a href="https://github.com/nervosys/Louie/blob/master/docs/SECURITY-AUDIT.md">
+        <a href="https://github.com/nervosys/HawkTUI/blob/master/docs/SECURITY-AUDIT.md">
           docs/SECURITY-AUDIT.md
         </a>.
       </p>
 
       <h2>Dependency Auditing</h2>
       <p>
-        Louie uses <code>cargo-deny</code> in CI to continuously check for:
+        Hawk TUI uses <code>cargo-deny</code> in CI to continuously check for:
       </p>
       <ul>
         <li>Known vulnerabilities (advisory database)</li>

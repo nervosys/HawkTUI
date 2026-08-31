@@ -1,6 +1,6 @@
-//! # Louie — An Agentic-First TUI Framework
+//! # Hawk TUI — An Agentic-First TUI Framework
 //!
-//! Louie is a terminal user interface framework built from the ground up for
+//! Hawk TUI is a terminal user interface framework built from the ground up for
 //! AI agent discoverability. Every widget, layout, and interaction carries
 //! structured metadata that agents can introspect at runtime, enabling
 //! programmatic discovery, inspection, and control of any TUI application.
@@ -59,7 +59,7 @@
 //!
 //! ## Agent Protocol
 //!
-//! Louie applications can be controlled entirely by AI agents via the
+//! Hawk TUI applications can be controlled entirely by AI agents via the
 //! [`agent`] module's JSON Lines protocol over stdin/stdout:
 //!
 //! ```text
@@ -81,12 +81,12 @@
 //! | Flag | Default | Description |
 //! |------|---------|-------------|
 //! | `crossterm` | **yes** | Crossterm terminal backend (disable for headless/agent-only) |
-//! | `bin` | no | Enables `louie-server` and `louie-demo` binaries (pulls in `tracing`) |
+//! | `bin` | no | Enables `hawktui-server` and `hawktui-demo` binaries (pulls in `tracing`) |
 //!
 //! ## Quick Start
 //!
 //! ```rust,no_run
-//! use louie::prelude::*;
+//! use hawktui::prelude::*;
 //!
 //! struct App { count: i32 }
 //!
@@ -134,7 +134,7 @@ pub mod theme;
 pub mod util;
 pub mod widget;
 
-/// Prelude: import everything you need for a typical louie application.
+/// Prelude: import everything you need for a typical hawktui application.
 pub mod prelude {
     pub use crate::animation::{Animation, Easing, Spring, Timeline, Tween};
     #[cfg(feature = "crossterm")]
@@ -147,7 +147,7 @@ pub mod prelude {
     pub use crate::core::text::{Line, Span, Text};
     pub use crate::error::{Error, Result};
     pub use crate::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent};
-    pub use crate::layout::{Alignment, Constraint, Direction, Layout, Margin};
+    pub use crate::layout::{Alignment, Constraint, Direction, Flex, Layout, Margin};
     pub use crate::ontology::{
         AgentAction, AgentCapability, Discoverable, OntologyRegistry, SemanticRole, WidgetSchema,
     };

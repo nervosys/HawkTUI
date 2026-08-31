@@ -16,7 +16,7 @@ use crate::widget::Widget;
 /// # Example
 ///
 /// ```ignore
-/// use louie::widget::calendar::Calendar;
+/// use hawktui::widget::calendar::Calendar;
 ///
 /// let cal = Calendar::new(2026, 3)
 ///     .show_header(true)

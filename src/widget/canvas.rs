@@ -7,6 +7,7 @@ use crate::ontology::{
 };
 use crate::widget::block::Block;
 use crate::widget::Widget;
+use std::rc::Rc;
 
 /// A point on the canvas coordinate system.
 #[derive(Debug, Clone, Copy)]
@@ -104,6 +105,304 @@ impl Shape for CanvasRect {
         line_bottom.draw(painter);
         line_left.draw(painter);
         line_right.draw(painter);
+    }
+}
+
+/// A circle outline, drawn with the midpoint circle algorithm.
+#[derive(Debug, Clone)]
+pub struct CanvasCircle {
+    /// Center x in canvas coordinates.
+    pub x: f64,
+    /// Center y in canvas coordinates.
+    pub y: f64,
+    /// Radius in canvas coordinates.
+    pub radius: f64,
+    pub color: Color,
+}
+
+impl Shape for CanvasCircle {
+    fn draw(&self, painter: &mut Painter) {
+        if self.radius <= 0.0 {
+            return;
+        }
+        // Sample the circle in canvas space so the radius stays circular under
+        // the canvas-to-grid aspect ratio, then let the painter map each point.
+        let (cx, cy) = painter.canvas_to_grid(self.x, self.y);
+        let (ex, _) = painter.canvas_to_grid(self.x + self.radius, self.y);
+        let (_, ey) = painter.canvas_to_grid(self.x, self.y + self.radius);
+        let rx = (ex as f64 - cx as f64).abs().max(1.0);
+        let ry = (ey as f64 - cy as f64).abs().max(1.0);
+
+        // One sample per grid step around the larger axis keeps the outline
+        // gap-free without over-drawing.
+        let steps = ((rx.max(ry) * 8.0) as usize).max(16);
+        for i in 0..steps {
+            let theta = (i as f64) * std::f64::consts::TAU / (steps as f64);
+            let gx = cx as f64 + rx * theta.cos();
+            let gy = cy as f64 + ry * theta.sin();
+            if gx < 0.0 || gy < 0.0 {
+                continue;
+            }
+            painter.paint(gx as usize, gy as usize, self.color);
+        }
+    }
+}
+
+/// A filled rectangle on the canvas.
+#[derive(Debug, Clone)]
+pub struct CanvasFilledRect {
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+    pub color: Color,
+}
+
+impl Shape for CanvasFilledRect {
+    fn draw(&self, painter: &mut Painter) {
+        let (x0, y0) = painter.canvas_to_grid(self.x, self.y);
+        let (x1, y1) = painter.canvas_to_grid(self.x + self.width, self.y + self.height);
+        let (left, right) = (x0.min(x1), x0.max(x1));
+        let (top, bottom) = (y0.min(y1), y0.max(y1));
+        for gy in top..=bottom {
+            for gx in left..=right {
+                painter.paint(gx, gy, self.color);
+            }
+        }
+    }
+}
+
+/// How densely a [`CanvasMap`] samples its data.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum MapResolution {
+    /// Draw every fourth vertex. Enough for a continent outline in a small
+    /// pane, and four times cheaper.
+    #[default]
+    Low,
+    /// Draw every vertex in the dataset.
+    High,
+}
+
+impl MapResolution {
+    /// Vertices to advance between samples.
+    const fn stride(self) -> usize {
+        match self {
+            Self::Low => 4,
+            Self::High => 1,
+        }
+    }
+}
+
+/// Geographic paths in `(longitude, latitude)` degrees.
+///
+/// Hawk TUI ships the renderer, not the cartography: point this at whatever
+/// dataset your program already has. [`from_geojson`](Self::from_geojson)
+/// reads Natural Earth and most other public coastline files directly, and
+/// [`path`](Self::path) takes coordinates you build yourself.
+///
+/// ```
+/// use hawktui::widget::canvas::MapData;
+///
+/// let data = MapData::new().path([(-9.5, 38.7), (2.3, 48.9), (13.4, 52.5)]);
+/// assert_eq!(data.point_count(), 3);
+/// ```
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct MapData {
+    paths: Vec<Vec<(f64, f64)>>,
+}
+
+impl MapData {
+    /// An empty dataset.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Add one polyline.
+    pub fn path(mut self, points: impl IntoIterator<Item = (f64, f64)>) -> Self {
+        let points: Vec<(f64, f64)> = points.into_iter().collect();
+        if !points.is_empty() {
+            self.paths.push(points);
+        }
+        self
+    }
+
+    /// Build from many polylines at once.
+    pub fn from_paths(paths: impl IntoIterator<Item = Vec<(f64, f64)>>) -> Self {
+        Self {
+            paths: paths.into_iter().filter(|p| !p.is_empty()).collect(),
+        }
+    }
+
+    /// Read every line and polygon ring out of a GeoJSON document.
+    ///
+    /// `LineString`, `MultiLineString`, `Polygon`, and `MultiPolygon`
+    /// geometries all become paths; points and unknown members are skipped.
+    /// Feature properties are ignored — this is an outline reader, not a full
+    /// GeoJSON implementation.
+    ///
+    /// Returns `None` if the input is not valid JSON.
+    pub fn from_geojson(source: &str) -> Option<Self> {
+        let value: serde_json::Value = serde_json::from_str(source).ok()?;
+        let mut data = Self::new();
+        collect_geojson(&value, &mut data.paths);
+        Some(data)
+    }
+
+    /// The polylines, in insertion order.
+    pub fn paths(&self) -> &[Vec<(f64, f64)>] {
+        &self.paths
+    }
+
+    /// Total number of vertices across all paths.
+    pub fn point_count(&self) -> usize {
+        self.paths.iter().map(Vec::len).sum()
+    }
+
+    /// True when there is nothing to draw.
+    pub fn is_empty(&self) -> bool {
+        self.paths.is_empty()
+    }
+}
+
+/// Walk a GeoJSON value, pushing every line or ring it contains.
+fn collect_geojson(value: &serde_json::Value, out: &mut Vec<Vec<(f64, f64)>>) {
+    let Some(object) = value.as_object() else {
+        if let Some(array) = value.as_array() {
+            for item in array {
+                collect_geojson(item, out);
+            }
+        }
+        return;
+    };
+
+    // Containers: recurse into whatever holds the geometries.
+    for key in ["features", "geometries", "geometry"] {
+        if let Some(inner) = object.get(key) {
+            collect_geojson(inner, out);
+        }
+    }
+
+    let Some(kind) = object.get("type").and_then(serde_json::Value::as_str) else {
+        return;
+    };
+    let Some(coordinates) = object.get("coordinates") else {
+        return;
+    };
+    // Nesting depth of the coordinate array before the [lon, lat] pairs.
+    let depth = match kind {
+        "LineString" => 1,
+        "MultiLineString" | "Polygon" => 2,
+        "MultiPolygon" => 3,
+        _ => return,
+    };
+    push_rings(coordinates, depth, out);
+}
+
+/// Descend `depth` levels of array nesting, then read each innermost array as
+/// a list of `[lon, lat]` pairs.
+fn push_rings(value: &serde_json::Value, depth: usize, out: &mut Vec<Vec<(f64, f64)>>) {
+    let Some(array) = value.as_array() else {
+        return;
+    };
+    if depth > 1 {
+        for item in array {
+            push_rings(item, depth - 1, out);
+        }
+        return;
+    }
+    let ring: Vec<(f64, f64)> = array
+        .iter()
+        .filter_map(|pair| {
+            let pair = pair.as_array()?;
+            Some((pair.first()?.as_f64()?, pair.get(1)?.as_f64()?))
+        })
+        .collect();
+    if !ring.is_empty() {
+        out.push(ring);
+    }
+}
+
+/// Coastlines, borders, or any other geographic paths drawn on a canvas.
+///
+/// Coordinates are plotted directly as `(longitude, latitude)`, so a canvas
+/// with [`Canvas::geographic`] bounds shows an equirectangular projection.
+#[derive(Debug, Clone)]
+pub struct CanvasMap {
+    pub data: MapData,
+    pub color: Color,
+    pub resolution: MapResolution,
+    /// Join consecutive vertices with lines. With this off the map is drawn as
+    /// a dot cloud, which reads better at very small sizes.
+    pub connect: bool,
+}
+
+impl CanvasMap {
+    /// Draw `data` in the default color, connecting vertices.
+    pub fn new(data: MapData) -> Self {
+        Self {
+            data,
+            color: Color::White,
+            resolution: MapResolution::default(),
+            connect: true,
+        }
+    }
+
+    pub fn color(mut self, color: Color) -> Self {
+        self.color = color;
+        self
+    }
+
+    pub fn resolution(mut self, resolution: MapResolution) -> Self {
+        self.resolution = resolution;
+        self
+    }
+
+    pub fn connect(mut self, connect: bool) -> Self {
+        self.connect = connect;
+        self
+    }
+}
+
+impl Shape for CanvasMap {
+    fn draw(&self, painter: &mut Painter) {
+        let stride = self.resolution.stride();
+        for path in self.data.paths() {
+            if path.is_empty() {
+                continue;
+            }
+            let mut previous: Option<(f64, f64)> = None;
+            // Always include the final vertex so a decimated ring still closes
+            // where the data says it does.
+            let indices = (0..path.len())
+                .step_by(stride)
+                .chain(std::iter::once(path.len() - 1));
+            for index in indices {
+                let (lon, lat) = path[index];
+                if !lon.is_finite() || !lat.is_finite() {
+                    previous = None;
+                    continue;
+                }
+                if self.connect {
+                    if let Some((plon, plat)) = previous {
+                        // A jump across the antimeridian is a seam in the data,
+                        // not a segment to draw across the whole map.
+                        if (lon - plon).abs() <= 180.0 {
+                            CanvasLine {
+                                x1: plon,
+                                y1: plat,
+                                x2: lon,
+                                y2: lat,
+                                color: self.color,
+                            }
+                            .draw(painter);
+                        }
+                    }
+                }
+                let (gx, gy) = painter.canvas_to_grid(lon, lat);
+                painter.paint(gx, gy, self.color);
+                previous = Some((lon, lat));
+            }
+        }
     }
 }
 
@@ -251,11 +550,19 @@ pub struct Canvas {
 }
 
 /// Type-erased shape storage for the Canvas builder.
-#[derive(Debug, Clone)]
+///
+/// Built-in shapes are stored by value so the canvas stays `Clone`; user shapes
+/// are shared behind an `Rc`, which keeps that property without requiring them
+/// to be clonable themselves.
+#[derive(Clone)]
 enum CanvasShapeBox {
     Line(CanvasLine),
     Rect(CanvasRect),
+    FilledRect(CanvasFilledRect),
+    Circle(CanvasCircle),
     Points(Points),
+    Map(CanvasMap),
+    Custom(Rc<dyn Shape>),
 }
 
 impl CanvasShapeBox {
@@ -263,7 +570,25 @@ impl CanvasShapeBox {
         match self {
             CanvasShapeBox::Line(s) => s.draw(painter),
             CanvasShapeBox::Rect(s) => s.draw(painter),
+            CanvasShapeBox::FilledRect(s) => s.draw(painter),
+            CanvasShapeBox::Circle(s) => s.draw(painter),
             CanvasShapeBox::Points(s) => s.draw(painter),
+            CanvasShapeBox::Map(s) => s.draw(painter),
+            CanvasShapeBox::Custom(s) => s.draw(painter),
+        }
+    }
+}
+
+impl std::fmt::Debug for CanvasShapeBox {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CanvasShapeBox::Line(s) => f.debug_tuple("Line").field(s).finish(),
+            CanvasShapeBox::Rect(s) => f.debug_tuple("Rect").field(s).finish(),
+            CanvasShapeBox::FilledRect(s) => f.debug_tuple("FilledRect").field(s).finish(),
+            CanvasShapeBox::Circle(s) => f.debug_tuple("Circle").field(s).finish(),
+            CanvasShapeBox::Points(s) => f.debug_tuple("Points").field(s).finish(),
+            CanvasShapeBox::Map(s) => f.debug_tuple("Map").field(s).finish(),
+            CanvasShapeBox::Custom(_) => f.write_str("Custom(..)"),
         }
     }
 }
@@ -306,6 +631,43 @@ impl Canvas {
 
     pub fn rect(mut self, rect: CanvasRect) -> Self {
         self.shapes.push(CanvasShapeBox::Rect(rect));
+        self
+    }
+
+    /// Draw a circle outline.
+    pub fn circle(mut self, circle: CanvasCircle) -> Self {
+        self.shapes.push(CanvasShapeBox::Circle(circle));
+        self
+    }
+
+    /// Draw a filled rectangle.
+    pub fn filled_rect(mut self, rect: CanvasFilledRect) -> Self {
+        self.shapes.push(CanvasShapeBox::FilledRect(rect));
+        self
+    }
+
+    /// Draw any custom [`Shape`].
+    ///
+    /// Everything the built-in shapes do is available to your own types: paint
+    /// into the [`Painter`] and the canvas composites the result the same way.
+    pub fn shape(mut self, shape: impl Shape + 'static) -> Self {
+        self.shapes.push(CanvasShapeBox::Custom(Rc::new(shape)));
+        self
+    }
+
+    /// Draw geographic paths.
+    ///
+    /// Pair with [`geographic`](Self::geographic) unless you are showing a
+    /// region and want to set the bounds yourself.
+    pub fn map(mut self, map: CanvasMap) -> Self {
+        self.shapes.push(CanvasShapeBox::Map(map));
+        self
+    }
+
+    /// Set whole-world bounds: longitude -180..180, latitude -90..90.
+    pub fn geographic(mut self) -> Self {
+        self.x_bounds = [-180.0, 180.0];
+        self.y_bounds = [-90.0, 90.0];
         self
     }
 

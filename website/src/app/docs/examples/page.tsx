@@ -3,14 +3,14 @@ export default function Examples() {
     <>
       <h1>Examples</h1>
       <p>
-        Louie ships several examples demonstrating different features and
+        Hawk TUI ships several examples demonstrating different features and
         complexity levels. Run any example with:
       </p>
       <pre><code>cargo run --example &lt;name&gt;</code></pre>
 
       <h2>hello</h2>
       <p>
-        Minimal &quot;Hello, Louie!&quot; application. Demonstrates the basic Elm
+        Minimal &quot;Hello, Hawk TUI!&quot; application. Demonstrates the basic Elm
         architecture: a model struct, quit message, bordered paragraph, and the
         program runtime.
       </p>
@@ -71,10 +71,10 @@ echo '{"type":"ping"}' | cargo run --example agent_rpc`}</code></pre>
       <h2>Running the Demo Script</h2>
       <p>
         A Python demo script exercises the agent protocol against{" "}
-        <code>louie-server</code>:
+        <code>hawktui-server</code>:
       </p>
-      <pre><code>{`cargo build --release --bin louie-server --features bin
-python3 scripts/louie-demo.py`}</code></pre>
+      <pre><code>{`cargo build --release --bin hawktui-server --features bin
+python3 scripts/hawktui-demo.py`}</code></pre>
     </>
   );
 }

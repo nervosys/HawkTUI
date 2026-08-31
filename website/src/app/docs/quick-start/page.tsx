@@ -2,19 +2,19 @@ export default function QuickStart() {
   return (
     <>
       <h1>Quick Start</h1>
-      <p>Build a minimal Louie application in under 5 minutes.</p>
+      <p>Build a minimal Hawk TUI application in under 5 minutes.</p>
 
       <h2>1. Create a New Project</h2>
-      <pre><code>{`cargo new my-louie-app
-cd my-louie-app
-cargo add louie`}</code></pre>
+      <pre><code>{`cargo new my-hawktui-app
+cd my-hawktui-app
+cargo add hawktui`}</code></pre>
 
       <h2>2. Write Your App</h2>
       <p>
         Replace <code>src/main.rs</code> with:
       </p>
-      <pre><code>{`use louie::prelude::*;
-use louie::runtime::{Command, Model, Program};
+      <pre><code>{`use hawktui::prelude::*;
+use hawktui::runtime::{Command, Model, Program};
 
 struct App;
 
@@ -33,7 +33,7 @@ impl Model for App {
     }
 
     fn view(&self, frame: &mut Frame<'_>) {
-        let greeting = Paragraph::new("Hello, Louie!")
+        let greeting = Paragraph::new("Hello, Hawk TUI!")
             .block(Block::default().title("Demo").borders(Borders::ALL));
         frame.render_widget(greeting, frame.area());
     }
@@ -57,12 +57,12 @@ fn main() -> std::io::Result<()> {
       <pre><code>cargo run</code></pre>
       <p>
         Press <code>q</code> or <code>Esc</code> to exit. You should see a bordered
-        box with &quot;Hello, Louie!&quot; rendered in your terminal.
+        box with &quot;Hello, Hawk TUI!&quot; rendered in your terminal.
       </p>
 
       <h2>How It Works</h2>
       <p>
-        Louie uses <strong>The Elm Architecture</strong> (TEA):
+        Hawk TUI uses <strong>The Elm Architecture</strong> (TEA):
       </p>
       <ol>
         <li>

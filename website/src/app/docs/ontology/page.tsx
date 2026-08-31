@@ -3,7 +3,7 @@ export default function Ontology() {
     <>
       <h1>Ontology System</h1>
       <p>
-        The ontology system is what makes Louie <em>agentic-first</em>. Every widget
+        The ontology system is what makes Hawk TUI <em>agentic-first</em>. Every widget
         exposes structured metadata that AI agents can query at runtime &mdash; no
         hardcoded assumptions, no screen-scraping, no trial-and-error.
       </p>

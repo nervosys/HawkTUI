@@ -16,6 +16,18 @@ pub struct Sparkline {
     style: Style,
     bar_style: Style,
     max: Option<u64>,
+    direction: SparklineDirection,
+}
+
+/// Which end of the sparkline the newest sample sits at.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SparklineDirection {
+    /// Oldest sample on the left, newest on the right — the usual reading order.
+    #[default]
+    LeftToRight,
+    /// Newest sample on the left, growing to the right. Useful for feeds that
+    /// prepend, so the fresh data stays where the eye already is.
+    RightToLeft,
 }
 
 impl Sparkline {
@@ -26,7 +38,14 @@ impl Sparkline {
             style: Style::default(),
             bar_style: Style::default(),
             max: None,
+            direction: SparklineDirection::default(),
         }
+    }
+
+    /// Choose which end holds the newest sample.
+    pub fn direction(mut self, direction: SparklineDirection) -> Self {
+        self.direction = direction;
+        self
     }
 
     pub fn block(mut self, block: Block) -> Self {
@@ -85,7 +104,13 @@ impl Widget for Sparkline {
         let visible = &self.data[data_start..];
 
         for (i, &value) in visible.iter().enumerate() {
-            let x = inner.x + i as u16;
+            let x = match self.direction {
+                SparklineDirection::LeftToRight => inner.x + i as u16,
+                // Mirror the column so the newest sample lands on the left.
+                SparklineDirection::RightToLeft => {
+                    inner.right().saturating_sub(1).saturating_sub(i as u16)
+                }
+            };
             if x >= inner.right() {
                 break;
             }

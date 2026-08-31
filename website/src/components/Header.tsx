@@ -8,7 +8,7 @@ const links = [
   { href: "/docs/widgets", label: "Widgets" },
   { href: "/docs/agent-protocol", label: "Agent Protocol" },
   { href: "/docs/examples", label: "Examples" },
-  { href: "https://github.com/nervosys/louie", label: "GitHub" },
+  { href: "https://github.com/nervosys/HawkTUI", label: "GitHub" },
 ];
 
 export default function Header() {
@@ -16,7 +16,7 @@ export default function Header() {
   return (
     <header className="header">
       <Link href="/" className="logo">
-        <span>[</span>LOUIE<span>]</span>
+        <span>[</span>HAWK<span>]</span>
       </Link>
       <nav>
         {links.map((l) => (

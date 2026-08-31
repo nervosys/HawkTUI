@@ -18,7 +18,7 @@ use crate::widget::Widget;
 /// # Example
 ///
 /// ```ignore
-/// use louie::widget::line_gauge::LineGauge;
+/// use hawktui::widget::line_gauge::LineGauge;
 ///
 /// let gauge = LineGauge::new()
 ///     .ratio(0.65)

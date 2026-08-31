@@ -1,4 +1,4 @@
-//! Error types for the Louie framework.
+//! Error types for the Hawk TUI framework.
 //!
 //! Provides a unified [`Error`] enum covering all failure modes in the
 //! framework: I/O errors, protocol errors, action dispatch errors, and
@@ -6,7 +6,7 @@
 
 use std::fmt;
 
-/// The unified error type for all Louie operations.
+/// The unified error type for all Hawk TUI operations.
 #[derive(Debug)]
 pub enum Error {
     /// An I/O error from the terminal backend or file system.
@@ -58,5 +58,5 @@ impl From<serde_json::Error> for Error {
     }
 }
 
-/// A specialized [`Result`] type for Louie operations.
+/// A specialized [`Result`] type for Hawk TUI operations.
 pub type Result<T> = std::result::Result<T, Error>;

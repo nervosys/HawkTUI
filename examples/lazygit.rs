@@ -1,4 +1,4 @@
-//! Lazygit-style Git TUI — built with Louie.
+//! Lazygit-style Git TUI — built with Hawk TUI.
 //!
 //! Replicates the layout and interaction model of lazygit, the most popular
 //! terminal UI (~55k GitHub stars):
@@ -8,12 +8,12 @@
 //! - Keyboard navigation: 1-5 switch panels, j/k navigate, Tab cycle
 //! - Simulated git data (no real git commands)
 
-use louie::ontology::registry::OntologyRegistry;
-use louie::prelude::*;
-use louie::runtime::{Command, Model, Program, ProgramOptions};
-use louie::widget::list::{List, ListItem, ListState};
-use louie::widget::paragraph::Wrap;
-use louie::widget::scrollbar::{Scrollbar, ScrollbarOrientation, ScrollbarState};
+use hawktui::ontology::registry::OntologyRegistry;
+use hawktui::prelude::*;
+use hawktui::runtime::{Command, Model, Program, ProgramOptions};
+use hawktui::widget::list::{List, ListItem, ListState};
+use hawktui::widget::paragraph::Wrap;
+use hawktui::widget::scrollbar::{Scrollbar, ScrollbarOrientation, ScrollbarState};
 
 // ── Palette ─────────────────────────────────────────────────────────────────
 
@@ -245,7 +245,7 @@ fn sample_commits() -> Vec<Commit> {
         },
         Commit {
             hash: "e0f1a2b".into(),
-            message: "init: louie TUI framework".into(),
+            message: "init: hawktui TUI framework".into(),
             author: "adam".into(),
             age: "3d".into(),
         },
@@ -314,12 +314,12 @@ fn diff_for_file(file: &FileEntry) -> Vec<DiffLine> {
             DiffLine::Header("--- /dev/null".into()),
             DiffLine::Header("+++ b/examples/lazygit.rs".into()),
             DiffLine::Hunk("@@ -0,0 +1,42 @@".into()),
-            DiffLine::Added("+//! Lazygit-style Git TUI — built with Louie.".into()),
+            DiffLine::Added("+//! Lazygit-style Git TUI — built with Hawk TUI.".into()),
             DiffLine::Added("+//!".into()),
             DiffLine::Added("+//! Replicates the layout and interaction model of lazygit,".into()),
             DiffLine::Added("+//! the most popular terminal UI.".into()),
             DiffLine::Added("+".into()),
-            DiffLine::Added("+use louie::prelude::*;".into()),
+            DiffLine::Added("+use hawktui::prelude::*;".into()),
             DiffLine::Added("+// ... (new file, 400+ lines)".into()),
         ],
         "examples/opencode.rs" => vec![
@@ -494,7 +494,7 @@ impl App {
                 let staged = self.files.iter().filter(|f| f.staged).count();
                 let unstaged = self.files.iter().filter(|f| !f.staged).count();
                 vec![
-                    DiffLine::Header("Repository: louie".into()),
+                    DiffLine::Header("Repository: hawktui".into()),
                     DiffLine::Context(format!(
                         "Branch:     {}",
                         self.branches
@@ -692,8 +692,8 @@ impl Model for App {
     fn register_ontology(&self, registry: &mut OntologyRegistry) {
         registry.register::<Block>();
         registry.register::<Paragraph>();
-        registry.register::<louie::widget::list::List>();
-        registry.register::<louie::widget::scrollbar::Scrollbar>();
+        registry.register::<hawktui::widget::list::List>();
+        registry.register::<hawktui::widget::scrollbar::Scrollbar>();
     }
 }
 
@@ -797,7 +797,7 @@ impl App {
                 Span::raw(" modified"),
             ]),
             Line::from(vec![
-                Span::styled("louie", Style::default().fg(Color::White).bold()),
+                Span::styled("hawktui", Style::default().fg(Color::White).bold()),
                 Span::styled(" — agentic TUI framework", Style::default().fg(DIM)),
             ]),
         ];

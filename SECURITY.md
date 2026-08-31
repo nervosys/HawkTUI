@@ -15,7 +15,7 @@ We actively support only the latest release.
 
 Instead, please report them via GitHub's private vulnerability reporting:
 
-<https://github.com/nervosys/Louie/security/advisories/new>
+<https://github.com/nervosys/HawkTUI/security/advisories/new>
 
 Or email: **security@nervosys.ai**
 

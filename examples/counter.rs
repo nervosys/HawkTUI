@@ -1,12 +1,12 @@
-//! Counter example demonstrating the Elm architecture in louie.
+//! Counter example demonstrating the Elm architecture in hawktui.
 //!
 //! Increment/decrement with arrow keys, animated gauge, quit with 'q'.
 
 use std::time::Duration;
 
-use louie::prelude::*;
-use louie::runtime::{Command, Model, Program};
-use louie::widget::gauge::Gauge;
+use hawktui::prelude::*;
+use hawktui::runtime::{Command, Model, Program};
+use hawktui::widget::gauge::Gauge;
 
 struct App {
     count: i64,
@@ -66,7 +66,7 @@ impl Model for App {
         let title = Paragraph::new(format!("Counter: {}", self.count))
             .block(
                 Block::default()
-                    .title("Louie Counter")
+                    .title("Hawk TUI Counter")
                     .borders(Borders::ALL)
                     .border_type(BorderType::Rounded),
             )

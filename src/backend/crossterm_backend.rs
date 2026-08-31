@@ -1,6 +1,7 @@
 use super::Backend;
 use crate::core::cell::Cell;
 use crate::core::rect::{Position, Size};
+use crate::core::style::{Color, Modifier};
 use std::io::{self, Write};
 
 /// Crossterm-based terminal backend.
@@ -8,11 +9,17 @@ use std::io::{self, Write};
 /// Uses the crossterm crate for cross-platform terminal control.
 pub struct CrosstermBackend<W: Write> {
     writer: W,
+    /// Scratch buffer for one frame of escape sequences, reused across draws so
+    /// steady-state rendering performs no allocation.
+    scratch: Vec<u8>,
 }
 
 impl<W: Write> CrosstermBackend<W> {
     pub fn new(writer: W) -> Self {
-        Self { writer }
+        Self {
+            writer,
+            scratch: Vec::new(),
+        }
     }
 
     pub fn writer(&self) -> &W {
@@ -24,79 +31,95 @@ impl<W: Write> CrosstermBackend<W> {
     }
 }
 
+impl<W: Write> CrosstermBackend<W> {
+    /// Encode a frame of cells, each with an optional hyperlink target, into
+    /// the scratch buffer and write it out in one call.
+    ///
+    /// Escape sequences are written directly rather than through a command
+    /// layer, and every attribute — position, colors, modifiers, hyperlink — is
+    /// emitted only when it actually changes from the previous cell.
+    fn encode_frame<'a, I>(&mut self, content: I) -> io::Result<()>
+    where
+        I: Iterator<Item = (u16, u16, &'a Cell, Option<&'a str>)>,
+    {
+        use super::ansi;
+
+        let out = &mut self.scratch;
+        out.clear();
+
+        let mut last_fg: Option<Color> = None;
+        let mut last_bg: Option<Color> = None;
+        let mut last_underline: Option<Color> = None;
+        let mut last_modifier: Option<Modifier> = None;
+        let mut next_pos: Option<(u16, u16)> = None;
+        let mut open_link: Option<&str> = None;
+
+        for (x, y, cell, link) in content {
+            // Skip the continuation half of a wide grapheme.
+            if cell.symbol.is_empty() {
+                continue;
+            }
+
+            if next_pos != Some((x, y)) {
+                ansi::move_to(out, x, y);
+            }
+
+            // Emit only the attributes that actually changed. Turning a single
+            // flag off costs one short sequence and — unlike a full SGR reset —
+            // leaves the colors intact, so they need no re-assertion.
+            if last_modifier != Some(cell.modifier) {
+                let previous = last_modifier.unwrap_or(Modifier::NONE);
+                ansi::diff_modifiers(out, previous, cell.modifier);
+                last_modifier = Some(cell.modifier);
+            }
+
+            if last_fg != Some(cell.fg) {
+                ansi::set_color(out, cell.fg, true);
+                last_fg = Some(cell.fg);
+            }
+            if last_bg != Some(cell.bg) {
+                ansi::set_color(out, cell.bg, false);
+                last_bg = Some(cell.bg);
+            }
+            if cell.underline_color != Color::Reset && last_underline != Some(cell.underline_color)
+            {
+                ansi::set_underline_color(out, cell.underline_color);
+                last_underline = Some(cell.underline_color);
+            }
+
+            if open_link != link {
+                match link {
+                    Some(url) => ansi::open_hyperlink(out, url),
+                    None => ansi::close_hyperlink(out),
+                }
+                open_link = link;
+            }
+
+            out.extend_from_slice(cell.symbol.as_str().as_bytes());
+            next_pos = Some((x.saturating_add(1), y));
+        }
+
+        if open_link.is_some() {
+            ansi::close_hyperlink(out);
+        }
+        ansi::reset_attributes(out);
+        self.writer.write_all(out)
+    }
+}
+
 impl<W: Write> Backend for CrosstermBackend<W> {
     fn draw<'a, I>(&mut self, content: I) -> io::Result<()>
     where
         I: Iterator<Item = (u16, u16, &'a Cell)>,
     {
-        use crossterm::{
-            cursor::MoveTo,
-            queue,
-            style::{Attribute, Print, SetAttribute, SetBackgroundColor, SetForegroundColor},
-        };
+        self.encode_frame(content.map(|(x, y, cell)| (x, y, cell, None)))
+    }
 
-        let mut last_fg = None;
-        let mut last_bg = None;
-        let mut last_modifier = None;
-        let mut last_pos: Option<(u16, u16)> = None;
-
-        for (x, y, cell) in content {
-            // Skip empty continuation cells (wide characters)
-            if cell.symbol.is_empty() {
-                continue;
-            }
-
-            // Only move cursor if not at the expected next position
-            let needs_move = match last_pos {
-                Some((lx, ly)) => !(ly == y && lx + 1 == x),
-                None => true,
-            };
-            if needs_move {
-                queue!(self.writer, MoveTo(x, y))?;
-            }
-
-            // Update foreground color if changed
-            let fg = super::to_crossterm_color(cell.fg);
-            if last_fg != Some(fg) {
-                queue!(self.writer, SetForegroundColor(fg))?;
-                last_fg = Some(fg);
-            }
-
-            // Update background color if changed
-            let bg = super::to_crossterm_color(cell.bg);
-            if last_bg != Some(bg) {
-                queue!(self.writer, SetBackgroundColor(bg))?;
-                last_bg = Some(bg);
-            }
-
-            // Update modifiers if changed
-            if last_modifier != Some(cell.modifier) {
-                queue!(self.writer, SetAttribute(Attribute::Reset))?;
-                let attrs = super::to_crossterm_attributes(cell.modifier);
-                for attr in attrs.into_iter() {
-                    queue!(self.writer, SetAttribute(attr))?;
-                }
-                // Re-set colors after reset
-                if let Some(fg) = last_fg {
-                    queue!(self.writer, SetForegroundColor(fg))?;
-                }
-                if let Some(bg) = last_bg {
-                    queue!(self.writer, SetBackgroundColor(bg))?;
-                }
-                last_modifier = Some(cell.modifier);
-            }
-
-            queue!(self.writer, Print(&cell.symbol))?;
-            last_pos = Some((x, y));
-        }
-
-        // Reset attributes at the end
-        queue!(
-            self.writer,
-            crossterm::style::SetAttribute(crossterm::style::Attribute::Reset)
-        )?;
-
-        Ok(())
+    fn draw_linked<'a, I>(&mut self, content: I) -> io::Result<()>
+    where
+        I: Iterator<Item = (u16, u16, &'a Cell, Option<&'a str>)>,
+    {
+        self.encode_frame(content)
     }
 
     fn hide_cursor(&mut self) -> io::Result<()> {

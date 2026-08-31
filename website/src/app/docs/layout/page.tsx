@@ -3,13 +3,13 @@ export default function Layout() {
     <>
       <h1>Layout</h1>
       <p>
-        Louie&apos;s layout engine divides rectangular areas into sub-areas using
+        Hawk TUI&apos;s layout engine divides rectangular areas into sub-areas using
         constraints. It supports vertical and horizontal splitting, margins,
         spacing, and flexible distribution.
       </p>
 
       <h2>Basic Usage</h2>
-      <pre><code>{`use louie::layout::{Layout, Constraint, Direction};
+      <pre><code>{`use hawktui::layout::{Layout, Constraint, Direction};
 
 let chunks = Layout::new(
     Direction::Vertical,
@@ -50,7 +50,7 @@ Layout::horizontal(&[Constraint::Percentage(30), Constraint::Fill(1)])`}</code><
         Control how remaining space is distributed when constraints don&apos;t
         consume the full area:
       </p>
-      <pre><code>{`use louie::layout::Flex;
+      <pre><code>{`use hawktui::layout::Flex;
 
 Layout::vertical(&[Constraint::Length(5), Constraint::Length(5)])
     .flex(Flex::Center)  // Center the two blocks vertically

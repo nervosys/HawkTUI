@@ -1,5 +1,6 @@
 # Build artifacts
 /target/
+/benchmarks/target/
 
 # Reference repos (third-party, not part of this project)
 /reference/
@@ -27,3 +28,6 @@ Thumbs.db
 
 # Debug output
 agent_demo_debug.txt
+
+# Local recovered chat archives
+.chat-history/

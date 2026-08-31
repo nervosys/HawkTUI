@@ -1,18 +1,18 @@
 # Agent Integration Guide
 
 How to connect an AI agent (OpenCode, Pi, OpenClaw, or any LLM-based system) to a
-Louie application via the JSON Lines RPC protocol.
+Hawk TUI application via the JSON Lines RPC protocol.
 
 ## Overview
 
-Louie exposes a JSON Lines (JSONL) protocol over stdin/stdout that lets agents:
+Hawk TUI exposes a JSON Lines (JSONL) protocol over stdin/stdout that lets agents:
 
 1. **Discover** the UI — query the ontology for widget types, schemas, capabilities
 2. **Inspect** state — read widget state and the UI tree snapshot
 3. **Act** — execute actions on widgets, inject keyboard/mouse events
 4. **Subscribe** — receive notifications when state changes
 
-No terminal is needed. The agent spawns the Louie app as a child process and
+No terminal is needed. The agent spawns the Hawk TUI app as a child process and
 communicates entirely through structured JSON messages.
 
 ## Transport
@@ -152,14 +152,14 @@ Event types: `state_changed`, `render_update`, `action_result`, `app_quit`, `err
 {"type": "quit"}
 ```
 
-## Launching a Louie App
+## Launching a Hawk TUI App
 
 ### Option 1: RPC Transport (stdin/stdout)
 
-Build a Louie app that uses `RpcTransport`:
+Build a Hawk TUI app that uses `RpcTransport`:
 
 ```rust
-use louie::agent::rpc::RpcTransport;
+use hawktui::agent::rpc::RpcTransport;
 
 fn main() -> std::io::Result<()> {
     let app = MyApp::default();
@@ -213,8 +213,8 @@ proc.wait()
 For Rust-based agents or testing, use `HeadlessDriver` directly:
 
 ```rust
-use louie::agent::HeadlessDriver;
-use louie::agent::protocol::AgentRequest;
+use hawktui::agent::HeadlessDriver;
+use hawktui::agent::protocol::AgentRequest;
 
 let mut driver = HeadlessDriver::new(MyApp::default(), 120, 40)?;
 driver.init();
@@ -253,7 +253,7 @@ let line = driver.row_text(0);
 
 ## Widget Discoverability
 
-Every Louie widget implements `Discoverable`, which exposes:
+Every Hawk TUI widget implements `Discoverable`, which exposes:
 
 | Attribute       | Description                                                       |
 | --------------- | ----------------------------------------------------------------- |
@@ -264,15 +264,15 @@ Every Louie widget implements `Discoverable`, which exposes:
 | `actions`       | Named operations with typed parameters                            |
 | `properties`    | Current state with types and constraints                          |
 
-Agents can use this metadata to operate any Louie app without hard-coded knowledge
+Agents can use this metadata to operate any Hawk TUI app without hard-coded knowledge
 of the specific UI. The ontology acts as a self-describing API.
 
 ## Compatibility with Pi/OpenCode
 
-Louie's RPC protocol is modeled after the pi-mono JSONL protocol used by OpenCode
+Hawk TUI's RPC protocol is modeled after the pi-mono JSONL protocol used by OpenCode
 and Pi. Key differences:
 
-| Feature        | pi-mono                                | Louie                      |
+| Feature        | pi-mono                                | Hawk TUI                      |
 | -------------- | -------------------------------------- | -------------------------- |
 | Transport      | JSONL stdin/stdout                     | JSONL stdin/stdout         |
 | Framing        | `{type, id?}`                          | `{type, id?}` (compatible) |
@@ -281,5 +281,5 @@ and Pi. Key differences:
 | Events         | `AgentEvent` stream                    | `AgentEvent` stream        |
 | Error handling | `{success: false, error}`              | `{success: false, error}`  |
 
-An adapter layer can bridge the two protocols — Louie's richer ontology is a
+An adapter layer can bridge the two protocols — Hawk TUI's richer ontology is a
 superset of pi-mono's capability model.

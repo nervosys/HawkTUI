@@ -1,21 +1,21 @@
 [package]
-name = "louietui"
+name = "hawktui"
 version = "1.0.0"
 edition = "2021"
 authors = ["Nervosys"]
 description = "An agentic-first TUI framework with complete ontology for agent discoverability"
 license = "AGPL-3.0-or-later"
-repository = "https://github.com/nervosys/louie"
-homepage = "https://github.com/nervosys/louie"
-documentation = "https://docs.rs/louietui"
+repository = "https://github.com/nervosys/HawkTUI"
+homepage = "https://github.com/nervosys/HawkTUI"
+documentation = "https://docs.rs/hawktui"
 readme = "README.md"
 keywords = ["tui", "terminal", "agent", "ontology", "ui"]
 categories = ["command-line-interface", "gui"]
 rust-version = "1.80"
-exclude = ["reference/", ".github/", "docs/", "scripts/", "website/"]
+exclude = ["reference/", ".github/", "docs/", "scripts/", "website/", "benchmarks/"]
 
 [lib]
-name = "louie"
+name = "hawktui"
 
 [features]
 default = ["crossterm"]
@@ -28,7 +28,6 @@ unicode-width = "0.2"
 unicode-segmentation = "1.12"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-compact_str = "0.8"
 tracing = { version = "0.1", optional = true }
 tracing-subscriber = { version = "0.3", features = [
     "fmt",
@@ -79,11 +78,11 @@ path = "examples/btop.rs"
 required-features = ["crossterm"]
 
 [[bin]]
-name = "louie-server"
-path = "src/bin/louie_server.rs"
+name = "hawktui-server"
+path = "src/bin/hawktui_server.rs"
 required-features = ["bin"]
 
 [[bin]]
-name = "louie-demo"
+name = "hawktui-demo"
 required-features = ["bin"]
-path = "src/bin/louie_demo.rs"
+path = "src/bin/hawktui_demo.rs"

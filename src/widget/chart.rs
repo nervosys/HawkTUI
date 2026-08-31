@@ -139,7 +139,7 @@ impl Axis {
 /// # Example
 ///
 /// ```ignore
-/// use louie::widget::chart::{Chart, Dataset, Axis};
+/// use hawktui::widget::chart::{Chart, Dataset, Axis};
 ///
 /// let data = Dataset::new(vec![(0.0, 0.0), (1.0, 1.0), (2.0, 4.0), (3.0, 9.0)])
 ///     .name("y = x²");

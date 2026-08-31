@@ -1,4 +1,4 @@
-# Louie Roadmap
+# Hawk TUI Roadmap
 
 ## Phase 0 — Foundation (Complete)
 
@@ -20,7 +20,7 @@
 ## Phase 1 — Agent Protocol Layer
 
 The critical missing piece: a structured protocol for AI agents (like OpenCode/Pi,
-OpenClaw, or any LLM-based coding agent) to connect to and drive a Louie application
+OpenClaw, or any LLM-based coding agent) to connect to and drive a Hawk TUI application
 without human interaction.
 
 - [x] `src/agent/protocol.rs` — JSON-based agent protocol messages
@@ -32,7 +32,7 @@ without human interaction.
   - Emit events when state changes
   - Track subscriptions (which state changes the agent cares about)
 - [x] `src/agent/driver.rs` — Headless agent driver
-  - Run a Louie app without a terminal (TestBackend)
+  - Run a Hawk TUI app without a terminal (TestBackend)
   - Agent sends protocol messages, receives events
   - Enables automated testing and CI pipelines
 - [x] `src/agent/mod.rs` — Module root with re-exports
@@ -91,7 +91,7 @@ Widgets matching the component richness of pi-tui, needed for real agent UIs.
 - [x] Widget rendering tests using TestBackend
 - [x] Agent protocol round-trip tests
 - [x] `examples/agent_rpc.rs` — RPC-driven agent demo
-  - Starts a Louie app in headless mode
+  - Starts a Hawk TUI app in headless mode
   - Reads JSON commands from stdin, writes events to stdout
   - Demonstrates the full agent protocol
 
@@ -100,7 +100,7 @@ Widgets matching the component richness of pi-tui, needed for real agent UIs.
 - [x] Update README with agent protocol documentation
 - [x] Update comparison table (add pi-tui, OpenTUI)
 - [x] Crate-level documentation with module overviews
-- [x] Agent integration guide (how to connect OpenCode/Pi to a Louie app)
+- [x] Agent integration guide (how to connect OpenCode/Pi to a Hawk TUI app)
 - [x] Performance benchmarks
 
 ## Phase 7 — Parity & Polish

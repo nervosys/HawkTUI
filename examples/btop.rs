@@ -1,4 +1,4 @@
-//! btop-style system monitor TUI — built with Louie.
+//! btop-style system monitor TUI — built with Hawk TUI.
 //!
 //! Replicates the layout of btop (~22k GitHub stars), the most popular
 //! terminal system monitor:
@@ -9,14 +9,14 @@
 //! - Process table (sorted, selectable)
 //! - Animated data with tick-driven updates
 
-use louie::ontology::registry::OntologyRegistry;
-use louie::prelude::*;
-use louie::runtime::{Command, Model, Program, ProgramOptions};
-use louie::widget::barchart::BarChart;
-use louie::widget::gauge::Gauge;
-use louie::widget::line_gauge::LineGauge;
-use louie::widget::sparkline::Sparkline;
-use louie::widget::table::{Table, TableColumn, TableColumnWidth, TableRow, TableState};
+use hawktui::ontology::registry::OntologyRegistry;
+use hawktui::prelude::*;
+use hawktui::runtime::{Command, Model, Program, ProgramOptions};
+use hawktui::widget::barchart::BarChart;
+use hawktui::widget::gauge::Gauge;
+use hawktui::widget::line_gauge::LineGauge;
+use hawktui::widget::sparkline::Sparkline;
+use hawktui::widget::table::{Table, TableColumn, TableColumnWidth, TableRow, TableState};
 use std::time::Duration;
 
 // ── Palette ─────────────────────────────────────────────────────────────────

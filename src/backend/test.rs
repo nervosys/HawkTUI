@@ -35,7 +35,7 @@ impl TestBackend {
         let mut text = String::new();
         for x in 0..self.buffer.area.width {
             if let Some(cell) = self.buffer.cell(Position::new(x, y)) {
-                text.push_str(&cell.symbol);
+                text.push_str(cell.symbol.as_str());
             }
         }
         // Trim trailing spaces
@@ -50,7 +50,7 @@ impl Backend for TestBackend {
     {
         for (x, y, cell) in content {
             if x < self.buffer.area.width && y < self.buffer.area.height {
-                self.buffer[(x, y)] = cell.clone();
+                self.buffer[(x, y)] = *cell;
             }
         }
         Ok(())

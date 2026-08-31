@@ -3,7 +3,7 @@ export default function Animation() {
     <>
       <h1>Animation</h1>
       <p>
-        Louie includes a full animation engine with tweens, springs, 25 easing
+        Hawk TUI includes a full animation engine with tweens, springs, 25 easing
         curves, and timeline sequencing. Drive animations from the Tick event in
         your update loop.
       </p>
@@ -12,7 +12,7 @@ export default function Animation() {
       <p>
         Interpolate between two values over a duration with an easing curve:
       </p>
-      <pre><code>{`use louie::animation::{Tween, Easing, Animation};
+      <pre><code>{`use hawktui::animation::{Tween, Easing, Animation};
 use std::time::Duration;
 
 let mut tween = Tween::new(0.0, 1.0, Duration::from_millis(300))
@@ -25,7 +25,7 @@ let still_running = tween.tick(dt);  // returns false when finished
 let current = tween.value();          // 0.0 → 1.0`}</code></pre>
 
       <h3>Repeat Modes</h3>
-      <pre><code>{`use louie::animation::RepeatMode;
+      <pre><code>{`use hawktui::animation::RepeatMode;
 
 Tween::new(0.0, 1.0, Duration::from_millis(500))
     .repeat(RepeatMode::Loop)       // Repeat forever
@@ -34,7 +34,7 @@ Tween::new(0.0, 1.0, Duration::from_millis(500))
 
       <h2>Springs</h2>
       <p>Physics-based animation with configurable stiffness and damping:</p>
-      <pre><code>{`use louie::animation::Spring;
+      <pre><code>{`use hawktui::animation::Spring;
 
 let mut spring = Spring::new(0.0, 100.0)  // initial, target
     .stiffness(170.0)
@@ -67,7 +67,7 @@ let current = spring.value();  // Converges to target`}</code></pre>
 
       <h2>Timelines</h2>
       <p>Compose multiple animations into sequential or parallel tracks:</p>
-      <pre><code>{`use louie::animation::Timeline;
+      <pre><code>{`use hawktui::animation::Timeline;
 
 // Sequential: one after another
 let mut timeline = Timeline::sequential()
@@ -88,7 +88,7 @@ let mut parallel = Timeline::parallel()
         The <code>Animator</code> type manages multiple named animations per
         widget:
       </p>
-      <pre><code>{`use louie::animation::Animator;
+      <pre><code>{`use hawktui::animation::Animator;
 
 let mut animator = Animator::new();
 animator.add("progress", Tween::new(0.0, 1.0, Duration::from_millis(800)));

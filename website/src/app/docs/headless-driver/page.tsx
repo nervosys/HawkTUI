@@ -3,7 +3,7 @@ export default function HeadlessDriver() {
     <>
       <h1>Headless Driver</h1>
       <p>
-        The <code>HeadlessDriver</code> runs a Louie application without a real
+        The <code>HeadlessDriver</code> runs a Hawk TUI application without a real
         terminal, enabling automated testing, CI/CD pipelines, and in-process agent
         integration.
       </p>
@@ -12,13 +12,13 @@ export default function HeadlessDriver() {
       <ul>
         <li><strong>Automated testing</strong> &mdash; Verify widget behavior without a terminal.</li>
         <li><strong>CI/CD</strong> &mdash; Run UI tests in headless environments (GitHub Actions, etc.).</li>
-        <li><strong>In-process agents</strong> &mdash; Embed Louie directly in a Rust agent without stdio.</li>
+        <li><strong>In-process agents</strong> &mdash; Embed Hawk TUI directly in a Rust agent without stdio.</li>
         <li><strong>Benchmarking</strong> &mdash; Measure rendering performance without terminal overhead.</li>
       </ul>
 
       <h2>Basic Usage</h2>
-      <pre><code>{`use louie::agent::HeadlessDriver;
-use louie::backend::TestBackend;
+      <pre><code>{`use hawktui::agent::HeadlessDriver;
+use hawktui::backend::TestBackend;
 
 // Create a headless app with an 80×24 virtual terminal
 let backend = TestBackend::new(80, 24);
@@ -44,7 +44,7 @@ let action_response = driver.handle_request(&AgentRequest::ExecuteAction {
         The <code>TestBackend</code> captures rendered output in an in-memory buffer
         rather than writing to a terminal:
       </p>
-      <pre><code>{`use louie::backend::TestBackend;
+      <pre><code>{`use hawktui::backend::TestBackend;
 
 let backend = TestBackend::new(120, 40);
 
@@ -69,10 +69,10 @@ fn test_paragraph_renders() {
     assert_eq!(buf[(1, 0)].symbol(), "e");
 }`}</code></pre>
 
-      <h2>vs. louie-server</h2>
+      <h2>vs. hawktui-server</h2>
       <table>
         <thead>
-          <tr><th>Feature</th><th>HeadlessDriver</th><th>louie-server</th></tr>
+          <tr><th>Feature</th><th>HeadlessDriver</th><th>hawktui-server</th></tr>
         </thead>
         <tbody>
           <tr><td>Transport</td><td>In-process function calls</td><td>JSON Lines over stdin/stdout</td></tr>

@@ -1,11 +1,11 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use louie::core::buffer::Buffer;
-use louie::core::rect::Rect;
-use louie::core::style::{Color, Modifier, Style};
-use louie::core::text::{Line, Text};
-use louie::layout::{Constraint, Direction, Layout};
-use louie::widget::paragraph::Paragraph;
-use louie::widget::Widget;
+use hawktui::core::buffer::Buffer;
+use hawktui::core::rect::Rect;
+use hawktui::core::style::{Color, Modifier, Style};
+use hawktui::core::text::{Line, Text};
+use hawktui::layout::{Constraint, Direction, Layout};
+use hawktui::widget::paragraph::Paragraph;
+use hawktui::widget::Widget;
 
 fn bench_buffer_empty(c: &mut Criterion) {
     c.bench_function("buffer_empty_80x24", |b| {
@@ -157,7 +157,7 @@ fn bench_paragraph_render(c: &mut Criterion) {
 }
 
 fn bench_agent_protocol_serde(c: &mut Criterion) {
-    use louie::agent::protocol::{AgentRequest, AgentResponse, RequestEnvelope};
+    use hawktui::agent::protocol::{AgentRequest, AgentResponse, RequestEnvelope};
 
     c.bench_function("request_serialize", |b| {
         let envelope = RequestEnvelope {

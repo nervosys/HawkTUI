@@ -3,7 +3,7 @@
 //! Verifies that arbitrary JSON inputs never cause panics during
 //! deserialization, and that valid types round-trip through serde.
 
-use louie::agent::protocol::{AgentRequest, AgentResponse, RequestEnvelope};
+use hawktui::agent::protocol::{AgentRequest, AgentResponse, RequestEnvelope};
 use proptest::prelude::*;
 
 // ── Fuzz deserialization: no panics on arbitrary input ──────────────────────

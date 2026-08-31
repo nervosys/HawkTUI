@@ -1,11 +1,16 @@
 use super::style::{Color, Modifier, Style};
-use compact_str::CompactString;
+use super::symbol::Symbol;
 
 /// A single cell in the terminal buffer.
-#[derive(Debug, Clone, PartialEq, Eq)]
+///
+/// `Cell` is `Copy` and 24 bytes wide: the grapheme cluster is stored inline
+/// (see [`Symbol`]) rather than behind a heap pointer, so allocating, resetting,
+/// cloning, and diffing a buffer never touch the allocator and never run a
+/// destructor.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Cell {
     /// The grapheme cluster displayed in this cell.
-    pub symbol: CompactString,
+    pub symbol: Symbol,
     /// Foreground color.
     pub fg: Color,
     /// Background color.
@@ -18,13 +23,7 @@ pub struct Cell {
 
 impl Default for Cell {
     fn default() -> Self {
-        Self {
-            symbol: CompactString::const_new(" "),
-            fg: Color::Reset,
-            bg: Color::Reset,
-            underline_color: Color::Reset,
-            modifier: Modifier::NONE,
-        }
+        Self::EMPTY
     }
 }
 
@@ -32,17 +31,30 @@ impl Cell {
     /// The empty/space cell constant.
     pub const EMPTY_SYMBOL: &'static str = " ";
 
+    /// A reset cell: a space with default colors and no modifiers.
+    pub const EMPTY: Self = Self {
+        symbol: Symbol::SPACE,
+        fg: Color::Reset,
+        bg: Color::Reset,
+        underline_color: Color::Reset,
+        modifier: Modifier::NONE,
+    };
+
     /// Set the grapheme cluster for this cell.
     pub fn set_symbol(&mut self, symbol: &str) -> &mut Self {
-        self.symbol = CompactString::from(symbol);
+        self.symbol = Symbol::new(symbol);
         self
     }
 
     /// Set a single character.
     pub fn set_char(&mut self, ch: char) -> &mut Self {
-        let mut buf = [0u8; 4];
-        self.symbol = CompactString::from(ch.encode_utf8(&mut buf) as &str);
+        self.symbol = Symbol::from_char(ch);
         self
+    }
+
+    /// The grapheme cluster as a string slice.
+    pub fn symbol(&self) -> &str {
+        self.symbol.as_str()
     }
 
     /// Apply a style to this cell (merging).
@@ -76,16 +88,12 @@ impl Cell {
 
     /// Reset this cell to empty.
     pub fn reset(&mut self) {
-        self.symbol = CompactString::const_new(" ");
-        self.fg = Color::Reset;
-        self.bg = Color::Reset;
-        self.underline_color = Color::Reset;
-        self.modifier = Modifier::NONE;
+        *self = Self::EMPTY;
     }
 
     /// Whether this cell has the default empty content.
     pub fn is_empty(&self) -> bool {
-        self.symbol == " "
+        self.symbol == Symbol::SPACE
             && self.fg == Color::Reset
             && self.bg == Color::Reset
             && self.modifier.is_empty()

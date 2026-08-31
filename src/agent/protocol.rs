@@ -1,7 +1,7 @@
 //! JSON-based agent protocol messages.
 //!
 //! Defines the request/response/event types that AI agents use to communicate
-//! with a Louie application. Modeled after pi-mono's RPC protocol.
+//! with a Hawk TUI application. Modeled after pi-mono's RPC protocol.
 
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 /// Incremented when breaking changes are made to the protocol format.
 pub const PROTOCOL_VERSION: u32 = 1;
 
-/// A request from an AI agent to the Louie application.
+/// A request from an AI agent to the Hawk TUI application.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum AgentRequest {
@@ -108,7 +108,7 @@ pub enum InjectedEvent {
     Resize { width: u16, height: u16 },
 }
 
-/// A response from the Louie application to an agent request.
+/// A response from the Hawk TUI application to an agent request.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentResponse {
     /// Whether the request was successful.
@@ -152,7 +152,7 @@ impl AgentResponse {
     }
 }
 
-/// An event streamed from the Louie application to a subscribed agent.
+/// An event streamed from the Hawk TUI application to a subscribed agent.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum AgentEvent {
