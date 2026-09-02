@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0] - 2026-09-02
 
 ### Changed
 
@@ -14,7 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `hawktui-demo`, and the repository moved to
   [nervosys/HawkTUI](https://github.com/nervosys/HawkTUI). 1.0.0 was published
   to crates.io as `louietui` with the import name `louie`; entries in the
-  released sections below use the current names.
+  released sections below use the current names. The version advances to 2.0.0
+  rather than restarting at 1.0.0: the API descends from what shipped as
+  `louietui 1.0.0` and breaks it, so a major bump tells the truth about the
+  relationship. Publishing a different API under the same 1.0.0 would not.
 - **`Cell` is now `Copy` and 24 bytes**: the grapheme cluster is stored inline
   in the new [`core::symbol::Symbol`] type (8 bytes) instead of a
   `CompactString`. Clusters longer than 7 UTF-8 bytes are interned process-wide
@@ -227,5 +230,6 @@ Measured against ratatui 0.29 on a 200×50 screen (see
 - Auth handshake support in agent session (AUTH-1)
 - Binary path validation for external commands (BIN-1)
 
+[2.0.0]: https://github.com/nervosys/HawkTUI/releases/tag/v2.0.0
 [1.0.0]: https://github.com/nervosys/HawkTUI/releases/tag/v1.0.0
 [0.1.0]: https://github.com/nervosys/HawkTUI/releases/tag/v0.1.0

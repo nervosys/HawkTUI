@@ -6,7 +6,7 @@
 [![MSRV](https://img.shields.io/badge/MSRV-1.80-blue.svg)](https://releases.rs/docs/1.80.0/)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-**A rendering engine measurably faster than ratatui — and the only TUI framework with a complete ontology for agent discoverability.**
+**A rendering engine measurably faster than ratatui — and a machine-readable widget ontology that lets agents drive your app through structured calls instead of screen-scraping.**
 
 Hawk TUI combines the best of modern TUI frameworks (ratatui, bubbletea, ink, etc) with a structured metadata layer that lets AI agents discover, inspect, and interact with every widget in your application — no hardcoded assumptions, no trial-and-error.
 
@@ -32,14 +32,14 @@ Or add it manually:
 
 ```toml
 [dependencies]
-hawktui = "1"
+hawktui = "2"
 ```
 
 For headless / agent-only builds, drop the terminal backend:
 
 ```toml
 [dependencies]
-hawktui = { version = "1", default-features = false }
+hawktui = { version = "2", default-features = false }
 ```
 
 **Minimum supported Rust version:** 1.80
@@ -49,11 +49,13 @@ hawktui = { version = "1", default-features = false }
 1.0.0 was published to crates.io as
 [`louietui`](https://crates.io/crates/louietui), with the import name `louie`
 and the binaries `louie-server` and `louie-demo`. The move is a rename plus the
-API changes listed under [Unreleased](CHANGELOG.md):
+API changes listed under [2.0.0](CHANGELOG.md). The major version advances
+because the API broke, even though the crate name changed too — the alternative,
+republishing a different API as 1.0.0, would have been the confusing option.
 
 ```diff
 -louietui = "1"
-+hawktui = "1"
++hawktui = "2"
 ```
 
 ```diff

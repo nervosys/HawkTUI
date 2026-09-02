@@ -1,9 +1,9 @@
 [package]
 name = "hawktui"
-version = "1.0.0"
+version = "2.0.0"
 edition = "2021"
 authors = ["Nervosys"]
-description = "An agentic-first TUI framework with complete ontology for agent discoverability"
+description = "A TUI framework for Rust with a machine-readable widget ontology for agent-driven UIs"
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/nervosys/HawkTUI"
 homepage = "https://github.com/nervosys/HawkTUI"
