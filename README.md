@@ -25,22 +25,27 @@ An agent connecting to a Hawk TUI app can ask: *"What widgets exist? What can I 
 ## Installation
 
 ```sh
-cargo add hawktui
+cargo add hawktui-rs
 ```
 
 Or add it manually:
 
 ```toml
 [dependencies]
-hawktui = "2"
+hawktui-rs = "2"
 ```
 
 For headless / agent-only builds, drop the terminal backend:
 
 ```toml
 [dependencies]
-hawktui = { version = "2", default-features = false }
+hawktui-rs = { version = "2", default-features = false }
 ```
+
+**The package is `hawktui-rs`; the import is `hawktui`.** You write
+`use hawktui::prelude::*` either way. The crates.io name `hawktui` is held by an
+unrelated account — one `0.0.0` version, yanked, published in 2024 with no
+repository — so the package ships under `hawktui-rs` until that is released.
 
 **Minimum supported Rust version:** 1.80
 
@@ -55,7 +60,7 @@ republishing a different API as 1.0.0, would have been the confusing option.
 
 ```diff
 -louietui = "1"
-+hawktui = "2"
++hawktui-rs = "2"
 ```
 
 ```diff

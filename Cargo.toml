@@ -1,5 +1,12 @@
 [package]
-name = "hawktui"
+# The crates.io name `hawktui` is held by an unrelated account: a single
+# 0.0.0 version, yanked, published 2024-10-08 with no repository. Until that is
+# released or transferred, the package publishes as `hawktui-rs`.
+#
+# The library name below stays `hawktui`, so users still write
+# `use hawktui::...` regardless — the same split `louietui`/`louie` already had.
+# Reverting is a one-line change here plus the install lines in README.md.
+name = "hawktui-rs"
 version = "2.0.0"
 edition = "2021"
 authors = ["Nervosys"]

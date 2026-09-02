@@ -8,11 +8,11 @@ publish = false
 description = "Head-to-head benchmarks: Hawk TUI vs other terminal UI frameworks"
 
 [dependencies]
-hawktui = { path = "..", features = ["crossterm"] }
+hawktui = { package = "hawktui-rs", path = "..", features = ["crossterm"] }
 ratatui = { version = "0.29", default-features = false, features = ["crossterm"] }
 
 [dev-dependencies]
-hawktui = { path = "..", features = ["crossterm"] }
+hawktui = { package = "hawktui-rs", path = "..", features = ["crossterm"] }
 ratatui = { version = "0.29", default-features = false, features = ["crossterm"] }
 superlighttui = { version = "0.23", default-features = false }
 criterion = { version = "0.5", features = ["html_reports"] }

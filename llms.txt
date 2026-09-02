@@ -63,6 +63,7 @@ Use it to choose a widget and understand what it holds; read the rustdoc or
 
 ## Facts
 
+- Package `hawktui-rs` on crates.io; import name `hawktui`
 - Rust 2021, MSRV 1.80
 - License AGPL-3.0-or-later
 - Backends: crossterm, and `TestBackend` for headless rendering

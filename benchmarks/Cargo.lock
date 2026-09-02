@@ -355,24 +355,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "hawktui"
-version = "1.0.0"
+name = "hawktui-benchmarks"
+version = "0.0.0"
+dependencies = [
+ "criterion",
+ "hawktui-rs",
+ "ratatui",
+ "superlighttui",
+]
+
+[[package]]
+name = "hawktui-rs"
+version = "2.0.0"
 dependencies = [
  "crossterm",
  "serde",
  "serde_json",
  "unicode-segmentation",
  "unicode-width 0.2.0",
-]
-
-[[package]]
-name = "hawktui-benchmarks"
-version = "0.0.0"
-dependencies = [
- "criterion",
- "hawktui",
- "ratatui",
- "superlighttui",
 ]
 
 [[package]]

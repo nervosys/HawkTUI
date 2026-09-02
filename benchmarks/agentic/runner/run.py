@@ -59,7 +59,7 @@ BUILD_FAILED_RX = re.compile(
 FRAMEWORKS = {
     "hawktui": {
         "crate": "hawktui",
-        "dep": '`hawktui = {{ path = "{repo}" }}`',
+        "dep": '`hawktui = {{ package = "hawktui-rs", path = "{repo}" }}`',
         "ontology": True,
         "registry_dir": None,          # read from the checkout instead
     },
