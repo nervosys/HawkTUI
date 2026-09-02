@@ -9,6 +9,7 @@
 //! - **RPC transport**: stdin/stdout JSON Lines protocol for embedding
 
 pub mod driver;
+pub mod mcp;
 pub mod protocol;
 pub mod rpc;
 pub mod session;

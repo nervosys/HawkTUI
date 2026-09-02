@@ -328,7 +328,8 @@ impl Discoverable for Table {
             actions: vec![],
 
             usage_hint: Some(
-                "Table::new([TableColumn::new(\"Name\", Fill)], [TableRow::new([\"Alice\"])])"
+                "Table::new([TableColumn::new(\"Name\", TableColumnWidth::Fill)], \
+                 [TableRow::new([\"Alice\"])])"
                     .into(),
             ),
             tags: vec![

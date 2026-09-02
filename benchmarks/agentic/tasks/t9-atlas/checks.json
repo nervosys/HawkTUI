@@ -1,0 +1,23 @@
+{
+  "id": "t9-atlas",
+  "name": "atlas",
+  "rung": 9,
+  "grid": { "w": 100, "h": 30 },
+  "script": ["n", "p", "p", "q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 4 },
+    { "id": "plot-pane-left", "kind": "region_contains", "frame": 0, "x": 0, "y": 0, "w": 50, "h": 29, "pattern": "Plot" },
+    { "id": "calendar-pane-right", "kind": "region_contains", "frame": 0, "x": 50, "y": 0, "w": 50, "h": 29, "pattern": "Calendar" },
+    { "id": "subcell-drawing", "kind": "region_contains", "frame": 0, "x": 0, "y": 0, "w": 50, "h": 29, "pattern": "[⠀-⣿]{3,}" },
+    { "id": "circle-spans-rows", "kind": "count_matching_lines", "frame": 0, "pattern": "[⠀-⣿]", "min": 4 },
+    { "id": "month-and-year", "kind": "region_contains", "frame": 0, "x": 50, "y": 0, "w": 50, "h": 29, "pattern": "March 2026" },
+    { "id": "weekday-headers", "kind": "region_contains", "frame": 0, "x": 50, "y": 0, "w": 50, "h": 29, "pattern": "(Mo|Mon).{0,4}(Tu|Tue)" },
+    { "id": "highlighted-day", "kind": "contains", "frame": 0, "pattern": "\\[15\\]" },
+    { "id": "next-month", "kind": "region_contains", "frame": 1, "x": 50, "y": 0, "w": 50, "h": 29, "pattern": "April 2026" },
+    { "id": "prev-returns", "kind": "region_contains", "frame": 2, "x": 50, "y": 0, "w": 50, "h": 29, "pattern": "March 2026" },
+    { "id": "prev-again", "kind": "region_contains", "frame": 3, "x": 50, "y": 0, "w": 50, "h": 29, "pattern": "February 2026" },
+    { "id": "highlight-follows-month", "kind": "contains", "frame": 3, "pattern": "\\[15\\]" },
+    { "id": "footer", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "n next" }
+  ]
+}

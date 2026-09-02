@@ -1,0 +1,22 @@
+{
+  "id": "t8-meters",
+  "name": "meters",
+  "rung": 8,
+  "grid": { "w": 80, "h": 24 },
+  "script": ["u", "t", "t", "d", "q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 5 },
+    { "id": "title", "kind": "contains", "frame": 0, "pattern": "Transfer" },
+    { "id": "starts-at-25", "kind": "contains", "frame": 0, "pattern": "25%" },
+    { "id": "two-indicators-labelled", "kind": "count_matching_lines", "frame": 0, "pattern": "\\d{1,3}%", "min": 2 },
+    { "id": "solid-bar-drawn", "kind": "contains", "frame": 0, "pattern": "[█▓▒░]{3,}" },
+    { "id": "line-indicator-drawn", "kind": "contains", "frame": 0, "pattern": "[─━┄┅╌╍▬]{3,}" },
+    { "id": "up-raises-value", "kind": "contains", "frame": 1, "pattern": "50%" },
+    { "id": "tick-changes-something", "kind": "frames_differ", "a": 1, "b": 2 },
+    { "id": "tick-advances-again", "kind": "frames_differ", "a": 2, "b": 3 },
+    { "id": "tick-leaves-value-alone", "kind": "contains", "frame": 3, "pattern": "50%" },
+    { "id": "down-lowers-value", "kind": "contains", "frame": 4, "pattern": "25%" },
+    { "id": "footer", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "t tick" }
+  ]
+}

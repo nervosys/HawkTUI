@@ -31,3 +31,7 @@ agent_demo_debug.txt
 
 # Local recovered chat archives
 .chat-history/
+
+# Python bytecode from the agentic benchmark runner
+__pycache__/
+*.pyc

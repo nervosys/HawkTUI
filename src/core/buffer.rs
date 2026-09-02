@@ -86,6 +86,56 @@ impl Buffer {
         self.index_of(pos.x, pos.y).map(|i| &mut self.content[i])
     }
 
+    /// The text of one row, without styling.
+    ///
+    /// Trailing cells are included, so the string is as wide as the buffer
+    /// except where a double-width grapheme covers two cells: it contributes
+    /// one character, and its trailing cell contributes nothing.
+    ///
+    /// Returns an empty string when `y` is outside the buffer.
+    pub fn row_text(&self, y: u16) -> String {
+        let mut out = String::with_capacity(self.area.width as usize);
+        for x in self.area.x..self.area.right() {
+            let Some(cell) = self.cell(Position::new(x, y)) else {
+                continue;
+            };
+            // A wide grapheme owns its trailing cell, which stays empty so the
+            // backend emits nothing there. The same rule keeps this text one
+            // character per glyph rather than one per cell.
+            if !cell.symbol.is_empty() {
+                out.push_str(cell.symbol.as_str());
+            }
+        }
+        out
+    }
+
+    /// The whole buffer as plain text, one line per row, joined by `\n`.
+    ///
+    /// This is the readback half of rendering: draw a frame into a
+    /// [`Buffer`](Self) and compare what came out against what was expected,
+    /// without a terminal and without parsing escape sequences.
+    ///
+    /// ```
+    /// use hawktui::core::buffer::Buffer;
+    /// use hawktui::core::rect::Rect;
+    /// use hawktui::core::style::Style;
+    ///
+    /// let mut buffer = Buffer::empty(Rect::new(0, 0, 5, 2));
+    /// buffer.set_string(0, 0, "hi", Style::default());
+    /// assert_eq!(buffer.to_text(), "hi   \n     ");
+    /// ```
+    pub fn to_text(&self) -> String {
+        let mut out =
+            String::with_capacity((self.area.width as usize + 1) * self.area.height as usize);
+        for y in self.area.y..self.area.bottom() {
+            if y != self.area.y {
+                out.push('\n');
+            }
+            out.push_str(&self.row_text(y));
+        }
+        out
+    }
+
     /// Copy the other buffer's hyperlinks into the overlapping region.
     fn merge_links(&mut self, other: &Buffer) {
         let area = self.area.intersection(other.area);

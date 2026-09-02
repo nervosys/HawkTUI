@@ -1,0 +1,118 @@
+name: Agentic benchmark
+
+# Measures how reliably an AI agent scaffolds working TUIs with Hawk TUI, and
+# fails when that regresses. Agent behaviour drifts with every model release;
+# without a gate the claims in the README go stale silently.
+#
+# THIS COSTS REAL MONEY. Every run calls a model many times over. It is
+# therefore off unless the repository variable RUN_AGENTIC_BENCHMARK is set to
+# "true", and it never runs on push or pull request.
+#
+# Enable with:
+#   gh variable set RUN_AGENTIC_BENCHMARK --body true
+#   gh secret set ANTHROPIC_API_KEY
+
+on:
+  workflow_dispatch:
+    inputs:
+      tasks:
+        description: Comma-separated task ids
+        default: t2-counter,t3-list,t7-settings
+      conditions:
+        description: Comma-separated conditions
+        default: c1,c2
+      replicates:
+        description: Runs per cell
+        default: "3"
+      update_baseline:
+        description: Record this run as the new baseline instead of gating on it
+        type: boolean
+        default: false
+  schedule:
+    # Weekly, Monday 04:00 UTC. Frequent enough to catch a model release,
+    # rare enough not to be a standing bill.
+    - cron: "0 4 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    name: Scaffold and score
+    runs-on: ubuntu-latest
+    # Both guards matter: the variable is the off switch, and the scheduled run
+    # must never fire on a fork that happens to have the secret.
+    if: github.repository == 'nervosys/HawkTUI' && vars.RUN_AGENTIC_BENCHMARK == 'true'
+    timeout-minutes: 180
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install the agent CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Prove the instrument works
+        # If the verifier cannot tell a correct program from a broken one, the
+        # rest of this job is measuring nothing.
+        working-directory: benchmarks/agentic/runner
+        run: |
+          python selftest.py
+          python selftest_discovery.py
+
+      - name: Build the context packs
+        working-directory: benchmarks/agentic/runner
+        run: python make_context.py
+
+      - name: Run the grid
+        working-directory: benchmarks/agentic/runner
+        env:
+          # Present, so run.py uses --bare: no CLAUDE.md discovery, no hooks, no
+          # plugins. Those vary between machines and would confound the results.
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python -u run.py \
+            --tasks "${{ inputs.tasks || 't2-counter,t3-list,t7-settings' }}" \
+            --frameworks hawktui \
+            --conditions "${{ inputs.conditions || 'c1,c2' }}" \
+            --replicates "${{ inputs.replicates || 3 }}" \
+            --out ../results/ci
+
+      - name: Re-score from the stored dumps
+        # run.py scores with the verifier it loaded at startup; re-scoring makes
+        # the numbers reflect the verifier in this commit.
+        working-directory: benchmarks/agentic/runner
+        run: python rescore.py ../results/ci/runs.jsonl
+
+      - name: Analyse
+        working-directory: benchmarks/agentic/runner
+        run: python analyze.py ../results/ci/runs.rescored.jsonl
+
+      - name: Check for regressions
+        working-directory: benchmarks/agentic/runner
+        run: |
+          python check_regression.py \
+            --runs ../results/ci/runs.rescored.jsonl \
+            --baseline ../baseline.json \
+            ${{ inputs.update_baseline && '--update' || '' }}
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentic-benchmark-${{ github.run_id }}
+          # Transcripts and frame dumps, so any number can be traced back to the
+          # frames that produced it. Excludes build output.
+          path: |
+            benchmarks/agentic/results/ci/runs.jsonl
+            benchmarks/agentic/results/ci/runs.rescored.jsonl
+            benchmarks/agentic/results/ci/**/_prompt.md
+            benchmarks/agentic/results/ci/**/_dump.txt
+            benchmarks/agentic/results/ci/**/_transcript.jsonl
+          retention-days: 30

@@ -129,6 +129,7 @@ pub mod ontology;
 pub mod overlay;
 pub mod runtime;
 pub mod terminal;
+pub mod testing;
 pub mod theme;
 #[doc(hidden)]
 pub mod util;

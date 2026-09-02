@@ -1,0 +1,23 @@
+{
+  "id": "t4-dashboard",
+  "name": "dashboard",
+  "rung": 4,
+  "grid": { "w": 100, "h": 30 },
+  "script": ["u", "u", "d", "q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 4 },
+    { "id": "header-placed", "kind": "region_contains", "frame": 0, "x": 0, "y": 0, "w": 100, "h": 3, "pattern": "Dashboard" },
+    { "id": "cpu-left", "kind": "region_contains", "frame": 0, "x": 0, "y": 3, "w": 50, "h": 26, "pattern": "CPU" },
+    { "id": "history-right-top", "kind": "region_contains", "frame": 0, "x": 50, "y": 3, "w": 50, "h": 13, "pattern": "History" },
+    { "id": "services-right-bottom", "kind": "region_contains", "frame": 0, "x": 50, "y": 16, "w": 50, "h": 13, "pattern": "Services" },
+    { "id": "sparkline-drawn", "kind": "region_contains", "frame": 0, "x": 50, "y": 3, "w": 50, "h": 13, "pattern": "[▁▂▃▄▅▆▇█]{4,}" },
+    { "id": "services-listed", "kind": "count_matching_lines", "frame": 0, "pattern": "\\b(api|web|db|cache|queue)\\b", "min": 5 },
+    { "id": "gauge-start", "kind": "contains", "frame": 0, "pattern": "30%" },
+    { "id": "gauge-up-1", "kind": "contains", "frame": 1, "pattern": "40%" },
+    { "id": "gauge-up-2", "kind": "contains", "frame": 2, "pattern": "50%" },
+    { "id": "gauge-down", "kind": "contains", "frame": 3, "pattern": "40%" },
+    { "id": "gauge-repaints", "kind": "frames_differ", "a": 0, "b": 1 },
+    { "id": "footer", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "q quit" }
+  ]
+}

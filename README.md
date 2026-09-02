@@ -174,10 +174,8 @@ pub trait Discoverable {
 ### Ontology Registry
 
 ```rust
-let mut registry = OntologyRegistry::new();
-registry.register::<Block>();
-registry.register::<Paragraph>();
-registry.register::<Input>();
+// Every widget that implements Discoverable, in one call
+let registry = hawktui::ontology::builtin_registry();
 
 // Search by semantic role
 let inputs = registry.find_by_role(SemanticRole::Input);
@@ -185,6 +183,20 @@ let inputs = registry.find_by_role(SemanticRole::Input);
 // Full JSON catalog
 let catalog = registry.export_catalog();
 ```
+
+Or read it from the command line, without writing any code:
+
+```sh
+hawktui-ontology list             # every widget with its role
+hawktui-ontology schema Gauge     # one widget in full
+hawktui-ontology search scroll
+```
+
+**Scope, stated plainly:** the ontology describes a widget's *runtime state* and
+semantic role — what it holds and what an agent can do to it while the program
+runs. It is not a catalog of builder methods. Use it to choose a widget; read
+the rustdoc for the methods that construct one. [`AGENTS.md`](AGENTS.md) covers
+the authoring side.
 
 ## Widget Set
 
@@ -329,12 +341,40 @@ python3 scripts/hawktui-demo.py
 
 See [docs/agent-protocol.md](docs/agent-protocol.md) for the full protocol specification, and [docs/agent-integration.md](docs/agent-integration.md) for integration guides (Python, TypeScript, Rust).
 
+### MCP
+
+Agents already speak the Model Context Protocol, so `hawktui-mcp` serves the
+ontology as MCP tools over JSON-RPC on stdio — no adapter to write:
+
+```json
+{ "mcpServers": { "hawktui": { "command": "hawktui-mcp" } } }
+```
+
+Tools: `list_widgets`, `get_widget_schema`, `search_widgets`, `widget_roles`,
+`ontology_digest`.
+
+### Testing without a terminal
+
+```rust
+use hawktui::testing::Harness;
+
+let mut harness = Harness::new(App::new(), 80, 24)?;
+let frames = harness.run_script("Down,Down,q")?;
+assert!(frames[2].contains("> Item 03"));
+```
+
+`Harness` applies keys and returns each frame as plain text; `assert_frame!`
+reports the first differing row and column. See [`AGENTS.md`](AGENTS.md).
+
 ## Feature Flags
 
 | Feature     | Default | Description                                                           |
 | ----------- | ------- | --------------------------------------------------------------------- |
 | `crossterm` | ✓       | Crossterm terminal backend (disable for headless / agent-only)        |
 | `bin`       |         | Enables `hawktui-server` and `hawktui-demo` binaries (pulls in `tracing`) |
+
+`hawktui-ontology` and `hawktui-mcp` need no feature flag; they depend only on
+what the library already requires.
 
 ## Animation System
 
@@ -438,6 +478,31 @@ other languages are not benchmarked here — a cross-runtime number would not be
 defensible — so their cells are left blank rather than guessed.
 
 pi-tui is [`@mariozechner/pi-tui`](https://github.com/badlogic/pi-mono) (vendored under `reference/`); [OpenTUI](https://github.com/sst/opentui) is the TypeScript/Zig library that powers OpenCode.
+
+### Agent authoring cost
+
+Feature presence is one thing; what it costs an AI agent to build with the
+framework is another, and for a project that calls itself agentic-first it is
+the more honest number. Measured over 45 runs on three canonical TUI programs
+([methodology](docs/AGENTIC-BENCHMARKS.md)):
+
+| Framework | Programs built correctly | Agent turns | Cost per program |
+|---|---|---|---|
+| ratatui 0.29 | 3 of 3 | 7–15 | **$0.21–0.33** |
+| **Hawk TUI** | 3 of 3 | 30–40 | $0.57–1.04 |
+| superlighttui 0.23 | 2.9 of 3 | 49–126 | $1.32–5.74 |
+
+**Hawk TUI is roughly 3–4× more expensive to build with than ratatui**, for
+identical results. The likeliest explanation is that ratatui is years older and
+far better represented in a model's training data, which no framework feature
+can fix quickly — but it is the current state of things and worth knowing before
+you choose.
+
+The same study found that supplying the widget ontology to the authoring agent
+made **no measurable difference** on any pre-registered metric. Its value is
+runtime introspection — an agent *driving* a running program — not code
+generation. The results, including the ones that went against us, are in
+[docs/AGENTIC-BENCHMARKS.md](docs/AGENTIC-BENCHMARKS.md).
 
 ## License
 

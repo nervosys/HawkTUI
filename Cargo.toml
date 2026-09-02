@@ -12,7 +12,19 @@ readme = "README.md"
 keywords = ["tui", "terminal", "agent", "ontology", "ui"]
 categories = ["command-line-interface", "gui"]
 rust-version = "1.80"
-exclude = ["reference/", ".github/", "docs/", "scripts/", "website/", "benchmarks/"]
+# Documentation an agent or a user needs while writing against the crate ships
+# inside the package; excluding all of `docs/` meant `cargo add hawktui`
+# delivered a README and nothing else. Only internal material is excluded.
+exclude = [
+    "reference/",
+    ".github/",
+    "scripts/",
+    "website/",
+    "benchmarks/",
+    "docs/AGENT-DX-PLAN.md",                    # internal roadmap
+    "docs/SECURITY-AUDIT.md",                   # internal audit
+    "docs/blog-why-agents-need-ui-ontology.md", # marketing, lives on the site
+]
 
 [lib]
 name = "hawktui"
@@ -76,6 +88,14 @@ required-features = ["crossterm"]
 name = "btop"
 path = "examples/btop.rs"
 required-features = ["crossterm"]
+
+[[bin]]
+name = "hawktui-mcp"
+path = "src/bin/hawktui_mcp.rs"
+
+[[bin]]
+name = "hawktui-ontology"
+path = "src/bin/hawktui_ontology.rs"
 
 [[bin]]
 name = "hawktui-server"

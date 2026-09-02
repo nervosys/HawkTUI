@@ -30,16 +30,27 @@ impl TestBackend {
         &self.buffer
     }
 
-    /// Get the text content at a specific row.
+    /// Get the text content at a specific row, with trailing spaces removed.
+    ///
+    /// Use [`Buffer::row_text`](crate::core::buffer::Buffer::row_text) when the
+    /// padding matters — this one is for readable assertions on a single line.
     pub fn row_text(&self, y: u16) -> String {
-        let mut text = String::new();
-        for x in 0..self.buffer.area.width {
-            if let Some(cell) = self.buffer.cell(Position::new(x, y)) {
-                text.push_str(cell.symbol.as_str());
-            }
-        }
-        // Trim trailing spaces
-        text.trim_end().to_string()
+        self.buffer.row_text(y).trim_end().to_string()
+    }
+
+    /// The whole screen as plain text, one line per row, joined by `\n`.
+    ///
+    /// Rows keep their padding, so every line is as wide as the terminal and a
+    /// rendered frame can be compared against an expected block of text.
+    ///
+    /// ```
+    /// use hawktui::backend::test::TestBackend;
+    ///
+    /// let backend = TestBackend::new(3, 2);
+    /// assert_eq!(backend.to_text(), "   \n   ");
+    /// ```
+    pub fn to_text(&self) -> String {
+        self.buffer.to_text()
     }
 }
 

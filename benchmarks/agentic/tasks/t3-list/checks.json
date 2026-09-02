@@ -1,0 +1,20 @@
+{
+  "id": "t3-list",
+  "name": "list",
+  "rung": 3,
+  "grid": { "w": 80, "h": 24 },
+  "script": ["Down", "Down", "Down", "q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 4 },
+    { "id": "title", "kind": "contains", "frame": 0, "pattern": "Items" },
+    { "id": "first-item", "kind": "contains", "frame": 0, "pattern": "Item 01" },
+    { "id": "last-item", "kind": "contains", "frame": 0, "pattern": "Item 20" },
+    { "id": "initial-selection", "kind": "contains", "frame": 0, "pattern": ">\\sItem 01" },
+    { "id": "moved-selection", "kind": "contains", "frame": 3, "pattern": ">\\sItem 04" },
+    { "id": "old-selection-cleared", "kind": "absent", "frame": 3, "pattern": ">\\sItem 01" },
+    { "id": "marker-travelled", "kind": "row_of_delta", "from": 0, "to": 3, "pattern": ">\\sItem", "delta": 3 },
+    { "id": "status-start", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "1\\s*/\\s*20" },
+    { "id": "status-moved", "kind": "row_matches", "frame": 3, "row": -1, "pattern": "4\\s*/\\s*20" }
+  ]
+}

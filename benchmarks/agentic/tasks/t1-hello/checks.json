@@ -1,0 +1,14 @@
+{
+  "id": "t1-hello",
+  "name": "hello",
+  "rung": 1,
+  "grid": { "w": 80, "h": 24 },
+  "script": ["q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 1 },
+    { "id": "title", "kind": "contains", "frame": 0, "pattern": "Greeting" },
+    { "id": "body", "kind": "contains", "frame": 0, "pattern": "Hello, world!" },
+    { "id": "border", "kind": "row_matches", "frame": 0, "row": 0, "pattern": "[-─━=+]{10,}" }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "t6-tasks",
+  "name": "tasks",
+  "rung": 6,
+  "grid": { "w": 100, "h": 30 },
+  "script": ["a", "x", "y", "Enter", "s", "Tab", "q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 7 },
+    { "id": "tab-bar", "kind": "row_matches", "frame": 0, "row": 0, "pattern": "\\[All\\]\\s+Active\\s+Done" },
+    { "id": "table-title", "kind": "contains", "frame": 0, "pattern": "Tasks" },
+    { "id": "table-header", "kind": "count_matching_lines", "frame": 0, "pattern": "ID\\s+Title\\s+Status", "min": 1 },
+    { "id": "seed-rows", "kind": "count_matching_lines", "frame": 0, "pattern": "(Deploy staging|Review PR|Write tests|Ship release|Audit deps)", "min": 5 },
+    { "id": "footer", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "a add" },
+    { "id": "modal-opens", "kind": "contains", "frame": 1, "pattern": "New Task" },
+    { "id": "modal-covers-table", "kind": "frames_differ", "a": 0, "b": 1 },
+    { "id": "modal-takes-input", "kind": "contains", "frame": 3, "pattern": "xy" },
+    { "id": "modal-closes", "kind": "absent", "frame": 4, "pattern": "New Task" },
+    { "id": "row-added", "kind": "contains", "frame": 4, "pattern": "6\\s+xy\\s+Active" },
+    { "id": "unsorted-order", "kind": "row_order", "frame": 4, "before": "Deploy staging", "after": "Audit deps" },
+    { "id": "sorted-order", "kind": "row_order", "frame": 5, "before": "Audit deps", "after": "Deploy staging" },
+    { "id": "tab-switches", "kind": "row_matches", "frame": 6, "row": 0, "pattern": "All\\s+\\[Active\\]\\s+Done" },
+    { "id": "tab-filters", "kind": "absent", "frame": 6, "pattern": "Deploy staging" }
+  ]
+}

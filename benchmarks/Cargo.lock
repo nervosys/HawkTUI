@@ -358,7 +358,6 @@ dependencies = [
 name = "hawktui"
 version = "1.0.0"
 dependencies = [
- "compact_str 0.8.2",
  "crossterm",
  "serde",
  "serde_json",

@@ -1,0 +1,24 @@
+{
+  "id": "t7-settings",
+  "name": "settings",
+  "rung": 7,
+  "grid": { "w": 80, "h": 24 },
+  "script": ["Enter", "Down", "Right", "Right", "q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 5 },
+    { "id": "title", "kind": "contains", "frame": 0, "pattern": "Settings" },
+    { "id": "all-settings-listed", "kind": "count_matching_lines", "frame": 0, "pattern": "(Theme|Font Size|Vim Mode)\\s*:", "min": 3 },
+    { "id": "initial-values", "kind": "contains", "frame": 0, "pattern": "Theme\\s*:\\s*Dark" },
+    { "id": "initial-font", "kind": "contains", "frame": 0, "pattern": "Font Size\\s*:\\s*14" },
+    { "id": "initial-vim", "kind": "contains", "frame": 0, "pattern": "Vim Mode\\s*:\\s*Off" },
+    { "id": "initial-selection", "kind": "contains", "frame": 0, "pattern": ">\\sTheme" },
+    { "id": "enter-cycles", "kind": "contains", "frame": 1, "pattern": "Theme\\s*:\\s*Light" },
+    { "id": "cycle-leaves-others-alone", "kind": "contains", "frame": 1, "pattern": "Font Size\\s*:\\s*14" },
+    { "id": "down-moves-selection", "kind": "contains", "frame": 2, "pattern": ">\\sFont Size" },
+    { "id": "selection-is-exclusive", "kind": "absent", "frame": 2, "pattern": ">\\sTheme" },
+    { "id": "right-cycles", "kind": "contains", "frame": 3, "pattern": "Font Size\\s*:\\s*16" },
+    { "id": "cycle-wraps", "kind": "contains", "frame": 4, "pattern": "Font Size\\s*:\\s*12" },
+    { "id": "footer", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "Enter cycle" }
+  ]
+}

@@ -1,0 +1,8 @@
+# Keep the summarised metrics — results/<stamp>/runs.jsonl and
+# runs.rescored.jsonl — so every published number stays auditable in git.
+#
+# Drop the per-run working directories: scaffolded source, agent transcripts,
+# frame dumps and build output. They are large, regenerable, and the transcripts
+# can carry incidental machine detail (absolute paths, environment) that has no
+# business in a public repository.
+*/*/

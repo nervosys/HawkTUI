@@ -34,6 +34,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Agent-facing documentation now ships inside the crate.** `docs/` was in the
+  package `exclude` list, so `cargo add hawktui` delivered a README and nothing
+  else. Added a top-level `AGENTS.md` (how to write a Hawk TUI program: the
+  program shape, the mistakes that recur, and how to assert on a rendered
+  screen) and an `llms.txt` reading order, and stopped excluding the reference
+  documentation. Shipped agent-facing docs went from 24.6 KB to 86 KB. Every
+  code snippet in `AGENTS.md` is compiled before release.
+- **`hawktui::testing`**: a headless harness for driving a [`Model`] without a
+  terminal. `Harness::new(model, w, h)` plus `run_script("Down,Down,q")` applies
+  keys and returns each frame as plain text. It folds `Command::Message` and
+  `Command::Batch` back in as the runtime does and stops on `Command::Quit`, but
+  never runs `Command::Task`, which would make a test non-deterministic.
+  `parse_key` covers the script vocabulary and rejects unknown names.
+- **`assert_frame!` and `testing::frame_diff`**: compare a rendered screen
+  against an expected one, reporting the first differing row and column instead
+  of printing two screens. Trailing padding is ignored on both sides.
+- **`Buffer::to_text`, `Buffer::row_text` and `TestBackend::to_text`**: read a
+  rendered frame back as plain text. A double-width grapheme contributes one
+  character and its trailing cell contributes none, so the text lines up with
+  what a terminal shows. `TestBackend::row_text` now delegates to the buffer,
+  keeping its existing trimming behaviour.
+- **`ontology::register_builtin_widgets` and `builtin_registry`**: register
+  every widget that implements `Discoverable`. `hawktui-server` previously
+  registered six of twenty-one by hand, so an agent asking a running application
+  what it could do was told about less than a third of the framework. A test
+  scans the widget sources and fails when the list falls behind.
+- **`ontology::report`**: `list`, `search`, `schema`, `roles`, `digest` and
+  `export` renderings of the catalog, returning `String` so they can be tested
+  or served rather than only printed.
+- **`hawktui-ontology`**: a binary exposing those renderings, so the ontology is
+  readable from an installed crate instead of only from a checkout.
+- **`hawktui-mcp` and `agent::mcp`**: a Model Context Protocol server over the
+  ontology, JSON-RPC 2.0 on stdio, offering `list_widgets`,
+  `get_widget_schema`, `search_widgets`, `widget_roles` and `ontology_digest`.
+  `McpServer` is transport-free, so it is testable without spawning a process.
+  Register it with `{"mcpServers": {"hawktui": {"command": "hawktui-mcp"}}}`.
+- **`benchmarks/agentic`**: a benchmark measuring how quickly and reliably an AI
+  agent scaffolds working TUIs with Hawk TUI versus ratatui and superlighttui,
+  and isolating how much of any difference the ontology accounts for. See
+  `docs/AGENTIC-BENCHMARKS.md` for the design and the pre-registered
+  falsification criteria, and `docs/AGENT-DX-PLAN.md` for the audit that
+  motivated the work above.
+
+### Fixed
+
+- **Two ontology usage hints did not compile.** `Canvas` suggested
+  `.line(CanvasLine { .. })`, which is not Rust, and `Table` suggested
+  `TableColumn::new("Name", Fill)` with `Fill` unqualified. A usage hint is the
+  part of a schema an agent is most likely to copy verbatim, so a wrong one is a
+  hallucination carrying the framework's authority. `tests/usage_hints_compile.rs`
+  now compiles every code hint and fails when a schema drifts from it.
+
 - **OSC 8 hyperlinks**: `Buffer::set_string_linked` and `Buffer::set_hyperlink`
   attach a URL to a run of cells, which terminals that support OSC 8 render as
   clickable. Targets live in a sparse table beside the grid rather than inside

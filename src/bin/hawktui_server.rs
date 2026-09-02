@@ -46,9 +46,7 @@ use hawktui::ontology::registry::OntologyRegistry;
 use hawktui::prelude::*;
 use hawktui::runtime::{Command, Model};
 use hawktui::widget::gauge::Gauge;
-use hawktui::widget::input::Input;
 use hawktui::widget::list::{List, ListItem, ListState};
-use hawktui::widget::select_list::SelectList;
 
 // ---------------------------------------------------------------------------
 // Demo application: a multi-widget showcase for agent exploration
@@ -168,12 +166,11 @@ impl Model for DemoApp {
     }
 
     fn register_ontology(&self, registry: &mut OntologyRegistry) {
-        registry.register::<Paragraph>();
-        registry.register::<Gauge>();
-        registry.register::<List>();
-        registry.register::<Block>();
-        registry.register::<Input>();
-        registry.register::<SelectList>();
+        // Register the whole catalog, not just the widgets this demo happens to
+        // draw. An agent asks `query_ontology` to find out what the framework
+        // offers, and answering with a subset of it is worse than useless — it
+        // reads as "these six are all there is".
+        hawktui::ontology::register_builtin_widgets(registry);
     }
 }
 

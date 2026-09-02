@@ -1,0 +1,27 @@
+{
+  "id": "t5-browser",
+  "name": "browser",
+  "rung": 5,
+  "grid": { "w": 100, "h": 30 },
+  "script": ["Down", "Tab", "a", "Tab", "j", "q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 6 },
+    { "id": "files-pane-left", "kind": "region_contains", "frame": 0, "x": 0, "y": 0, "w": 30, "h": 29, "pattern": "Files" },
+    { "id": "preview-pane-right", "kind": "region_contains", "frame": 0, "x": 30, "y": 0, "w": 70, "h": 29, "pattern": "Preview" },
+    { "id": "filter-bar", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "Filter:" },
+    { "id": "list-focused-at-start", "kind": "contains", "frame": 0, "pattern": "\\*Files" },
+    { "id": "files-listed", "kind": "region_contains", "frame": 0, "x": 0, "y": 0, "w": 30, "h": 29, "pattern": "alpha\\.txt" },
+    { "id": "preview-follows-selection", "kind": "region_contains", "frame": 0, "x": 30, "y": 0, "w": 70, "h": 29, "pattern": "alpha\\.txt line 01" },
+    { "id": "down-moves-selection", "kind": "contains", "frame": 1, "pattern": ">\\sbeta\\.txt" },
+    { "id": "preview-updates", "kind": "region_contains", "frame": 1, "x": 30, "y": 0, "w": 70, "h": 29, "pattern": "beta\\.txt line 01" },
+    { "id": "tab-focuses-filter", "kind": "row_matches", "frame": 2, "row": -1, "pattern": "\\*Filter:" },
+    { "id": "focus-is-exclusive", "kind": "absent", "frame": 2, "pattern": "\\*Files" },
+    { "id": "typing-fills-filter", "kind": "row_matches", "frame": 3, "row": -1, "pattern": "\\*Filter:\\s*a" },
+    { "id": "filter-applies", "kind": "absent", "frame": 3, "pattern": "epsilon" },
+    { "id": "filter-keeps-matches", "kind": "region_contains", "frame": 3, "x": 0, "y": 0, "w": 30, "h": 29, "pattern": "gamma\\.txt" },
+    { "id": "tab-returns-focus", "kind": "contains", "frame": 4, "pattern": "\\*Files" },
+    { "id": "preview-scrolls", "kind": "region_contains", "frame": 5, "x": 30, "y": 0, "w": 70, "h": 29, "pattern": "alpha\\.txt line 02" },
+    { "id": "scroll-consumed-a-line", "kind": "frames_differ", "a": 4, "b": 5 }
+  ]
+}

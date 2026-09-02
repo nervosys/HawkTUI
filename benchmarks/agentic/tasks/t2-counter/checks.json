@@ -1,0 +1,16 @@
+{
+  "id": "t2-counter",
+  "name": "counter",
+  "rung": 2,
+  "grid": { "w": 80, "h": 24 },
+  "script": ["+", "+", "-", "q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 4 },
+    { "id": "title", "kind": "contains", "frame": 0, "pattern": "Counter" },
+    { "id": "start", "kind": "contains", "frame": 0, "pattern": "Count:\\s*0" },
+    { "id": "inc1", "kind": "contains", "frame": 1, "pattern": "Count:\\s*1" },
+    { "id": "inc2", "kind": "contains", "frame": 2, "pattern": "Count:\\s*2" },
+    { "id": "dec", "kind": "contains", "frame": 3, "pattern": "Count:\\s*1" }
+  ]
+}
