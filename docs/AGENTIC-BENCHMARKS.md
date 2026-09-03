@@ -463,6 +463,65 @@ failures, and the next step is a task this model tier actually fails.
 — the trigger conditions and the type summaries regenerated shortly before it —
 so it cannot attribute the consultation rise to the descriptions alone.
 
+### The agent reads the source, whatever the ontology says
+
+`runner/source_usage.py` and `runner/why_source.py` reconstruct what the agent
+does from the stored transcripts. The result reframes every ontology finding in
+this document.
+
+| Framework | Runs reading the implementation | Reads per run | First read |
+|---|---:|---:|---:|
+| **Hawk TUI** | **100 %** | 16–22 | tool call #1 |
+| ratatui | 6 % | 0.1 | #8 |
+
+80 % of those reads are core and runtime files, not widgets:
+`backend/test.rs`, `event/mod.rs`, `core/buffer.rs`, `terminal.rs`,
+`runtime/mod.rs`, `lib.rs`. Three iterations of the ontology — runtime state,
+then the widget API, then the program skeleton — left this unchanged:
+
+| Condition | source reads | ontology calls | turns | cost |
+|---|---:|---:|---:|---:|
+| C1, no ontology | 20 | 0 | 36 | $0.78 |
+| C5, widget API | 16 | 6 | 38 | $0.78 |
+| C5, + skeleton and traits | 20 | 10 | 48 | $0.92 |
+
+`program_skeleton` was called in **9 of 9** runs. The agent adopted it, then read
+the source anyway. `prelude` was called 3 times while `lib.rs` was read 15.
+
+**This is a fact about how current models are trained, not about the ontology.**
+They ground themselves in code: 36 source reads came directly after an ontology
+answer on the same type. No amount of coverage changes that, and treating the
+flat outcome as evidence against the ontology would be the same mistake as
+treating the earlier nulls as evidence when the agent had never opened it.
+
+### Sufficiency: the question that survives
+
+If agents are trained to prefer an ontology when one exists, the useful question
+is not whether this one changes behaviour but whether it *could* replace the
+source. `runner/sufficiency.py` answers that directly: for every file opened
+across 24 runs, does the ontology describe that file's public API?
+
+| | Reads covered |
+|---|---:|
+| Before | 174/193 (90 %) |
+| After closing three gaps | **193/193 (100 %)** |
+
+The gaps were `agent/driver.rs`, `agent/session.rs` and — the one that mattered
+— `src/testing.rs`, the `Harness` every task needs for headless rendering, with
+eleven public functions and none of them described.
+
+The catalog is now 93 types and 480 functions, and **an agent trained to prefer
+it would have had no reason to open a single source file in those runs.**
+
+Two defects were found getting there. The generator derived module paths by
+stripping a segment, which published `hawktui::backend` for `TestBackend` — an
+import that does not resolve, and exactly the kind of wrong answer that sends an
+agent to the source. It now emits `examples/api_imports.rs`, every published
+path as a `use` statement compiled as an example, so a bad path is a build
+failure. And the first run of the sufficiency audit reported thirteen false gaps
+because a regex spanning type boundaries captured nothing; it was caught because
+the output contradicted something already known to be true.
+
 ### What did separate the frameworks
 
 Effort, by a wide margin, on identical correctness:

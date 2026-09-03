@@ -6,11 +6,26 @@
 
 use super::api::{ApiFn, ApiKind, ApiType};
 
-/// Every public type an author builds a program out of (90 of them).
+/// Every public type an author builds a program out of (93 of them).
 pub static API: &[ApiType] = &[
     ApiType {
+        name: "AgentSession",
+        module: "hawktui::agent::session",
+        kind: ApiKind::Struct,
+        summary: "Manages an agent's connection to a Hawk TUI application.",
+        variants: &[],
+        functions: &[
+            ApiFn { name: "new", signature: "pub fn new() -> Self", role: "constructor", summary: "" },
+            ApiFn { name: "is_subscribed", signature: "pub fn is_subscribed(&self, event_type: &str) -> bool", role: "method", summary: "Check if the agent is subscribed to a specific event type." },
+            ApiFn { name: "process_request", signature: "pub fn process_request( &mut self, request: &AgentRequest, registry: &OntologyRegistry, ) -> (AgentResponse, bool)", role: "method", summary: "Process an incoming agent request and return a response plus optional events." },
+            ApiFn { name: "convert_injected_event", signature: "pub fn convert_injected_event(injected: &InjectedEvent) -> Option<Event>", role: "constructor", summary: "Convert an [`InjectedEvent`] into a hawktui [`Event`]." },
+            ApiFn { name: "emit_state_changed", signature: "pub fn emit_state_changed( &self, agent_id: &str, state: serde_json::Value, ) -> Option<AgentEvent>", role: "method", summary: "Generate an [`AgentEvent`] for a state change, if the agent is subscribed." },
+            ApiFn { name: "emit_render_update", signature: "pub fn emit_render_update(&self, tree: serde_json::Value) -> Option<AgentEvent>", role: "method", summary: "Generate an [`AgentEvent`] for a render update, if subscribed." },
+        ],
+    },
+    ApiType {
         name: "Alignment",
-        module: "hawktui::core",
+        module: "hawktui::core::text",
         kind: ApiKind::Enum,
         summary: "Text alignment within a line.",
         variants: &["Left", "Center", "Right"],
@@ -154,7 +169,7 @@ pub static API: &[ApiType] = &[
     },
     ApiType {
         name: "Buffer",
-        module: "hawktui::core",
+        module: "hawktui::core::buffer",
         kind: ApiKind::Struct,
         summary: "A two-dimensional grid of terminal cells.",
         variants: &[],
@@ -256,7 +271,7 @@ pub static API: &[ApiType] = &[
     },
     ApiType {
         name: "Cell",
-        module: "hawktui::core",
+        module: "hawktui::core::cell",
         kind: ApiKind::Struct,
         summary: "A single cell in the terminal buffer.",
         variants: &[],
@@ -287,7 +302,7 @@ pub static API: &[ApiType] = &[
     },
     ApiType {
         name: "Color",
-        module: "hawktui::core",
+        module: "hawktui::core::style",
         kind: ApiKind::Enum,
         summary: "Terminal color.",
         variants: &["Reset", "Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "Gray", "DarkGray", "LightRed", "LightGreen", "LightYellow", "LightBlue", "LightMagenta", "LightCyan", "White", "Indexed", "Rgb"],
@@ -454,6 +469,46 @@ pub static API: &[ApiType] = &[
         ],
     },
     ApiType {
+        name: "Harness",
+        module: "hawktui::testing",
+        kind: ApiKind::Struct,
+        summary: "A model, a screen, and the loop between them — without a terminal.",
+        variants: &[],
+        functions: &[
+            ApiFn { name: "new", signature: "pub fn new(model: M, width: u16, height: u16) -> io::Result<Self>", role: "constructor", summary: "Build a harness around `model` with a `width` × `height` screen." },
+            ApiFn { name: "model", signature: "pub fn model(&self) -> &M", role: "method", summary: "The model, for assertions that are easier against state than pixels." },
+            ApiFn { name: "is_running", signature: "pub fn is_running(&self) -> bool", role: "method", summary: "Whether the model is still running, i.e. has not returned" },
+            ApiFn { name: "render", signature: "pub fn render(&mut self) -> io::Result<String>", role: "method", summary: "Render a frame and return it as plain text." },
+            ApiFn { name: "text", signature: "pub fn text(&self) -> String", role: "method", summary: "The most recently rendered frame, without drawing a new one." },
+            ApiFn { name: "send", signature: "pub fn send(&mut self, event: Event)", role: "method", summary: "Feed an event through [`handle_event`](Model::handle_event) and, if it" },
+            ApiFn { name: "key", signature: "pub fn key(&mut self, code: KeyCode)", role: "method", summary: "Send a key press with no modifiers." },
+            ApiFn { name: "char", signature: "pub fn char(&mut self, c: char)", role: "method", summary: "Send a character key press." },
+            ApiFn { name: "run_script", signature: "pub fn run_script(&mut self, script: &str) -> io::Result<Vec<String>>", role: "method", summary: "Render the initial frame, then apply each key in `script` and render" },
+            ApiFn { name: "frame_diff", signature: "pub fn frame_diff(actual: &str, expected: &str) -> Option<String>", role: "constructor", summary: "Compare a rendered frame against an expected screen." },
+            ApiFn { name: "parse_key", signature: "pub fn parse_key(name: &str) -> Option<KeyCode>", role: "constructor", summary: "Parse a key name used by [`Harness::run_script`]." },
+        ],
+    },
+    ApiType {
+        name: "HeadlessDriver",
+        module: "hawktui::agent::driver",
+        kind: ApiKind::Struct,
+        summary: "Run a Hawk TUI application headlessly, driven entirely by agent protocol messages.",
+        variants: &[],
+        functions: &[
+            ApiFn { name: "new", signature: "pub fn new(model: M, width: u16, height: u16) -> io::Result<Self>", role: "constructor", summary: "Create a new headless driver with the given model and virtual terminal size." },
+            ApiFn { name: "is_running", signature: "pub fn is_running(&self) -> bool", role: "method", summary: "Whether the application is still running." },
+            ApiFn { name: "model", signature: "pub fn model(&self) -> &M", role: "method", summary: "Access the current model." },
+            ApiFn { name: "ontology", signature: "pub fn ontology(&self) -> &OntologyRegistry", role: "method", summary: "Access the ontology registry." },
+            ApiFn { name: "session", signature: "pub fn session(&self) -> &AgentSession", role: "method", summary: "Access the agent session." },
+            ApiFn { name: "row_text", signature: "pub fn row_text(&self, y: u16) -> String", role: "method", summary: "Get the rendered text content of a specific row." },
+            ApiFn { name: "render", signature: "pub fn render(&mut self) -> io::Result<()>", role: "method", summary: "Render the current model state into the virtual terminal." },
+            ApiFn { name: "process_request", signature: "pub fn process_request(&mut self, request: &AgentRequest) -> AgentResponse", role: "method", summary: "Process a single agent request and return the response." },
+            ApiFn { name: "process_envelope", signature: "pub fn process_envelope(&mut self, envelope: &RequestEnvelope) -> AgentResponse", role: "method", summary: "Process a framed request envelope." },
+            ApiFn { name: "tick", signature: "pub fn tick(&mut self)", role: "method", summary: "Inject a tick event (advance animations / periodic updates)." },
+            ApiFn { name: "init", signature: "pub fn init(&mut self)", role: "method", summary: "Run the init command for the model." },
+        ],
+    },
+    ApiType {
         name: "HitMap",
         module: "hawktui::event",
         kind: ApiKind::Struct,
@@ -593,7 +648,7 @@ pub static API: &[ApiType] = &[
     },
     ApiType {
         name: "Line",
-        module: "hawktui::core",
+        module: "hawktui::core::text",
         kind: ApiKind::Struct,
         summary: "A single line of styled text, composed of multiple [`Span`]s.",
         variants: &[],
@@ -883,7 +938,7 @@ pub static API: &[ApiType] = &[
     },
     ApiType {
         name: "Rect",
-        module: "hawktui::core",
+        module: "hawktui::core::rect",
         kind: ApiKind::Struct,
         summary: "A rectangular area in terminal coordinates.",
         variants: &[],
@@ -1043,7 +1098,7 @@ pub static API: &[ApiType] = &[
     },
     ApiType {
         name: "Span",
-        module: "hawktui::core",
+        module: "hawktui::core::text",
         kind: ApiKind::Struct,
         summary: "A styled segment of text (a single style applied to a string).",
         variants: &[],
@@ -1089,7 +1144,7 @@ pub static API: &[ApiType] = &[
     },
     ApiType {
         name: "Style",
-        module: "hawktui::core",
+        module: "hawktui::core::style",
         kind: ApiKind::Struct,
         summary: "Complete styling specification for a terminal cell.",
         variants: &[],
@@ -1099,7 +1154,7 @@ pub static API: &[ApiType] = &[
     },
     ApiType {
         name: "Stylize",
-        module: "hawktui::core",
+        module: "hawktui::core::style",
         kind: ApiKind::Trait,
         summary: "[Stylize] trait enables a fluent shorthand API.",
         variants: &[],
@@ -1130,7 +1185,7 @@ pub static API: &[ApiType] = &[
     },
     ApiType {
         name: "Symbol",
-        module: "hawktui::core",
+        module: "hawktui::core::symbol",
         kind: ApiKind::Struct,
         summary: "A grapheme cluster stored in 8 bytes.",
         variants: &[],
@@ -1236,7 +1291,7 @@ pub static API: &[ApiType] = &[
     },
     ApiType {
         name: "TestBackend",
-        module: "hawktui::backend",
+        module: "hawktui::backend::test",
         kind: ApiKind::Struct,
         summary: "In-memory backend for testing.",
         variants: &[],
@@ -1249,7 +1304,7 @@ pub static API: &[ApiType] = &[
     },
     ApiType {
         name: "Text",
-        module: "hawktui::core",
+        module: "hawktui::core::text",
         kind: ApiKind::Struct,
         summary: "Multi-line styled text.",
         variants: &[],
