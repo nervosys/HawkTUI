@@ -45,10 +45,11 @@ Or register the MCP server and call the ontology as tools:
 Tools: `list_widgets`, `get_widget_schema`, `search_widgets`, `widget_roles`,
 `ontology_digest`.
 
-Scope, stated plainly: the ontology describes a widget's **runtime state**, not
-its builder API, and currently names roughly an eighth of the public methods.
-Use it to choose a widget and understand what it holds; read the rustdoc or
-`src/widget/` for the methods that construct it.
+Two catalogs, two questions. `api`, `api-search` and `stateful` are the
+**authoring** view — 72 types and 350 functions, with constructors, builder
+signatures, enum variants, and which widgets need a companion state value.
+`list`, `schema`, `roles` and `search` are the **runtime** view, describing what
+a widget holds and what an agent driving a live application can do to it.
 
 ## Reference
 

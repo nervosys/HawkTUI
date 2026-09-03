@@ -17,6 +17,9 @@ authoring at all.
 
 ### 1.1 The ontology describes runtime state, not the authoring API
 
+**Fixed** by the authoring catalog in Phase 1.1 below. The measurements in this
+section describe the state that motivated it.
+
 21 widgets implement `Discoverable`. Their schemas describe 40 properties in
 total. The same widgets expose 180 public builder and mutator methods.
 
@@ -167,19 +170,45 @@ packs before the next grid.*
 
 This is the substantive bet, and the one the benchmark is designed to judge.
 
-**1.1 Add an authoring section to `WidgetSchema`.** For each widget: its
-constructors with argument types, its builder methods with argument types and
-whether they consume `self`, whether it renders as `Widget` or
-`StatefulWidget`, and the state type it pairs with. *Target: ontology coverage
-of public builder/mutator methods from 12% to > 90%.*
+**1.1 Add an authoring section to `WidgetSchema`.** ✅ **Done**, though not
+where this item expected. Rather than extend `WidgetSchema` — which describes
+runtime state and has a different audience — the authoring API became its own
+catalog, `ontology::api`, generated from the signatures by
+`scripts/gen_api_ontology.py`.
 
-**1.2 Make coverage a build failure.** A test that enumerates `pub fn` on every
-`Discoverable` widget and fails when one is undescribed. Without this, 1.1
-decays back to 12% within a few releases — §1.4 is the proof.
+**72 types and 350 functions**, against 40 properties before. It carries what
+`WidgetSchema` structurally could not:
 
-**1.3 Extend the ontology past widgets.** Schemas for `Layout`, `Constraint`,
-`Direction`, `Flex`, `Frame`, `Terminal` and the event types. *Metric:
-`api_errors` at rungs T3–T6, where these dominate.*
+- whether a type renders as `Widget` or `StatefulWidget`, **and the state type
+  it pairs with** — the mistake `AGENTS.md` lists second, now a typed field
+- full signatures with argument types, so `percent(mut self, percent: u16)`
+  rather than a property called `ratio`
+- the core types a program is built from — `Layout`, `Constraint` with all six
+  variants, `Rect`, `Style`, `Text` — which §1.2 noted the ontology described
+  *not at all*
+- `render_call()`, which emits the exact line including the state variable
+
+Reachable as `hawktui-ontology api|api-search|stateful` and as the MCP tools
+`widget_api`, `api_search` and `stateful_widgets`.
+
+**1.2 Make coverage a build failure.** ✅ **Done.**
+`tests/api_ontology_tests.rs` enumerates `pub fn` across `src/widget/` and fails
+on anything the catalog omits, runs the generator with `--check` so a stale
+file fails CI, and asserts the core types are present and that every stateful
+widget names a state type the catalog also describes.
+
+It earned its keep immediately: the first run failed with five stateful widgets
+instead of six. `SettingsList` implements **both** `Widget` and
+`StatefulWidget`, and the generator let the later impl overwrite the earlier,
+silently dropping the state pairing. That is the same drift that left the
+runtime registry 29% populated in §1.4 — caught in a minute this time.
+
+**1.3 Extend the ontology past widgets.** ✅ **Partly done.** `Layout`,
+`Constraint`, `Rect`, `Style`, `Text` and `Buffer` are in the authoring catalog
+with their functions and, for enums, their variants. `Frame`, `Terminal` and the
+event types are declared in the generator's module list but carry few public
+functions of their own; the `Model` trait's three required methods are still
+prose in `AGENTS.md` rather than catalog entries.
 
 **1.4 Compile the usage hints.** ✅ **Done.** `usage_hint` is a free-text string today
 (`"Gauge::new().percent(42).label(\"Loading...\")"`) that nothing checks. Emit

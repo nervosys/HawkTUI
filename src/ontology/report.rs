@@ -177,6 +177,100 @@ pub fn export(registry: &OntologyRegistry) -> String {
     serde_json::to_string_pretty(&registry.export_catalog()).unwrap_or_else(|_| "{}".into())
 }
 
+/// The authoring view of one type: how to construct it, what to chain onto it,
+/// and — for a widget — the exact line that renders it.
+///
+/// This answers the questions the widget schema cannot: which state type a
+/// `StatefulWidget` needs, what a builder method actually takes, and how an
+/// enum's variants are spelled.
+pub fn api(name: &str) -> Option<String> {
+    let ty = super::api::get(name)?;
+    let mut out = String::new();
+
+    let kind = match &ty.kind {
+        super::api::ApiKind::Widget => "widget".to_string(),
+        super::api::ApiKind::StatefulWidget { state } => {
+            format!("stateful widget (state: {state})")
+        }
+        super::api::ApiKind::Enum => "enum".to_string(),
+        super::api::ApiKind::Struct => "struct".to_string(),
+    };
+    let _ = writeln!(out, "{} — {}", ty.name, kind);
+    let _ = writeln!(out, "use {}::{};", ty.module, ty.name);
+    if !ty.summary.is_empty() {
+        let _ = writeln!(out, "{}", ty.summary);
+    }
+    if !ty.variants.is_empty() {
+        let _ = writeln!(
+            out,
+            "
+variants: {}",
+            ty.variants.join(", ")
+        );
+    }
+
+    for (label, mut fns) in [
+        ("constructors", ty.constructors().collect::<Vec<_>>()),
+        ("builders", ty.builders().collect::<Vec<_>>()),
+        ("methods", ty.methods().collect::<Vec<_>>()),
+    ] {
+        if fns.is_empty() {
+            continue;
+        }
+        fns.sort_by_key(|f| f.name);
+        let _ = writeln!(
+            out,
+            "
+{label}:"
+        );
+        for f in fns {
+            let _ = writeln!(out, "  {}", f.signature);
+            if !f.summary.is_empty() {
+                let _ = writeln!(out, "      {}", f.summary);
+            }
+        }
+    }
+
+    if let Some(call) = ty.render_call() {
+        let _ = writeln!(
+            out,
+            "
+render:
+  {call}"
+        );
+    }
+    Some(out)
+}
+
+/// Types matching a query, with the shape of each, for finding the right one.
+pub fn api_search(query: &str) -> String {
+    let mut hits = super::api::search(query);
+    hits.sort_by_key(|t| t.name);
+    let mut out = String::new();
+    for t in hits {
+        let shape = match &t.kind {
+            super::api::ApiKind::Widget => "widget".to_string(),
+            super::api::ApiKind::StatefulWidget { state } => format!("stateful/{state}"),
+            super::api::ApiKind::Enum => "enum".to_string(),
+            super::api::ApiKind::Struct => "struct".to_string(),
+        };
+        let _ = writeln!(out, "{:<18} {:<20} {}", t.name, shape, t.module);
+    }
+    out
+}
+
+/// Every widget that needs a companion state value.
+pub fn stateful() -> String {
+    let mut out = String::from(
+        "widget -> state type (render_stateful_widget)
+",
+    );
+    for (widget, state) in super::api::stateful_widgets() {
+        let _ = writeln!(out, "  {widget:<16} {state}");
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -217,6 +311,68 @@ mod tests {
             value.as_object().map(|o| o.len()),
             Some(registry.list_types().len())
         );
+    }
+
+    #[test]
+    fn api_shows_how_to_construct_and_render() {
+        let text = api("List").expect("List is in the authoring catalog");
+        assert!(
+            text.contains("stateful widget (state: ListState)"),
+            "{text}"
+        );
+        assert!(text.contains("use hawktui::widget::list::List;"), "{text}");
+        assert!(text.contains("constructors:"), "{text}");
+        assert!(text.contains("pub fn new("), "{text}");
+        assert!(text.contains("render_stateful_widget"), "{text}");
+    }
+
+    #[test]
+    fn api_covers_the_layout_system() {
+        let text = api("Constraint").expect("Constraint is in the catalog");
+        assert!(text.contains("enum"), "{text}");
+        for v in ["Length", "Percentage", "Fill"] {
+            assert!(text.contains(v), "missing variant {v} in {text}");
+        }
+        // Not a widget, so it has no render call to offer.
+        assert!(!text.contains("render:"), "{text}");
+    }
+
+    #[test]
+    fn api_of_a_plain_widget_uses_the_simple_render_call() {
+        let text = api("Paragraph").expect("Paragraph is in the catalog");
+        assert!(text.contains("render_widget(paragraph, area)"), "{text}");
+        assert!(!text.contains("render_stateful_widget"), "{text}");
+    }
+
+    #[test]
+    fn api_of_an_unknown_type_is_none() {
+        assert!(api("NoSuchType").is_none());
+    }
+
+    #[test]
+    fn api_search_finds_by_method_name() {
+        let text = api_search("highlight_symbol");
+        assert!(text.contains("List"), "{text}");
+    }
+
+    #[test]
+    fn api_search_reports_the_shape_of_each_hit() {
+        let text = api_search("Constraint");
+        assert!(text.contains("enum"), "{text}");
+        assert!(text.contains("hawktui::layout"), "{text}");
+    }
+
+    #[test]
+    fn stateful_lists_every_widget_needing_state() {
+        let text = stateful();
+        for (widget, state) in [
+            ("List", "ListState"),
+            ("Table", "TableState"),
+            ("SettingsList", "SettingsListState"),
+        ] {
+            assert!(text.contains(widget), "{widget} missing from {text}");
+            assert!(text.contains(state), "{state} missing from {text}");
+        }
     }
 
     #[test]

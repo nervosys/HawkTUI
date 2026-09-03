@@ -118,7 +118,7 @@ def main() -> int:
     flagged: list[str] = []
     print("\nontology effect within Hawk TUI — median difference vs C1")
     print("(negative is better for every metric except score)\n")
-    for target in ("c2", "c3"):
+    for target in ("c2", "c3", "c4", "c5"):
         pairs = sorted({t for (t, f, c) in cells if f == "hawktui" and c in ("c1", target)})
         for task in pairs:
             base = cells.get((task, "hawktui", "c1"))

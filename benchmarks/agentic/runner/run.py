@@ -135,7 +135,17 @@ def source_dir(framework: str) -> Path | None:
             return candidate
     return None
 
-CONDITIONS = ("c0", "c1", "c2", "c3")
+CONDITIONS = ("c0", "c1", "c2", "c3", "c4", "c5")
+
+# C4 and C5 both serve the ontology as MCP tools; they differ in what the
+# ontology contains. C4 is the runtime widget schema, C5 adds the authoring
+# API — constructors, builder signatures, and the Widget/StatefulWidget
+# split. Both come from the working tree, since the frozen snapshot predates
+# `hawktui-mcp`; that is disclosed in the results.
+# C4 serves the ontology as MCP tools. Built from the working tree, since
+# the frozen snapshot predates `hawktui-mcp`; its catalog differs from the
+# snapshot's by two corrected usage hints, which is disclosed in the results.
+MCP_BINARY = Path.home() / ".cargo-target" / "release" / "hawktui-mcp.exe"
 
 
 # ------------------------------------------------------------------- prompting
@@ -194,7 +204,8 @@ def seed_context(workdir: Path, framework: str, condition: str) -> list[str]:
 # ---------------------------------------------------------------- agent driver
 
 
-def run_agent(prompt: str, workdir: Path, model: str, timeout: int, src: Path | None) -> dict:
+def run_agent(prompt: str, workdir: Path, model: str, timeout: int, src: Path | None,
+              mcp_config: Path | None = None) -> dict:
     """Invoke the agent headlessly and return its parsed transcript."""
     # `--bare` is the clean-room mode: no CLAUDE.md discovery, hooks, memory or
     # plugins. It authenticates only via ANTHROPIC_API_KEY, never OAuth, so it
@@ -218,6 +229,10 @@ def run_agent(prompt: str, workdir: Path, model: str, timeout: int, src: Path | 
     ]
     if src is not None:
         cmd += ["--add-dir", str(src)]
+    if mcp_config is not None:
+        # --strict-mcp-config so no server from the developer's own settings can
+        # leak in and make the condition mean something different per machine.
+        cmd += ["--mcp-config", str(mcp_config), "--strict-mcp-config"]
     env = dict(os.environ, CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1")
     started = time.monotonic()
     try:
@@ -472,7 +487,25 @@ def run_cell(task: str, framework: str, condition: str, rep: int, args, out_dir:
 
     src = source_dir(framework)
     record["source_dir"] = str(src) if src else None
-    record.update(run_agent(prompt, workdir, args.model, args.agent_timeout, src))
+
+    # C4 differs from C1 only in that the ontology arrives as MCP tools, which
+    # the agent sees in its tool list without opening a file. C2 and C3 both
+    # required the agent to choose to look; it almost never did.
+    mcp_config = None
+    if condition in ("c4", "c5"):
+        if not MCP_BINARY.is_file():
+            record["invalid"] = True
+            record["agent_error"] = f"hawktui-mcp not built at {MCP_BINARY}"
+            print(f"INVALID: {record['agent_error']}")
+            return record
+        mcp_config = workdir / ".mcp.json"
+        mcp_config.write_text(json.dumps({
+            "mcpServers": {"hawktui": {"command": str(MCP_BINARY), "args": []}}
+        }, indent=2), encoding="utf-8")
+        record["mcp"] = True
+
+    record.update(run_agent(prompt, workdir, args.model, args.agent_timeout, src,
+                            mcp_config))
 
     # An agent that never ran (auth failure, quota, transport error) is a broken
     # instrument, not a framework failure. Mark it invalid so it is excluded
@@ -572,7 +605,7 @@ def main() -> int:
         for c in conditions
         for r in range(1, args.replicates + 1)
         # Only Hawk TUI has an ontology; C2/C3 do not exist for the others.
-        if not (c in ("c2", "c3") and not FRAMEWORKS[f]["ontology"])
+        if not (c in ("c2", "c3", "c4", "c5") and not FRAMEWORKS[f]["ontology"])
     ]
 
     # One target directory for the whole grid: 45 private ones cost ~2 GB and

@@ -28,6 +28,13 @@
       behaviour without naming a widget, because T1–T6 all finished at 1.00 with
       zero API errors and a ladder with no failures measures nothing
 
+- [x] **10. Ontology diagnosis and rebuild** — the C2/C3 nulls were measuring
+      non-consumption (28% and 4%), not ontology quality. The catalog also
+      answered the wrong question: 40 runtime properties against a 334-function
+      authoring surface, and none of the layout system. Replaced by
+      `ontology::api`: 72 types, 350 functions, generated from the signatures.
+      Verified as C5 — consultation rose to 42%, outcomes null.
+
 ## Findings — 70 runs, 9 tasks
 
 Full write-up in `docs/AGENTIC-BENCHMARKS.md` § Results.

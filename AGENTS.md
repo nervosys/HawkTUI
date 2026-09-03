@@ -227,12 +227,33 @@ hawktui-ontology search scroll
 
 From a checkout without installing: `cargo run --example ontology_query -- list`.
 
-**Read this honestly:** the ontology describes a widget's *runtime state*, for
-an agent driving a running application over `hawktui-server`. It is not a
-catalog of builder methods, and today it names about an eighth of the public
-API. If you are writing code, use it to find *which widget* you want and what it
-conceptually holds — then read the rustdoc or the source for the methods that
-build it. Expecting constructor signatures there will waste your time.
+There are two catalogs, answering different questions.
+
+**Writing code** — `api`, `api-search` and `stateful` cover 72 types and 350
+functions: constructors and builders with full signatures, enum variants, and
+whether a type renders as `Widget` or `StatefulWidget` and with which state:
+
+```sh
+hawktui-ontology api List          # constructors, builders, the render call
+hawktui-ontology api-search sort   # find a type by name, module or method
+hawktui-ontology stateful          # which widgets need a state value
+```
+
+```
+List — stateful widget (state: ListState)
+use hawktui::widget::list::List;
+
+constructors:
+  pub fn new(items: impl IntoIterator<Item = impl Into<ListItem>>) -> Self
+```
+
+It is generated from the signatures, so it cannot drift from the code: a test
+regenerates it and fails when the checked-in copy is stale.
+
+**Driving a running application** — `list`, `schema`, `roles` and `search`
+describe each widget's *runtime state*, semantic role and invocable actions.
+That is what an agent controlling a live program over `hawktui-server` needs,
+and it is not a guide to writing code.
 
 `docs/agent-integration.md` and `docs/agent-protocol.md` cover driving a running
 app, which is the job the ontology was built for.

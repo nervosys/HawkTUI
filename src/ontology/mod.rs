@@ -17,6 +17,8 @@
 //! types, enabling agents to list, search, and instantiate widgets by name or role.
 
 mod action;
+pub mod api;
+mod api_generated;
 mod builtin;
 mod capability;
 pub mod registry;
@@ -24,6 +26,7 @@ pub mod report;
 mod schema;
 
 pub use action::{ActionParam, ActionParamType, AgentAction};
+pub use api::{ApiFn, ApiKind, ApiType};
 pub use builtin::{builtin_registry, register_builtin_widgets};
 pub use capability::AgentCapability;
 pub use registry::{OntologyRegistry, UiNode, UiTree};

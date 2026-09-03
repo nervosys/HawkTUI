@@ -29,6 +29,12 @@ usage: hawktui-ontology <command>
   roles           widget types grouped by semantic role
   digest          a compact generated cheatsheet
   export          the whole catalog as JSON
+
+The authoring view — what you need to *write* a program rather than drive one:
+
+  api NAME        constructors, builders and the render call for one type
+  api-search Q    types matching a query, with the shape of each
+  stateful        which widgets need a companion state value
 ";
 
 fn main() {
@@ -41,6 +47,34 @@ fn main() {
         "roles" => report::roles(&registry),
         "digest" => report::digest(&registry),
         "export" => report::export(&registry),
+        "stateful" => report::stateful(),
+        "api" => match args.get(1) {
+            Some(name) => match report::api(name) {
+                Some(text) => text,
+                None => {
+                    eprintln!("unknown type {name:?}; try `hawktui-ontology api-search {name}`");
+                    std::process::exit(1);
+                }
+            },
+            None => {
+                eprintln!("api needs a type name\n\n{USAGE}");
+                std::process::exit(2);
+            }
+        },
+        "api-search" => match args.get(1) {
+            Some(query) => {
+                let hits = report::api_search(query);
+                if hits.is_empty() {
+                    eprintln!("nothing matches {query:?}");
+                    std::process::exit(1);
+                }
+                hits
+            }
+            None => {
+                eprintln!("api-search needs a query\n\n{USAGE}");
+                std::process::exit(2);
+            }
+        },
         "search" => match args.get(1) {
             Some(query) => {
                 let hits = report::search(&registry, query);

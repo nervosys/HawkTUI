@@ -72,6 +72,21 @@ const TOOLS: &[Tool] = &[
         argument: None,
     },
     Tool {
+        name: "widget_api",
+        description: "How to WRITE code for one type: constructors and builder methods with                       full signatures, whether it renders as Widget or StatefulWidget and                       with which state type, and the exact render call. Use this before                       writing code against a type.",
+        argument: Some(("name", "Type name, e.g. \"List\", \"Layout\", \"Constraint\".")),
+    },
+    Tool {
+        name: "api_search",
+        description: "Find types by name, module, or a method they expose. Covers widgets                       and the core types a program is built from (Layout, Constraint, Rect,                       Style, Text).",
+        argument: Some(("query", "Search term, e.g. \"constraint\" or \"highlight\".")),
+    },
+    Tool {
+        name: "stateful_widgets",
+        description: "Which widgets need a companion state value, and the name of each state                       type. Getting this wrong is the most common mistake when writing                       against this framework.",
+        argument: None,
+    },
+    Tool {
         name: "ontology_digest",
         description: "A compact cheatsheet of every widget and its properties.",
         argument: None,
@@ -189,10 +204,7 @@ impl McpServer {
                 "name": "hawktui-ontology",
                 "version": env!("CARGO_PKG_VERSION"),
             },
-            "instructions": "Query the Hawk TUI widget ontology. Note that it describes \
-                             each widget's runtime state and semantic role, not its \
-                             builder API; use it to choose a widget, then read the \
-                             rustdoc for the methods that construct it.",
+            "instructions": "The Hawk TUI ontology. To *write* code, use widget_api, \n                             api_search and stateful_widgets: they give constructors, \n                             builder signatures, and which widgets need a companion \n                             state value. To inspect a *running* application, use \n                             list_widgets, get_widget_schema and widget_roles, which \n                             describe runtime state and semantic roles.",
         })
     }
 
@@ -237,6 +249,21 @@ impl McpServer {
 
         let text = match name {
             "list_widgets" => report::list(&self.registry),
+            "stateful_widgets" => report::stateful(),
+            "widget_api" => {
+                let name = argument.expect("widget_api declares an argument");
+                report::api(&name).ok_or_else(|| {
+                    McpError::Tool(format!("unknown type {name:?}; try api_search"))
+                })?
+            }
+            "api_search" => {
+                let query = argument.expect("api_search declares an argument");
+                let hits = report::api_search(&query);
+                if hits.is_empty() {
+                    return Err(McpError::Tool(format!("nothing matches {query:?}")));
+                }
+                hits
+            }
             "widget_roles" => report::roles(&self.registry),
             "ontology_digest" => report::digest(&self.registry),
             "search_widgets" => {

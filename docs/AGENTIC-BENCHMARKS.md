@@ -310,6 +310,110 @@ sort moves the rows but not the meters" is the expensive shape. Anyone
 extending this ladder should build tasks around coupled invariants, not around
 line counts.
 
+### Why the ontology conditions were null: the agent never opened them
+
+The C2 and C3 results were reported as evidence that the ontology does not help
+authoring. That was wrong, and the transcripts say so. Scanning all 99 stored
+runs for the file reads and tool calls each condition depends on:
+
+| Condition | Delivery | Runs | Consulted the ontology |
+|---|---|---:|---:|
+| C2 | files seeded into the working directory | 18 | **5 (28 %)** |
+| C3 | a CLI, after reading an instructions file | 25 | **1 (4 %)** |
+
+A null result from a treatment that was never administered measures nothing.
+What C2 and C3 actually measured is whether an agent *chooses* to consult
+passive reference material, and mostly it does not: an agent that believes it
+knows the API has no reason to open a file about it.
+
+The six runs that did consult were self-selecting — three of them `t9-atlas`,
+the hardest discovery rung — so their higher cost reflects the tasks that
+prompted the lookup, not a cost of looking.
+
+`runner/ontology_usage.py` reports this. **Any future condition must publish its
+consultation rate alongside its outcome**, because below roughly half the
+outcome numbers cannot be interpreted.
+
+### Two faults, not one
+
+Fixing consumption exposed the second fault, which is about content. The widget
+ontology answers *what does this widget hold at runtime* — the right question
+for an agent driving a running application, the wrong one for an agent writing
+a program:
+
+| | |
+|---|---|
+| Public functions in the authoring surface | **334** |
+| Described by the widget ontology | 40 properties (**12 %**) |
+| `Layout`, `Constraint`, `Frame`, `Terminal`, events | **0 of 78** |
+
+An agent cannot write a program from a catalog that omits the layout system.
+The `ontology::api` catalog added in response covers 72 types and 350
+functions, generated from the signatures — including whether a type renders as
+`Widget` or `StatefulWidget` and with which state type.
+
+**Condition C5** supplies that catalog as MCP tools, so it arrives in the tool
+surface rather than as a file to open. It therefore changes *two* things at once
+against C1 — content and delivery — and cannot separate them on its own. C4,
+the runtime schema over the same transport, is the control that isolates
+content; it is specified in the runner and not yet run.
+
+### C5: the authoring ontology, measured
+
+`ontology::api` replaced a 40-property runtime schema with 350 functions
+covering constructors, builder signatures, enum variants, the layout system and
+the `Widget`/`StatefulWidget` split. C5 supplies it as MCP tools. 24 runs,
+C1 against C5, on two discovery rungs and two complex ones.
+
+**Consultation rose but did not become universal.**
+
+| Condition | Delivery | Consulted |
+|---|---|---:|
+| C3 | CLI, after reading an instructions file | 4 % |
+| C2 | files seeded into the directory | 28 % |
+| **C5** | authoring catalog as MCP tools | **42 %** (5 of 12) |
+
+A tenfold improvement over C3, and still fewer than half of runs. An agent that
+believes it knows the API does not reach for a reference, and putting the
+reference in its tool list only partly changes that.
+
+**Outcomes were null, with one interval against us.**
+
+| Task | turns Δ | cost Δ | Verdict |
+|---|---:|---:|---|
+| `t10-repo` | −10 | −$0.33 | no effect |
+| `t8-meters` | +5 | −$0.14 | no effect |
+| `t9-atlas` | +5 | −$0.06 | no effect |
+| `t11-monitor` | **+18** | **+$0.16** | **worse**, both intervals exclude zero |
+
+`score` was 1.000 and `api_errors` 0 in every cell. Of 24 intervals, ~1.2 are
+expected to exclude zero by chance; two did, both on one task, both in the worse
+direction.
+
+**The one suggestive number is within C5**, comparing runs by whether they
+actually used the tools:
+
+| | n | turns | cost |
+|---|---:|---:|---:|
+| consulted | 5 | 40 | **$0.64** |
+| did not | 7 | 37 | **$0.83** |
+
+Runs that consulted were cheaper despite taking more turns. This is
+self-selected and n=5 — the agent chooses when to look — so it is a hypothesis
+for a larger run, not a result.
+
+**What this does and does not establish.** The artifact is better by every
+measure that can be checked without an agent: coverage, correctness,
+drift-resistance. The benefit remains unproven, and the reason is the same one
+that has now recurred across five grids: `score` never leaves 1.000 and
+`api_errors` fires in roughly 3 % of runs. **A reliability aid cannot be priced
+on a benchmark with no failures.** The instrument is the limiting factor, not
+the ontology.
+
+Two things would change that, neither of them more ontology content: raise
+consultation above 42 % — the tool descriptions say what the tools do but not
+*when* to call them — and build a task this model tier actually fails.
+
 ### What did separate the frameworks
 
 Effort, by a wide margin, on identical correctness:
