@@ -29,14 +29,24 @@ OUT = SRC / "ontology" / "api_generated.rs"
 
 # Modules whose public API an author needs. Widgets are discovered from the
 # directory; these are the core types a program is built out of.
+# Ordered by how often the agent reads each file when it has the source.
+# Widgets are discovered from their directory; these are the skeleton a program
+# is assembled from, which is what the transcripts show it going to source for.
 CORE_MODULES = {
-    "layout::Layout": SRC / "layout" / "mod.rs",
-    "terminal::Terminal": SRC / "terminal.rs",
-    "core::buffer::Buffer": SRC / "core" / "buffer.rs",
-    "core::rect::Rect": SRC / "core" / "rect.rs",
-    "core::text::Text": SRC / "core" / "text.rs",
-    "core::style::Style": SRC / "core" / "style.rs",
-    "runtime::Program": SRC / "runtime" / "mod.rs",
+    "backend::test": SRC / "backend" / "test.rs",
+    "event": SRC / "event" / "mod.rs",
+    "core::buffer": SRC / "core" / "buffer.rs",
+    "terminal": SRC / "terminal.rs",
+    "core::cell": SRC / "core" / "cell.rs",
+    "runtime": SRC / "runtime" / "mod.rs",
+    "layout": SRC / "layout" / "mod.rs",
+    "core::rect": SRC / "core" / "rect.rs",
+    "core::text": SRC / "core" / "text.rs",
+    "core::style": SRC / "core" / "style.rs",
+    "core::symbol": SRC / "core" / "symbol.rs",
+    "backend": SRC / "backend" / "mod.rs",
+    "focus": SRC / "focus.rs",
+    "overlay": SRC / "overlay.rs",
 }
 
 # Trait methods and derives that are noise for an author.
@@ -53,6 +63,9 @@ TRAIT_IMPL_RX = re.compile(
 FN_RX = re.compile(r"^\s*pub fn\s+(\w+)\s*(?:<[^>]*>)?\s*\(")
 STRUCT_RX = re.compile(r"^\s*pub struct\s+(\w+)")
 ENUM_RX = re.compile(r"^\s*pub enum\s+(\w+)")
+TRAIT_RX = re.compile(r"^\s*pub trait\s+(\w+)")
+# Inside a trait body, required methods are declared without a body.
+TRAIT_FN_RX = re.compile(r"^\s*fn\s+(\w+)\s*(?:<[^>]*>)?\s*\(")
 
 
 def rust_str(text: str) -> str:
@@ -142,6 +155,35 @@ def parse_file(path: Path) -> dict:
             i += 1
             continue
 
+        m = TRAIT_RX.match(line)
+        if m:
+            name = m.group(1)
+            types.setdefault(name, {"fns": []})
+            kinds[name] = "trait"
+            if docs:
+                summaries[name] = docs[0]
+            # Collect the trait's own method declarations, which is what an
+            # implementor has to write.
+            depth, j = 0, i
+            while j < len(lines):
+                depth += lines[j].count("{") - lines[j].count("}")
+                fm = TRAIT_FN_RX.match(lines[j])
+                if fm and j > i:
+                    sig, end = signature(lines, j)
+                    required = not sig.rstrip().endswith("}") and "{" not in lines[j]
+                    types[name]["fns"].append({
+                        "name": fm.group(1), "sig": sig,
+                        "kind": "required" if required else "provided",
+                        "doc": "",
+                    })
+                if depth == 0 and j > i:
+                    break
+                j += 1
+            docs = []
+            current = None
+            i = j + 1
+            continue
+
         for rx, kind in ((STRUCT_RX, "struct"), (ENUM_RX, "enum")):
             m = rx.match(line)
             if m:
@@ -210,6 +252,29 @@ def collect() -> list[tuple[str, str, dict]]:
     return out
 
 
+def prelude_items() -> list[str]:
+    """What `use hawktui::prelude::*` brings into scope.
+
+    lib.rs is among the files the agent reads most, and this is the only reason
+    it needs to.
+    """
+    text = (SRC / "lib.rs").read_text(encoding="utf-8")
+    body = text.split("pub mod prelude", 1)[-1]
+    items: list[str] = []
+    for line in body.splitlines():
+        line = line.strip()
+        if line.startswith("}"):
+            break
+        m = re.match(r"pub use crate::([\w:]+)::\{?([^};]*)\}?;", line)
+        if not m:
+            continue
+        for name in m.group(2).split(","):
+            name = name.strip()
+            if name:
+                items.append(name)
+    return sorted(set(items))
+
+
 def emit(entries) -> str:
     lines = [
         "//! The authoring API, generated from the source by",
@@ -225,6 +290,7 @@ def emit(entries) -> str:
     ]
     for name, module, info in sorted(entries, key=lambda e: e[0]):
         kind = {
+            "trait": "ApiKind::Trait",
             "Widget": "ApiKind::Widget",
             "StatefulWidget": f"ApiKind::StatefulWidget {{ state: {rust_str(info['state'] or '')} }}",
             "enum": "ApiKind::Enum",
@@ -245,6 +311,14 @@ def emit(entries) -> str:
                 f"role: {rust_str(fn['kind'])}, "
                 f"summary: {rust_str(fn['doc'])} }},")
         lines += ["        ],", "    },"]
+    lines += ["];", ""]
+
+    items = prelude_items()
+    lines += [
+        f"/// Everything `use hawktui::prelude::*` brings into scope ({len(items)} items).",
+        "pub static PRELUDE: &[&str] = &[",
+    ]
+    lines += [f"    {rust_str(i)}," for i in items]
     lines += ["];", ""]
     return "\n".join(lines)
 

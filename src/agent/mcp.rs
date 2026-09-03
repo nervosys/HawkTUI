@@ -72,6 +72,16 @@ const TOOLS: &[Tool] = &[
         argument: None,
     },
     Tool {
+        name: "program_skeleton",
+        description: "Call this FIRST, before writing any Hawk TUI program. Returns a complete minimal program that compiles and passes its own test: the Model trait's three required methods, how a Program is started, how a stateful widget is rendered with its state, and how to drive it headlessly. Start from this rather than reconstructing the skeleton from the source.",
+        argument: None,
+    },
+    Tool {
+        name: "prelude",
+        description: "What `use hawktui::prelude::*` brings into scope, and what it does not — Program, Model, Command and ProgramOptions come from hawktui::runtime instead. Call this when an import will not resolve.",
+        argument: None,
+    },
+    Tool {
         name: "widget_api",
         description: "Call this BEFORE writing the first line of code that uses a Hawk TUI type, and again whenever a build fails on a missing method. Returns its constructors and builder methods with full signatures, its enum variants, whether it renders as Widget or StatefulWidget and with which state type, and the exact render call. Guessing a signature costs a build cycle; this does not.",
         argument: Some(("name", "Type name, e.g. \"List\", \"Layout\", \"Constraint\".")),
@@ -204,7 +214,7 @@ impl McpServer {
                 "name": "hawktui-ontology",
                 "version": env!("CARGO_PKG_VERSION"),
             },
-            "instructions": "The Hawk TUI ontology. To *write* code, use widget_api, \n api_search and stateful_widgets: they give constructors, \n builder signatures, and which widgets need a companion \n state value. To inspect a *running* application, use \n list_widgets, get_widget_schema and widget_roles, which \n describe runtime state and semantic roles.",
+            "instructions": "The Hawk TUI ontology. Start any new program with program_skeleton, which returns a complete compiling example. To *write* code, use widget_api, \n api_search and stateful_widgets: they give constructors, \n builder signatures, and which widgets need a companion \n state value. To inspect a *running* application, use \n list_widgets, get_widget_schema and widget_roles, which \n describe runtime state and semantic roles.",
         })
     }
 
@@ -250,6 +260,8 @@ impl McpServer {
         let text = match name {
             "list_widgets" => report::list(&self.registry),
             "stateful_widgets" => report::stateful(),
+            "program_skeleton" => report::skeleton(),
+            "prelude" => report::prelude(),
             "widget_api" => {
                 let name = argument.expect("widget_api declares an argument");
                 report::api(&name).ok_or_else(|| {

@@ -485,8 +485,9 @@ def run_cell(task: str, framework: str, condition: str, rep: int, args, out_dir:
         record["dry_run"] = True
         return record
 
-    src = source_dir(framework)
+    src = None if args.no_source else source_dir(framework)
     record["source_dir"] = str(src) if src else None
+    record["source_withheld"] = bool(args.no_source)
 
     # C4 differs from C1 only in that the ontology arrives as MCP tools, which
     # the agent sees in its tool list without opening a file. C2 and C3 both
@@ -569,6 +570,11 @@ def main() -> int:
                     help="shared CARGO_TARGET_DIR for every run "
                          "(default: <out>/_target)")
     ap.add_argument("--no-prewarm", action="store_true")
+    ap.add_argument("--no-source", action="store_true",
+                    help="withhold --add-dir, so the agent cannot read the "
+                         "framework's implementation. 100%% of Hawk TUI runs "
+                         "read it otherwise, which makes an ontology derived "
+                         "from that source redundant.")
     ap.add_argument("--hawktui-path", type=Path, default=None,
                     help="Hawk TUI tree to depend on (default: this checkout)")
     ap.add_argument("--dry-run", action="store_true", help="seed and prompt, but do not call the agent")

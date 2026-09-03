@@ -166,8 +166,10 @@ fn signatures_are_complete_enough_to_call() {
                 f.name,
                 f.signature
             );
+            // Inherent functions are `pub fn`; trait methods are declared
+            // without `pub`, because visibility comes from the trait.
             assert!(
-                f.signature.starts_with("pub fn "),
+                f.signature.starts_with("pub fn ") || f.signature.starts_with("fn "),
                 "{}::{} signature is malformed: {:?}",
                 ty.name,
                 f.name,

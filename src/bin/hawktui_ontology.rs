@@ -32,6 +32,8 @@ usage: hawktui-ontology <command>
 
 The authoring view — what you need to *write* a program rather than drive one:
 
+  skeleton        a complete minimal program, compiled and tested
+  prelude         what `use hawktui::prelude::*` brings into scope
   api NAME        constructors, builders and the render call for one type
   api-search Q    types matching a query, with the shape of each
   stateful        which widgets need a companion state value
@@ -48,6 +50,8 @@ fn main() {
         "digest" => report::digest(&registry),
         "export" => report::export(&registry),
         "stateful" => report::stateful(),
+        "skeleton" => report::skeleton(),
+        "prelude" => report::prelude(),
         "api" => match args.get(1) {
             Some(name) => match report::api(name) {
                 Some(text) => text,

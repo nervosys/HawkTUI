@@ -29,7 +29,7 @@
 
 use serde::Serialize;
 
-pub use super::api_generated::API;
+pub use super::api_generated::{API, PRELUDE};
 
 /// How a type participates in rendering.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -43,6 +43,10 @@ pub enum ApiKind {
     Struct,
     /// An enum. Its `variants` are the spellings an author needs.
     Enum,
+    /// A trait. Its functions are what an implementor must write — `Model` is
+    /// the one every program implements, and it was invisible to the catalog
+    /// until the generator learned to parse traits.
+    Trait,
 }
 
 /// One public function, with the signature an author has to satisfy.

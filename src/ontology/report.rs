@@ -193,6 +193,7 @@ pub fn api(name: &str) -> Option<String> {
             format!("stateful widget (state: {state})")
         }
         super::api::ApiKind::Enum => "enum".to_string(),
+        super::api::ApiKind::Trait => "trait".to_string(),
         super::api::ApiKind::Struct => "struct".to_string(),
     };
     let _ = writeln!(out, "{} — {}", ty.name, kind);
@@ -210,6 +211,20 @@ variants: {}",
     }
 
     for (label, mut fns) in [
+        (
+            "required methods",
+            ty.functions
+                .iter()
+                .filter(|f| f.role == "required")
+                .collect::<Vec<_>>(),
+        ),
+        (
+            "provided methods",
+            ty.functions
+                .iter()
+                .filter(|f| f.role == "provided")
+                .collect::<Vec<_>>(),
+        ),
         ("constructors", ty.constructors().collect::<Vec<_>>()),
         ("builders", ty.builders().collect::<Vec<_>>()),
         ("methods", ty.methods().collect::<Vec<_>>()),
@@ -252,6 +267,7 @@ pub fn api_search(query: &str) -> String {
             super::api::ApiKind::Widget => "widget".to_string(),
             super::api::ApiKind::StatefulWidget { state } => format!("stateful/{state}"),
             super::api::ApiKind::Enum => "enum".to_string(),
+            super::api::ApiKind::Trait => "trait".to_string(),
             super::api::ApiKind::Struct => "struct".to_string(),
         };
         let _ = writeln!(out, "{:<18} {:<20} {}", t.name, shape, t.module);
@@ -267,6 +283,33 @@ pub fn stateful() -> String {
     );
     for (widget, state) in super::api::stateful_widgets() {
         let _ = writeln!(out, "  {widget:<16} {state}");
+    }
+    out
+}
+
+/// The minimal complete program, served verbatim from `examples/skeleton.rs`.
+///
+/// `include_str!` of a compiled example rather than a string literal, so the
+/// skeleton handed to an agent is exactly the one CI builds. Transcripts showed
+/// agents reading `examples/counter.rs`, `runtime/mod.rs` and `terminal.rs` to
+/// work out how a program is assembled; this answers that in one call.
+pub fn skeleton() -> String {
+    include_str!("../../examples/skeleton.rs").to_string()
+}
+
+/// What `use hawktui::prelude::*` brings into scope.
+///
+/// `src/lib.rs` is among the files agents read most, and this is the only
+/// reason they need to.
+pub fn prelude() -> String {
+    let mut out = String::from(
+        "use hawktui::prelude::*; brings these into scope.
+         Program, Model, Command and ProgramOptions are NOT included; import          them from hawktui::runtime.
+
+",
+    );
+    for item in super::api::PRELUDE {
+        let _ = writeln!(out, "  {item}");
     }
     out
 }

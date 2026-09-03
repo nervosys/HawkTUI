@@ -68,6 +68,11 @@ path = "examples/hello.rs"
 required-features = ["crossterm"]
 
 [[example]]
+name = "skeleton"
+path = "examples/skeleton.rs"
+required-features = ["crossterm"]
+
+[[example]]
 name = "counter"
 path = "examples/counter.rs"
 required-features = ["crossterm"]
