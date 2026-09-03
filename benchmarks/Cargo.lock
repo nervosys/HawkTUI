@@ -30,14 +30,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "940b3a0ca603d1eade50a4846a2afffd5ef57a9feac2c0e2ec2e14f9ead76000"
 
 [[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "hawktui",
- "unicode-width 0.2.0",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -360,17 +352,6 @@ dependencies = [
  "allocator-api2",
  "equivalent",
  "foldhash",
-]
-
-[[package]]
-name = "hawktui"
-version = "1.0.0"
-dependencies = [
- "crossterm",
- "serde",
- "serde_json",
- "unicode-segmentation",
- "unicode-width 0.2.0",
 ]
 
 [[package]]

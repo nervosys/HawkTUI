@@ -1,5 +1,4 @@
 [workspace]
-members = ["agentic/results/wrap/t14-wrap__hawktui__c5__r3"]
 
 [package]
 name = "hawktui-benchmarks"

@@ -565,7 +565,15 @@ def main() -> int:
     ap.add_argument("--agent-timeout", type=int, default=1800)
     ap.add_argument("--build-timeout", type=int, default=600)
     ap.add_argument("--program-timeout", type=int, default=120)
-    ap.add_argument("--out", type=Path, default=None)
+    ap.add_argument("--out", type=Path, default=None,
+                    help="where run directories go. Defaults inside results/, "
+                         "which is convenient but not isolated: a scaffolded "
+                         "crate once edited benchmarks/Cargo.toml to add itself "
+                         "as a workspace member. Use --isolate for a temp root.")
+    ap.add_argument("--isolate", action="store_true",
+                    help="put run directories outside the repository entirely, "
+                         "so an agent cannot reach the host tree. The metrics "
+                         "still land in results/.")
     ap.add_argument("--target-dir", type=Path, default=None,
                     help="shared CARGO_TARGET_DIR for every run "
                          "(default: <out>/_target)")
@@ -601,6 +609,9 @@ def main() -> int:
     # against the wrong base and report a manifest the agent did create as
     # missing.
     out_dir = (args.out or (RESULTS_DIR / stamp)).resolve()
+    if args.isolate:
+        import tempfile
+        out_dir = Path(tempfile.gettempdir()) / "hawktui-agentic" / stamp
     out_dir.mkdir(parents=True, exist_ok=True)
     jsonl = out_dir / "runs.jsonl"
 

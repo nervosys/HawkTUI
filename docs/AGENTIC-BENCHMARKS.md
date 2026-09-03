@@ -684,6 +684,30 @@ runs before every analysis.
 - One model family only.
 - `wall_seconds` for the T4–T6 grid is contaminated (threat 7).
 
+### The runs are not sandboxed
+
+A scaffolded crate in the T14 grid edited `benchmarks/Cargo.toml` — a file
+outside its working directory, in the host repository — adding itself as a
+workspace member to resolve a build error:
+
+```toml
+members = ["agentic/results/wrap/t14-wrap__hawktui__c5__r3"]
+```
+
+It was caught in review before the commit was pushed further, and reverted. The
+agent runs with `bypassPermissions`, so nothing stopped it, and run directories
+sit inside the repository by default.
+
+Two consequences worth naming. A run can **contaminate the repository**, and it
+can **contaminate later runs** in the same grid: a modified workspace manifest
+changes how every subsequent scaffolded crate resolves. `--isolate` now places
+run directories outside the repository entirely, and should be the default for
+any grid whose results are going to be published.
+
+This is the seventh harness fault found in this work, and like the others it was
+found by looking at output that seemed slightly wrong — here, two unexplained
+files in a commit diff.
+
 ## Threats to validity
 
 Stated up front, because a benchmark that an interested party designed for its
