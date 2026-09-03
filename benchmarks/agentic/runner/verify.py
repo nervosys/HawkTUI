@@ -33,7 +33,8 @@ class Frame:
     def __init__(self, rows: list[str], w: int, h: int):
         self.declared_w = w
         self.declared_h = h
-        self.rows = [r.ljust(w) for r in rows]
+        # Pad to the declared width in display columns, for the same reason.
+        self.rows = [r + " " * max(0, w - display_width(r)) for r in rows]
 
     @property
     def text(self) -> str:
@@ -48,9 +49,20 @@ class Frame:
     def shape_ok(self) -> tuple[bool, str]:
         if len(self.rows) != self.declared_h:
             return False, f"expected {self.declared_h} rows, got {len(self.rows)}"
-        over = [i for i, r in enumerate(self.rows) if len(r.rstrip()) > self.declared_w]
+        # Width is display columns, not characters. A CJK ideograph is one
+        # character and two columns; a combining mark is one character and
+        # none. Measuring characters rejected correct output: a row padded to
+        # 30 columns containing a decomposed accent is 31 characters long.
+        over = [
+            (i, display_width(r.rstrip()))
+            for i, r in enumerate(self.rows)
+            if display_width(r.rstrip()) > self.declared_w
+        ]
         if over:
-            return False, f"rows wider than {self.declared_w}: {over[:5]}"
+            return False, (
+                f"rows wider than {self.declared_w} display columns: "
+                f"{[f'row {i} = {w}' for i, w in over[:5]]}"
+            )
         return True, ""
 
 
