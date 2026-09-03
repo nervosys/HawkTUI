@@ -1,0 +1,26 @@
+{
+  "id": "t15-frame",
+  "name": "frame",
+  "rung": 15,
+  "grid": { "w": 30, "h": 10 },
+  "script": ["q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 1 },
+    { "id": "title", "kind": "contains", "frame": 0, "pattern": "Frame" },
+
+    { "id": "line-plain", "kind": "contains", "frame": 0, "pattern": "plain text" },
+    { "id": "line-cjk", "kind": "contains", "frame": 0, "pattern": "日本語です" },
+    { "id": "line-combining", "kind": "contains", "frame": 0, "pattern": "café table" },
+    { "id": "line-emoji", "kind": "contains", "frame": 0, "pattern": "🙂 ok" },
+    { "id": "line-mixed", "kind": "contains", "frame": 0, "pattern": "mixed 語 x" },
+
+    { "id": "border-is-aligned", "kind": "border_column", "frame": 0, "pattern": "[│|┃]" },
+
+    { "id": "no-injected-spaces-cjk", "kind": "absent", "frame": 0, "pattern": "日 本 語" },
+    { "id": "no-injected-spaces-mixed", "kind": "absent", "frame": 0, "pattern": "mixed 語  x" },
+    { "id": "combining-not-split", "kind": "absent", "frame": 0, "pattern": "cafe table|caf e" },
+
+    { "id": "inner-width", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "inner:\\s*10" }
+  ]
+}

@@ -571,9 +571,10 @@ def main() -> int:
                          "crate once edited benchmarks/Cargo.toml to add itself "
                          "as a workspace member. Use --isolate for a temp root.")
     ap.add_argument("--isolate", action="store_true",
-                    help="put run directories outside the repository entirely, "
-                         "so an agent cannot reach the host tree. The metrics "
-                         "still land in results/.")
+                    help="put the whole run outside the repository, so an "
+                         "agent cannot reach the host tree. runs.jsonl goes "
+                         "there too, since rescore.py resolves run directories "
+                         "relative to it; copy it into results/ to publish.")
     ap.add_argument("--target-dir", type=Path, default=None,
                     help="shared CARGO_TARGET_DIR for every run "
                          "(default: <out>/_target)")

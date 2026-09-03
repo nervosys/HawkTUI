@@ -41,6 +41,7 @@ python runner/selftest_discovery.py  # T7-T9 checks
 python runner/selftest_complex.py    # T10-T12 checks
 python runner/selftest_unicode.py    # T13 display-width checks
 python runner/selftest_wrap.py       # T14 wrapping and truncation checks
+python runner/selftest_frame.py      # T15 border-alignment checks
 
 # 2. Build the context packs (regenerate whenever the ontology changes).
 python runner/make_context.py
@@ -48,7 +49,9 @@ python runner/make_context.py
 # 3. Check prompts and seeding without spending agent time.
 python runner/run.py --tasks t1-hello --conditions c0,c1,c2,c3 --dry-run
 
-# 4. Run for real.
+# 4. Run for real. Use --isolate for anything you intend to publish: a
+#    scaffolded crate once edited benchmarks/Cargo.toml to add itself as a
+#    workspace member, which contaminates both the repo and later runs.
 python runner/run.py --tasks t2-counter,t3-list \
                      --frameworks hawktui,ratatui \
                      --conditions c1,c2 --replicates 5

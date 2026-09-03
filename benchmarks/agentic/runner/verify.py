@@ -208,6 +208,35 @@ def evaluate(check: dict, frames: list[Frame]) -> tuple[bool, str]:
                 )
         return found, f"no row matches {check['pattern']!r}"
 
+    if kind == "border_column":
+        # Every row containing the border character must place its *last*
+        # occurrence in the same display column. Padding by character count
+        # instead of display width makes this ragged, which is the visible
+        # symptom of misunderstanding how wide a glyph is.
+        rx = re.compile(check["pattern"])
+        columns: dict[int, list[str]] = {}
+        for row in frame.rows:
+            matches = list(rx.finditer(row.rstrip()))
+            if not matches:
+                continue
+            col = display_width(row[: matches[-1].start()])
+            columns.setdefault(col, []).append(row.rstrip())
+        if not columns:
+            return False, f"no row contains {check['pattern']!r}"
+        if "equals" in check and list(columns) != [check["equals"]]:
+            return False, (
+                f"border sits at display columns {sorted(columns)}, expected "
+                f"only {check['equals']}"
+            )
+        if len(columns) > 1:
+            worst = max(columns.items(), key=lambda kv: len(kv[1]))
+            other = [c for c in columns if c != worst[0]]
+            return False, (
+                f"border is ragged: columns {sorted(columns)}; rows at {other} "
+                f"differ from the majority at {worst[0]}"
+            )
+        return True, ""
+
     if kind == "row_order":
         a, b = _row_of(frame, check["before"]), _row_of(frame, check["after"])
         if a is None or b is None:
