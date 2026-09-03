@@ -256,6 +256,60 @@ produce failures cannot show a reliability difference.
 **A harder ladder is the prerequisite for any future ontology claim.** Until a
 rung exists where the agent measurably fails, C2 and C3 have nothing to improve.
 
+### The complex canonical rungs, T10-T12
+
+T7-T9 made the agent discover a widget but stayed small. T10-T12 are modelled on
+the reproductions this repository ships — `examples/lazygit.rs` (1043 lines),
+`examples/btop.rs` (749) and `examples/opencode.rs` (665) — and each carries
+roughly twice the checks of the earlier rungs:
+
+|        | Task | The coupling that can break |
+|--------|------|-----------------------------|
+| **T10** | `repo` — four-pane git browser | the diff pane tracks the *Files* selection whichever pane has focus, and each pane keeps its own selection |
+| **T11** | `monitor` — meters, sparkline, sortable process table | refresh moves the meters without disturbing row order; sort moves rows without disturbing the meters |
+| **T12** | `chat` — two sessions, markdown transcript, composer | each session keeps its own transcript and composer; markdown markers must not reach the screen |
+
+These are framework-neutral shapes — a git browser and a system monitor are not
+built around any framework's widget set — so ratatui runs them too, unlike
+T7-T9.
+
+**All 27 runs scored 1.000.** Every check, every framework, every condition.
+
+`api_errors` did fire here, twice, where it had fired twice in the previous 72
+runs. So the metric has resolution at this complexity and still showed no
+difference between conditions. That matters for the decision in
+[AGENT-DX-PLAN.md](AGENT-DX-PLAN.md) §8: the ontology's authoring value moves
+from *untested* toward *tested and null*, though two events remain too few to
+call it settled.
+
+18 intervals were computed across these rungs and **none excluded zero**.
+
+### The gap is not constant
+
+| Task | Hawk TUI vs ratatui, cost | turns |
+|---|---|---|
+| `t10-repo` | 2.3× | 2.1× |
+| `t11-monitor` | 3.0× | 2.5× |
+| `t12-chat` | 1.2× | 1.4× |
+
+The T4-T6 figure of 3-4× is not a constant property of the framework. On the
+chat task the gap nearly closes. Whatever costs an agent extra effort in Hawk
+TUI is concentrated in particular API surfaces rather than spread evenly, and
+finding which is a more tractable problem than "be more like ratatui".
+
+### Program size does not predict agent effort
+
+The rungs were sized by the line count of their reference implementations. That
+predicted cost badly: `t12-chat` follows the 665-line `opencode.rs` and cost
+$0.35, `t10-repo` follows the 1043-line `lazygit.rs` and cost $0.83, and
+`t11-monitor` — the *smallest* reference at 749 lines — cost the most at $0.88.
+
+What tracks effort is the number of **independent state relationships the
+program must hold at once**. T11's "refresh moves the meters but not the rows,
+sort moves the rows but not the meters" is the expensive shape. Anyone
+extending this ladder should build tasks around coupled invariants, not around
+line counts.
+
 ### What did separate the frameworks
 
 Effort, by a wide margin, on identical correctness:

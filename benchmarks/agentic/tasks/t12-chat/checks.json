@@ -1,0 +1,27 @@
+{
+  "id": "t12-chat",
+  "name": "chat",
+  "rung": 12,
+  "grid": { "w": 100, "h": 30 },
+  "script": ["h", "i", "Enter", "Tab", "Esc"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 5 },
+    { "id": "session-bar", "kind": "row_matches", "frame": 0, "row": 0, "pattern": "\\[Alpha\\]\\s+Beta" },
+    { "id": "transcript-box", "kind": "contains", "frame": 0, "pattern": "Transcript" },
+    { "id": "composer-box", "kind": "contains", "frame": 0, "pattern": "Message" },
+    { "id": "alpha-messages", "kind": "contains", "frame": 0, "pattern": "you: how do I center text" },
+    { "id": "markdown-bold-stripped", "kind": "contains", "frame": 0, "pattern": "bot: use the center alignment" },
+    { "id": "no-raw-asterisks", "kind": "absent", "frame": 0, "pattern": "\\*\\*center\\*\\*" },
+    { "id": "typing-fills-composer", "kind": "contains", "frame": 2, "pattern": "hi" },
+    { "id": "enter-adds-user-message", "kind": "contains", "frame": 3, "pattern": "you: hi" },
+    { "id": "enter-adds-reply", "kind": "contains", "frame": 3, "pattern": "bot: ok" },
+    { "id": "enter-clears-composer", "kind": "absent", "frame": 3, "pattern": "Message.*hi" },
+    { "id": "sent-after-existing", "kind": "row_order", "frame": 3, "before": "you: how do I center text", "after": "you: hi" },
+    { "id": "tab-switches-session", "kind": "row_matches", "frame": 4, "row": 0, "pattern": "Alpha\\s+\\[Beta\\]" },
+    { "id": "beta-has-its-own-messages", "kind": "contains", "frame": 4, "pattern": "you: what is a gauge" },
+    { "id": "beta-code-span-stripped", "kind": "contains", "frame": 4, "pattern": "bot: a bar showing a ratio from 0 to 1" },
+    { "id": "sessions-are-separate", "kind": "absent", "frame": 4, "pattern": "you: hi" },
+    { "id": "footer", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "Enter send" }
+  ]
+}

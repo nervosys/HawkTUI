@@ -333,8 +333,20 @@ premise is untested rather than refuted.
 disproven, but because nothing currently measures whether they work, and a
 multi-week schema project justified by an untestable hypothesis is how
 frameworks acquire features nobody needed. The prerequisite is a harder ladder:
-a rung where a competent agent measurably fails. Build that first; if failures
-appear and cluster on API recall, Phase 1 becomes testable and worth revisiting.
+a rung where a competent agent measurably fails.
+
+**Update, after the complex rungs.** That harder ladder was built: T10-T12 are
+modelled on the 650-1000 line reproductions this repository ships, with the
+cross-pane coupling real TUIs have. All 27 runs still scored 1.000, and the
+ontology contrast was null across 18 further intervals.
+
+`api_errors` did finally fire — twice in 27 runs, against twice in the previous
+72 — so the reliability metric has some resolution at this complexity. It showed
+no difference between conditions. The finding therefore moves from *untested*
+toward *tested and null*: across 99 runs and 12 tasks, supplying the ontology to
+an authoring agent has never measurably helped. Two error events is still too
+thin to call it settled, but the burden has shifted, and Phase 1 should not be
+funded on the hope that a richer schema would change it.
 
 **What the data does support**, and what should be funded instead:
 

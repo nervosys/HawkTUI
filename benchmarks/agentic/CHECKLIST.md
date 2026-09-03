@@ -19,6 +19,11 @@
       four phases, per-item target metrics, and a decision rule for the case
       where the benchmark says the ontology does not help authoring
 
+- [x] **9. Complex canonical rungs** — T10–T12 (`repo`, `monitor`, `chat`),
+      modelled on the lazygit/btop/opencode reproductions this repo ships, with
+      cross-pane coupling the earlier rungs could not test. All 27 runs scored
+      1.000; `api_errors` fired for the first time and still showed no
+      condition effect.
 - [x] **8. Discovery rungs** — T7–T9 (`settings`, `meters`, `atlas`) describe
       behaviour without naming a widget, because T1–T6 all finished at 1.00 with
       zero API errors and a ladder with no failures measures nothing

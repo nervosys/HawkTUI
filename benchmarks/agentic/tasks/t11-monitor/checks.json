@@ -1,0 +1,30 @@
+{
+  "id": "t11-monitor",
+  "name": "monitor",
+  "rung": 11,
+  "grid": { "w": 100, "h": 30 },
+  "script": ["r", "s", "s", "q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 4 },
+    { "id": "cpu-left", "kind": "region_contains", "frame": 0, "x": 0, "y": 0, "w": 50, "h": 8, "pattern": "CPU" },
+    { "id": "memory-right", "kind": "region_contains", "frame": 0, "x": 50, "y": 0, "w": 50, "h": 8, "pattern": "Memory" },
+    { "id": "four-cores", "kind": "count_matching_lines", "frame": 0, "pattern": "CPU[0-3]\\s+\\d{1,3}%", "min": 4 },
+    { "id": "core-values", "kind": "contains", "frame": 0, "pattern": "CPU2\\s+30%" },
+    { "id": "memory-value", "kind": "contains", "frame": 0, "pattern": "MEM\\s+55%" },
+    { "id": "memory-detail", "kind": "contains", "frame": 0, "pattern": "6\\.4 GiB / 16\\.0 GiB" },
+    { "id": "network-sparkline", "kind": "region_contains", "frame": 0, "x": 0, "y": 8, "w": 100, "h": 7, "pattern": "[▁▂▃▄▅▆▇█]{4,}" },
+    { "id": "bars-drawn", "kind": "contains", "frame": 0, "pattern": "[█▓▒░]{3,}" },
+    { "id": "table-header", "kind": "count_matching_lines", "frame": 0, "pattern": "PID\\s+NAME\\s+CPU%\\s+MEM%", "min": 1 },
+    { "id": "all-processes", "kind": "count_matching_lines", "frame": 0, "pattern": "(rustc|firefox|cargo|systemd|zsh)", "min": 5 },
+    { "id": "initial-order", "kind": "row_order", "frame": 0, "before": "rustc", "after": "cargo" },
+    { "id": "refresh-raises-cores", "kind": "contains", "frame": 1, "pattern": "CPU2\\s+35%" },
+    { "id": "refresh-raises-memory", "kind": "contains", "frame": 1, "pattern": "MEM\\s+60%" },
+    { "id": "refresh-leaves-table-alone", "kind": "row_order", "frame": 1, "before": "rustc", "after": "cargo" },
+    { "id": "sort-descending", "kind": "row_order", "frame": 2, "before": "cargo", "after": "rustc" },
+    { "id": "sort-puts-lowest-last", "kind": "row_order", "frame": 2, "before": "zsh", "after": "systemd" },
+    { "id": "sort-toggles-ascending", "kind": "row_order", "frame": 3, "before": "systemd", "after": "cargo" },
+    { "id": "sort-leaves-meters-alone", "kind": "contains", "frame": 3, "pattern": "CPU2\\s+35%" },
+    { "id": "footer", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "s sort" }
+  ]
+}

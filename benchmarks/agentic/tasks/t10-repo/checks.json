@@ -1,0 +1,33 @@
+{
+  "id": "t10-repo",
+  "name": "repo",
+  "rung": 10,
+  "grid": { "w": 100, "h": 30 },
+  "script": ["Tab", "Down", "Down", "Tab", "Down", "q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 6 },
+    { "id": "four-panes", "kind": "count_matching_lines", "frame": 0, "pattern": "(Status|Files|Branches|Commits)", "min": 4 },
+    { "id": "panes-on-the-left", "kind": "region_contains", "frame": 0, "x": 0, "y": 0, "w": 40, "h": 29, "pattern": "Branches" },
+    { "id": "diff-on-the-right", "kind": "region_contains", "frame": 0, "x": 40, "y": 0, "w": 60, "h": 29, "pattern": "Diff" },
+    { "id": "status-content", "kind": "contains", "frame": 0, "pattern": "On branch main" },
+    { "id": "file-list", "kind": "count_matching_lines", "frame": 0, "pattern": "(src/main\\.rs|src/lib\\.rs|README\\.md|old\\.txt|notes\\.md)", "min": 5 },
+    { "id": "branch-list", "kind": "contains", "frame": 0, "pattern": "feature/ui" },
+    { "id": "commit-list", "kind": "contains", "frame": 0, "pattern": "a1b2c3d Initial commit" },
+    { "id": "status-focused-at-start", "kind": "contains", "frame": 0, "pattern": "\\*Status" },
+    { "id": "no-marker-when-unfocused", "kind": "absent", "frame": 0, "pattern": ">\\s+(src/main|\\* main|a1b2c3d)" },
+    { "id": "diff-follows-first-file", "kind": "region_contains", "frame": 0, "x": 40, "y": 0, "w": 60, "h": 29, "pattern": "\\+\\+\\+ b/src/main\\.rs" },
+    { "id": "tab-focuses-files", "kind": "contains", "frame": 1, "pattern": "\\*Files" },
+    { "id": "focus-is-exclusive", "kind": "absent", "frame": 1, "pattern": "\\*Status" },
+    { "id": "marker-appears-on-focus", "kind": "contains", "frame": 1, "pattern": ">\\s+M\\s+src/main\\.rs" },
+    { "id": "down-moves-file-selection", "kind": "contains", "frame": 2, "pattern": ">\\s+A\\s+src/lib\\.rs" },
+    { "id": "diff-updates-with-selection", "kind": "region_contains", "frame": 2, "x": 40, "y": 0, "w": 60, "h": 29, "pattern": "\\+\\+\\+ b/src/lib\\.rs" },
+    { "id": "second-down-moves-again", "kind": "contains", "frame": 3, "pattern": ">\\s+M\\s+README\\.md" },
+    { "id": "diff-tracks-third-file", "kind": "region_contains", "frame": 3, "x": 40, "y": 0, "w": 60, "h": 29, "pattern": "\\+\\+\\+ b/README\\.md" },
+    { "id": "tab-focuses-branches", "kind": "contains", "frame": 4, "pattern": "\\*Branches" },
+    { "id": "file-selection-persists", "kind": "region_contains", "frame": 4, "x": 40, "y": 0, "w": 60, "h": 29, "pattern": "\\+\\+\\+ b/README\\.md" },
+    { "id": "branch-selection-moves", "kind": "contains", "frame": 5, "pattern": ">\\s+feature/ui" },
+    { "id": "diff-unaffected-by-branch-pane", "kind": "region_contains", "frame": 5, "x": 40, "y": 0, "w": 60, "h": 29, "pattern": "\\+\\+\\+ b/README\\.md" },
+    { "id": "footer", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "Tab pane" }
+  ]
+}

@@ -59,7 +59,10 @@ BUILD_FAILED_RX = re.compile(
 FRAMEWORKS = {
     "hawktui": {
         "crate": "hawktui",
-        "dep": '`hawktui = {{ package = "hawktui-rs", path = "{repo}" }}`',
+        # Derived by dep_line() from the depended-on tree's own Cargo.toml: the
+        # package name differs between the frozen snapshot and the current
+        # checkout, and a hardcoded copy here went stale exactly that way.
+        "dep": None,
         "ontology": True,
         "registry_dir": None,          # read from the checkout instead
     },
@@ -82,6 +85,39 @@ FRAMEWORKS = {
 # --hawktui-path so a run can be pinned to a frozen snapshot while the working
 # tree is edited; otherwise a mid-run edit silently changes what is measured.
 HAWKTUI_PATH = REPO
+
+
+def dep_line(framework: str) -> str:
+    """The `[dependencies]` line the task prompt tells the agent to use.
+
+    For Hawk TUI this is read from the tree being depended on rather than
+    hardcoded. The package was renamed to `hawktui-rs` while the frozen
+    benchmark snapshot still declares `hawktui`, and a stale template made every
+    scaffolded crate fail to resolve — a harness fault that the transcript would
+    have recorded against the agent.
+    """
+    entry = FRAMEWORKS[framework]
+    if entry["registry_dir"] is not None:
+        return entry["dep"]
+
+    manifest = HAWKTUI_PATH / "Cargo.toml"
+    package = "hawktui"
+    if manifest.is_file():
+        in_package = False
+        for line in manifest.read_text(encoding="utf-8").splitlines():
+            stripped = line.strip()
+            if stripped.startswith("["):
+                in_package = stripped == "[package]"
+                continue
+            if in_package and stripped.startswith("name"):
+                package = stripped.split("=", 1)[1].strip().strip('"')
+                break
+
+    path = str(HAWKTUI_PATH).replace("\\", "/")
+    if package == "hawktui":
+        return f'`hawktui = {{ path = "{path}" }}`'
+    # The import name stays `hawktui` whatever the package is called.
+    return f'`hawktui = {{ package = "{package}", path = "{path}" }}`'
 
 
 def source_dir(framework: str) -> Path | None:
@@ -118,7 +154,7 @@ def build_prompt(task: str, framework: str, seeded: list[str]) -> str:
 
     text = (
         prompt.replace("{{FRAMEWORK}}", fw["crate"])
-        .replace("{{DEP}}", fw["dep"].format(repo=str(HAWKTUI_PATH).replace("\\", "/")))
+        .replace("{{DEP}}", dep_line(framework))
         .replace("{{CONTRACT}}", "## Harness contract\n\n" + body)
     )
 
@@ -315,7 +351,7 @@ def capture_dump(workdir: Path, grid: dict, script: list[str], timeout: int):
     # unrelated package in this repository.
     cmd = [
         "cargo", "run", "--release", "--quiet",
-        "--manifest-path", str(workdir / "Cargo.toml"), "--",
+        "--manifest-path", str((workdir / "Cargo.toml").resolve()), "--",
         "--headless", f"{grid['w']}x{grid['h']}",
         "--script", ",".join(script),
         "--dump",
@@ -336,7 +372,7 @@ def capture_dump(workdir: Path, grid: dict, script: list[str], timeout: int):
 
 
 def builds(workdir: Path, timeout: int) -> tuple[bool, str]:
-    manifest = workdir / "Cargo.toml"
+    manifest = (workdir / "Cargo.toml").resolve()
     if not manifest.is_file():
         # The task says to work in the current directory. An agent that put its
         # crate somewhere else has not met the contract, and saying so beats
@@ -373,9 +409,10 @@ def prewarm(frameworks: list[str], target_dir: Path, timeout: int) -> None:
     import tempfile
 
     for framework in frameworks:
-        entry = FRAMEWORKS[framework]
-        dep = entry["dep"].format(repo=str(HAWKTUI_PATH).replace("\\", "/"))
-        dep = dep.strip("`")
+        # The same line the prompt gives the agent, so a dependency that warms
+        # here is one that resolves there. Building it a second way is how the
+        # two drifted apart in the first place.
+        dep = dep_line(framework).strip("`")
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "src").mkdir()
@@ -520,7 +557,11 @@ def main() -> int:
             ap.error(f"unknown condition {c!r}; choose from {', '.join(CONDITIONS)}")
 
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    out_dir = args.out or (RESULTS_DIR / stamp)
+    # Absolute: every cargo invocation below runs with cwd set to the run
+    # directory and is handed --manifest-path, so a relative path would resolve
+    # against the wrong base and report a manifest the agent did create as
+    # missing.
+    out_dir = (args.out or (RESULTS_DIR / stamp)).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     jsonl = out_dir / "runs.jsonl"
 
