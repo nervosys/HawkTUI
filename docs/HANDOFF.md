@@ -155,5 +155,15 @@ evidence, that is the failure mode to expect.
 - Phase 1.3 of the DX plan is partly done: `Frame`, `Terminal` and the `Model`
   trait's methods are in the catalog, but the runtime half of the MCP server
   (`execute_action`, `get_state`, `inject_event`) is unwired.
-- `t15-frame` was still running when this was written; five Hawk TUI runs and
-  two ratatui runs had all scored 1.000.
+- `t15-frame` finished: Hawk TUI 1.000 five times of five, ratatui 1.000 four
+  times and 0.917 once. The single miss is **a flaw in the prompt, not an agent
+  error** — it reported `inner: 28`, the box interior across a 30-column screen,
+  where the checks expect `10`, the widest line. The prompt says the box "fills
+  everything except the bottom row" *and* that lines are padded so the border
+  aligns, which implies a box sized to content. Both readings are defensible and
+  the task should be reworded before it is used again.
+
+  So T15 produced **no genuine failures**, and the count stands at one agent
+  failure in roughly 235 runs. Note also that if the box fills the screen, the
+  border aligns trivially — the rung is easier than intended, which is the more
+  useful thing to fix.
