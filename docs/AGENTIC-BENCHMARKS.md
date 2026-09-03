@@ -594,6 +594,62 @@ too thin to build a claim on, but it is the first non-zero variance in the
 boundaries, combining marks, bidirectional text, terminal-width edge cases.
 Those are where implementations diverge and compilers stay silent.
 
+### T14, and what the failing axis actually is
+
+T14 asks for greedy wrapping to 24 display columns and truncation to 10 columns
+including an ellipsis — the same unicode-width theme as T13, pushed harder. All
+twelve runs scored 1.000, across both frameworks and both conditions.
+
+The prediction behind it was wrong, and the reason is worth more than the rung.
+**T14 asks the agent to compute a layout in plain Rust**: call `unicode-width`,
+loop over words, accumulate. That is ordinary programming and the model is good
+at it. **T13 asks it to make text line up on a terminal grid**, which requires
+knowing that the terminal already renders an ideograph as two columns.
+
+The T13 failure shows the difference. It did not miscount padding; it rendered
+
+```
+│cjk     日 本 語       3
+│emoji   🙂 🙂         2
+```
+
+inserting a space after each wide character, apparently to *make* it two columns
+wide — so each took three. The text is corrupted, not merely misaligned, and it
+compiled with zero API errors. No API documentation would have prevented it: the
+agent used the API correctly and misunderstood the medium.
+
+So the discriminating axis is narrower than "display correctness". It is
+**beliefs about the rendering surface**, not string arithmetic. That is the only
+thing shown to break this agent in ~215 runs, and it is where a further rung
+should aim.
+
+### The ontology condition is worse on the hardest rungs
+
+Across T13 and T14, with identical scores everywhere:
+
+| | `api_errors` | turns |
+|---|---|---:|
+| Hawk TUI C1 (8 runs) | **0** | 15–45 |
+| Hawk TUI C5 (8 runs) | 2, 5, 2, 0, 0, 0, 0, 0 | 39–62 |
+
+Seven grids now point the same way. The ontology is complete, sufficient,
+correctly delivered and consumed, and on the two rungs where the work is hardest
+it costs turns and introduces errors rather than preventing them.
+
+### Three findings that are not about ontologies
+
+1. **Structural complexity does not create failures.** Twelve rungs up to a
+   four-pane git browser with cross-pane coupling: 1.000 everywhere.
+2. **Misunderstanding the medium does.** One prompt about terminal columns
+   produced text corruption that compiled cleanly.
+3. **The agent's ceiling is the framework's own correctness** for anything it
+   delegates, and its own beliefs for anything it computes.
+
+At n=4 per cell, T14's uniform 1.000 says the rung is too easy, not that agents
+are reliable; T13's single failure in nine runs remains one event. Two rungs
+built to produce failures yielded one failure between them, which is itself a
+result about how hard it is to make this agent fail at TUI work.
+
 ### What did separate the frameworks
 
 Effort, by a wide margin, on identical correctness:
