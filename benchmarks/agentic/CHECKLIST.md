@@ -35,6 +35,12 @@
       `ontology::api`: 72 types, 350 functions, generated from the signatures.
       Verified as C5 — consultation rose to 42%, outcomes null.
 
+- [x] **11. Consultation raised, outcome still null** — naming *when* to call the
+      authoring tools took consultation from 42% to 83% (107 tool calls). Median
+      cost was identical to having no ontology at all. Every excuse the earlier
+      nulls had — wrong content, never opened — is now eliminated, and the
+      binding constraint is a benchmark whose agent does not fail.
+
 ## Findings — 70 runs, 9 tasks
 
 Full write-up in `docs/AGENTIC-BENCHMARKS.md` § Results.

@@ -73,17 +73,17 @@ const TOOLS: &[Tool] = &[
     },
     Tool {
         name: "widget_api",
-        description: "How to WRITE code for one type: constructors and builder methods with                       full signatures, whether it renders as Widget or StatefulWidget and                       with which state type, and the exact render call. Use this before                       writing code against a type.",
+        description: "Call this BEFORE writing the first line of code that uses a Hawk TUI type, and again whenever a build fails on a missing method. Returns its constructors and builder methods with full signatures, its enum variants, whether it renders as Widget or StatefulWidget and with which state type, and the exact render call. Guessing a signature costs a build cycle; this does not.",
         argument: Some(("name", "Type name, e.g. \"List\", \"Layout\", \"Constraint\".")),
     },
     Tool {
         name: "api_search",
-        description: "Find types by name, module, or a method they expose. Covers widgets                       and the core types a program is built from (Layout, Constraint, Rect,                       Style, Text).",
+        description: "Call this when you know what a thing should DO but not what Hawk TUI calls it, before assuming a name from another framework. Searches names, modules, summaries and method names across widgets and the core types a program is built from (Layout, Constraint, Rect, Style, Text).",
         argument: Some(("query", "Search term, e.g. \"constraint\" or \"highlight\".")),
     },
     Tool {
         name: "stateful_widgets",
-        description: "Which widgets need a companion state value, and the name of each state                       type. Getting this wrong is the most common mistake when writing                       against this framework.",
+        description: "Call this before rendering any list, table, editor or scrollbar. Six widgets need a companion state value and must be drawn with render_stateful_widget rather than render_widget; using the wrong one is the most common mistake made against this framework. Returns each widget with its state type.",
         argument: None,
     },
     Tool {
@@ -204,7 +204,7 @@ impl McpServer {
                 "name": "hawktui-ontology",
                 "version": env!("CARGO_PKG_VERSION"),
             },
-            "instructions": "The Hawk TUI ontology. To *write* code, use widget_api, \n                             api_search and stateful_widgets: they give constructors, \n                             builder signatures, and which widgets need a companion \n                             state value. To inspect a *running* application, use \n                             list_widgets, get_widget_schema and widget_roles, which \n                             describe runtime state and semantic roles.",
+            "instructions": "The Hawk TUI ontology. To *write* code, use widget_api, \n api_search and stateful_widgets: they give constructors, \n builder signatures, and which widgets need a companion \n state value. To inspect a *running* application, use \n list_widgets, get_widget_schema and widget_roles, which \n describe runtime state and semantic roles.",
         })
     }
 

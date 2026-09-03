@@ -414,6 +414,55 @@ Two things would change that, neither of them more ontology content: raise
 consultation above 42 % — the tool descriptions say what the tools do but not
 *when* to call them — and build a task this model tier actually fails.
 
+### Consultation raised to 83 %, outcomes still flat
+
+The C5 tool descriptions said what each tool does but never when to call it,
+leaving the agent to decide. Naming the trigger — "call this BEFORE writing the
+first line of code that uses a type", "before rendering any list, table, editor
+or scrollbar" — roughly doubled consultation.
+
+| Condition | Delivery | Consulted | Tool calls |
+|---|---|---:|---:|
+| C3 | CLI, after reading an instructions file | 4 % | 2 |
+| C5 | authoring catalog as MCP tools | 42 % | 55 |
+| **C5 + triggers** | the same tools, with trigger conditions | **83 %** | **107** |
+
+Outcomes did not move:
+
+| Condition | n | turns | cost | `api_errors` | score |
+|---|---:|---:|---:|---:|---:|
+| C1 — no ontology | 12 | 36 | **$0.78** | 0 | 1.000 |
+| C5 | 12 | 38 | $0.79 | 0 | 1.000 |
+| C5 + triggers | 12 | 38 | **$0.78** | 2 | 1.000 |
+
+Median cost is identical between no ontology at all and an ontology consulted in
+83 % of runs across 107 tool calls. Per task the effect is noise in both
+directions: `t9-atlas` and `t10-repo` improved slightly, `t11-monitor` got worse
+at every step (19 → 37 → 53 turns).
+
+**This is the result the earlier nulls could not be.** Each previous null had an
+excuse — the catalog described the wrong things, or the agent never opened it.
+Both are now gone: the ontology covers 350 functions including the layout
+system, it is delivered as tools in the agent's own surface, and it is consumed
+in five runs out of six. It still changes nothing measurable.
+
+The remaining explanation is the one that has held across every grid in this
+document: **`score` is 1.000 and `api_errors` is approximately zero in every
+condition.** A tool whose purpose is to prevent mistakes cannot show value
+against an agent that is not making any. Note that the only two API errors in
+these 36 runs occurred in the *consulted* condition.
+
+**What follows for the framework.** The authoring ontology is a better artifact
+by every measure checkable without an agent, and it is worth keeping for the
+runtime introspection it was built for and as documentation that cannot drift
+from the code. Its value for *authoring* is unproven, and further ontology work
+is not what would prove it. The binding constraint is a benchmark with no
+failures, and the next step is a task this model tier actually fails.
+
+**A caveat on this specific run.** It differs from the preceding C5 in two ways
+— the trigger conditions and the type summaries regenerated shortly before it —
+so it cannot attribute the consultation rise to the descriptions alone.
+
 ### What did separate the frameworks
 
 Effort, by a wide margin, on identical correctness:
