@@ -18,6 +18,7 @@ import json
 import re
 import subprocess
 import sys
+import unicodedata
 from pathlib import Path
 
 FORM_FEED = "\x0c"
@@ -51,6 +52,21 @@ class Frame:
         if over:
             return False, f"rows wider than {self.declared_w}: {over[:5]}"
         return True, ""
+
+
+def display_width(text: str) -> int:
+    """Terminal columns occupied by `text`.
+
+    The dump stores a double-width glyph as one character, so a character
+    offset into a frame row is not a display column. Any check about alignment
+    has to convert between them.
+    """
+    width = 0
+    for ch in text:
+        if unicodedata.combining(ch):
+            continue
+        width += 2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1
+    return width
 
 
 def parse_frames(stdout: str, w: int, h: int) -> list[Frame]:
@@ -153,6 +169,23 @@ def evaluate(check: dict, frames: list[Frame]) -> tuple[bool, str]:
         n = sum(1 for r in frame.rows if rx.search(r))
         lo, hi = check.get("min", 0), check.get("max", 10**9)
         return lo <= n <= hi, f"{n} matching lines, wanted {lo}..{hi}"
+
+    if kind == "display_gap":
+        # Distance in display columns between the start of two strings on the
+        # same row, for checking that columns line up when their contents are
+        # different widths.
+        rx_from, rx_to = re.compile(check["from"]), re.compile(check["to"])
+        for row in frame.rows:
+            a, b = rx_from.search(row), rx_to.search(row)
+            if not (a and b):
+                continue
+            gap = display_width(row[a.start() : b.start()])
+            want = check["equals"]
+            return gap == want, (
+                f"row {row.strip()!r}: {check['from']!r} to {check['to']!r} spans "
+                f"{gap} display columns, expected {want}"
+            )
+        return False, f"no row contains both {check['from']!r} and {check['to']!r}"
 
     if kind == "row_order":
         a, b = _row_of(frame, check["before"]), _row_of(frame, check["after"])

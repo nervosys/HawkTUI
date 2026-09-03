@@ -41,6 +41,13 @@
       nulls had — wrong content, never opened — is now eliminated, and the
       binding constraint is a benchmark whose agent does not fail.
 
+- [x] **12. A rung that fails** — `t13-unicode` requires display-column
+      alignment for CJK, emoji and accented text while reporting character
+      counts. It compiles either way, so no build error guides the agent. It
+      produced the first sub-1.000 score anywhere in this benchmark (a ratatui
+      run at 0.533, failing exactly the wide-character checks). The ontology did
+      not help: Hawk TUI passed with and without it, and C5 cost more.
+
 ## Findings — 70 runs, 9 tasks
 
 Full write-up in `docs/AGENTIC-BENCHMARKS.md` § Results.

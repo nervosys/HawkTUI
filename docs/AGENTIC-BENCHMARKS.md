@@ -554,6 +554,46 @@ source — which is what today's does — pays for both. Settling it needs a mod
 with that preference run against this same grid; the harness, tasks, verifier
 and analysis tools are all here and reproducible.
 
+### T13: the first rung that produced a failure
+
+Twelve rungs scored 1.000 because they all tested things the **compiler
+catches**. The agent writes a wrong method name, `cargo build` says so, it
+iterates. That loop is what `api_errors` measures, and it is why the metric
+fired in about 3 % of 190 runs.
+
+`t13-unicode` tests something a compiler cannot catch. A table of `hello`,
+`日本語`, `🙂🙂`, `café` and `a日b` must align in **display columns**, while a
+separate column reports **character** counts — two different numbers for the
+same string. Pad by character count and the program compiles perfectly and
+renders misaligned.
+
+Checking that required a new verifier capability. The dump contract stores a
+double-width glyph as one character, so character offsets in a frame are not
+display columns; `display_gap` measures the distance between two strings on a
+row in display columns via `east_asian_width`.
+
+| Framework | Condition | Scores | `api_errors` | turns |
+|---|---|---|---:|---:|
+| Hawk TUI | C1 | 1.000, 1.000, 1.000 | 0 | 14–35 |
+| Hawk TUI | C5 | 1.000, 1.000, 1.000 | 2, 2, 0 | 45–54 |
+| ratatui | C1 | 1.000, 1.000, **0.533** | 0 | 16–25 |
+
+The failing run failed exactly where the task aims: `cjk`, `emoji` and `mixed`
+column checks, with the ASCII and `café` rows passing. Zero API errors — it
+compiled cleanly and rendered wrongly.
+
+**The prediction behind this rung was wrong in both directions.** It was built
+expecting Hawk TUI to fail without the ontology and be rescued by it. Hawk TUI
+did not fail either way, and C5 cost more: two API errors where C1 had none, and
+about 40 % more turns.
+
+What it does establish is the mechanism: **display-correctness tasks produce
+failures where API-correctness tasks cannot.** One failure in nine runs is far
+too thin to build a claim on, but it is the first non-zero variance in the
+`score` column anywhere in this document, and it says where to dig — grapheme
+boundaries, combining marks, bidirectional text, terminal-width edge cases.
+Those are where implementations diverge and compilers stay silent.
+
 ### What did separate the frameworks
 
 Effort, by a wide margin, on identical correctness:

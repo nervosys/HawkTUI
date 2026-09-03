@@ -1,0 +1,28 @@
+{
+  "id": "t13-unicode",
+  "name": "unicode",
+  "rung": 13,
+  "grid": { "w": 60, "h": 12 },
+  "script": ["q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 1 },
+    { "id": "title", "kind": "contains", "frame": 0, "pattern": "Widths" },
+    { "id": "all-rows-present", "kind": "count_matching_lines", "frame": 0, "pattern": "(ascii|cjk|emoji|accent|mixed)", "min": 5 },
+    { "id": "samples-present", "kind": "count_matching_lines", "frame": 0, "pattern": "(hello|日本語|🙂🙂|café|a日b)", "min": 5 },
+
+    { "id": "ascii-sample-column", "kind": "display_gap", "frame": 0, "from": "ascii", "to": "hello", "equals": 8 },
+    { "id": "cjk-sample-column", "kind": "display_gap", "frame": 0, "from": "cjk", "to": "日本語", "equals": 8 },
+    { "id": "emoji-sample-column", "kind": "display_gap", "frame": 0, "from": "emoji", "to": "🙂🙂", "equals": 8 },
+    { "id": "accent-sample-column", "kind": "display_gap", "frame": 0, "from": "accent", "to": "café", "equals": 8 },
+    { "id": "mixed-sample-column", "kind": "display_gap", "frame": 0, "from": "mixed", "to": "a日b", "equals": 8 },
+
+    { "id": "ascii-count-column", "kind": "display_gap", "frame": 0, "from": "ascii", "to": "5", "equals": 20 },
+    { "id": "cjk-count-column", "kind": "display_gap", "frame": 0, "from": "cjk", "to": "3", "equals": 20 },
+    { "id": "emoji-count-column", "kind": "display_gap", "frame": 0, "from": "emoji", "to": "2", "equals": 20 },
+    { "id": "accent-count-column", "kind": "display_gap", "frame": 0, "from": "accent", "to": "4", "equals": 20 },
+    { "id": "mixed-count-column", "kind": "display_gap", "frame": 0, "from": "mixed", "to": "3", "equals": 20 },
+
+    { "id": "total-display-width", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "total width:\\s*23" }
+  ]
+}
