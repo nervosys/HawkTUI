@@ -18,6 +18,14 @@ runner/selftest.py  proves the verifier discriminates
 runner/selftest_discovery.py  proves the T7-T9 checks discriminate
 runner/rescore.py   re-scores stored dumps with the current verifier
 runner/analyze.py   medians, IQR, bootstrap CIs, multiple-comparison count
+
+Analysis of agent behaviour, all reading the stored transcripts:
+
+runner/ontology_usage.py  did the agent consult the ontology at all
+runner/source_usage.py    did it read the framework's source instead
+runner/why_source.py      which files, in what order, and after what
+runner/sufficiency.py     could the ontology have answered those reads
+runner/token_cost.py      what source reading costs in context tokens
 runner/make_context.py  builds the C0–C3 context packs
 runner/run.py       drives the agent, collects metrics, writes runs.jsonl
 context/        generated — do not edit by hand

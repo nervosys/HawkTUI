@@ -522,6 +522,38 @@ failure. And the first run of the sufficiency audit reported thirteen false gaps
 because a regex spanning type boundaries captured nothing; it was caught because
 the output contradicted something already known to be true.
 
+### What source reading costs, and what the ontology would cost instead
+
+`runner/token_cost.py` measures both from the transcripts. Tokens are estimated
+at four characters each, which is close enough for a ratio.
+
+| | calls per run | tokens returned |
+|---|---:|---:|
+| source reads | 12.0 | **10,664** |
+| ontology calls | 10.3 | **1,989** |
+| all tool results | — | 25,211 |
+
+**Source reading is 42 % of everything tools put into the context**, and the
+ontology answers comparable questions in **5.4× fewer tokens** — a similar
+number of calls returning a fifth of the payload, because a signature is a line
+and a source file is hundreds.
+
+That is a floor. Tool results are re-sent on every subsequent turn, so ten
+thousand tokens read at turn three are paid again at every turn after it; the
+compounding is most of what drives the $0.85 mean cost per task.
+
+So for a model trained to prefer an ontology when one exists, on these tasks:
+
+- 42 % of returned-token context is freed, compounding with conversation length
+- the same answers arrive in 1,989 tokens rather than 10,664
+- no source file is needed at all — sufficiency is 193/193
+
+**This is the size of the prize, not a measured win.** No model trained that way
+exists to test against, and an agent that consults the ontology *and* reads the
+source — which is what today's does — pays for both. Settling it needs a model
+with that preference run against this same grid; the harness, tasks, verifier
+and analysis tools are all here and reproducible.
+
 ### What did separate the frameworks
 
 Effort, by a wide margin, on identical correctness:
