@@ -1,0 +1,30 @@
+{
+  "id": "t14-wrap",
+  "name": "wrap",
+  "rung": 14,
+  "grid": { "w": 40, "h": 14 },
+  "script": ["q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 1 },
+    { "id": "title", "kind": "contains", "frame": 0, "pattern": "Text" },
+
+    { "id": "line-1-exact", "kind": "contains", "frame": 0, "pattern": "the quick 日本語 fox$|the quick 日本語 fox\\s" },
+    { "id": "line-2-exact", "kind": "contains", "frame": 0, "pattern": "jumps 🙂 over café lazy" },
+    { "id": "line-3-exact", "kind": "contains", "frame": 0, "pattern": "dogs" },
+
+    { "id": "line-1-not-overfull", "kind": "line_width", "frame": 0, "pattern": "the quick", "max": 24 },
+    { "id": "line-2-not-overfull", "kind": "line_width", "frame": 0, "pattern": "jumps", "max": 24 },
+    { "id": "line-1-is-maximal", "kind": "line_width", "frame": 0, "pattern": "the quick", "min": 20 },
+    { "id": "line-2-is-maximal", "kind": "line_width", "frame": 0, "pattern": "jumps", "min": 23 },
+
+    { "id": "no-word-split", "kind": "absent", "frame": 0, "pattern": "jump$|cafe$|laz$|do$" },
+    { "id": "dogs-on-its-own-line", "kind": "line_width", "frame": 0, "pattern": "^\\W*dogs\\W*$", "max": 4 },
+
+    { "id": "truncated-present", "kind": "contains", "frame": 0, "pattern": "日本語テ…" },
+    { "id": "truncated-width", "kind": "line_width", "frame": 0, "pattern": "…", "max": 10 },
+    { "id": "truncation-not-by-chars", "kind": "absent", "frame": 0, "pattern": "日本語テキスト…|日本語テキストが…" },
+
+    { "id": "line-count", "kind": "row_matches", "frame": 0, "row": -1, "pattern": "lines:\\s*3" }
+  ]
+}

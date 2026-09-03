@@ -40,6 +40,7 @@ python runner/selftest.py            # T2/T3 checks
 python runner/selftest_discovery.py  # T7-T9 checks
 python runner/selftest_complex.py    # T10-T12 checks
 python runner/selftest_unicode.py    # T13 display-width checks
+python runner/selftest_wrap.py       # T14 wrapping and truncation checks
 
 # 2. Build the context packs (regenerate whenever the ontology changes).
 python runner/make_context.py

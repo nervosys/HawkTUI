@@ -187,6 +187,27 @@ def evaluate(check: dict, frames: list[Frame]) -> tuple[bool, str]:
             )
         return False, f"no row contains both {check['from']!r} and {check['to']!r}"
 
+    if kind == "line_width":
+        # Display width of the content on rows matching a pattern. Box borders
+        # and padding are stripped so the assertion is about the text, not the
+        # frame it sits in.
+        rx = re.compile(check["pattern"])
+        lo = check.get("min", 0)
+        hi = check.get("max", 10**9)
+        found = False
+        for row in frame.rows:
+            if not rx.search(row):
+                continue
+            found = True
+            content = row.strip().strip("|\u2502").strip()
+            width = display_width(content)
+            if not lo <= width <= hi:
+                return False, (
+                    f"row {content!r} is {width} display columns, wanted "
+                    f"{lo}..{hi}"
+                )
+        return found, f"no row matches {check['pattern']!r}"
+
     if kind == "row_order":
         a, b = _row_of(frame, check["before"]), _row_of(frame, check["after"])
         if a is None or b is None:
