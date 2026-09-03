@@ -505,6 +505,9 @@ far better represented in a model's training data, which no framework feature
 can fix quickly — but it is the current state of things and worth knowing before
 you choose.
 
+See [docs/HANDOFF.md](docs/HANDOFF.md) for the state of this work, what is
+solid, and the eight harness faults found while producing it.
+
 The same study found that supplying the widget ontology to the authoring agent
 made **no measurable difference** on any pre-registered metric. Its value is
 runtime introspection — an agent *driving* a running program — not code

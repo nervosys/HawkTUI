@@ -183,9 +183,32 @@ def main() -> int:
             print(f"  {task} {fw} {cond} (n={len(cells[(task, fw, cond)])})")
     contract = [r for r in records if r.get("contract_failed")]
     if contract:
-        print(f"\n{len(contract)} run(s) failed the harness contract rather than the UI:")
+        # A malformed frame can come from a protocol mistake (no dump, wrong
+        # frame count) or from a rendering bug that happens to produce an
+        # invalid frame. Only the first says the task or harness needs work.
+        rendering, protocol = [], []
         for r in contract:
-            print(f"  {r['label']}: {r.get('run_error', 'malformed frame dump')[:100]}")
+            detail = ""
+            for c in r.get("checks", []):
+                if c.get("contract") and not c.get("passed"):
+                    detail = c.get("detail", "")
+                    break
+            (rendering if "display columns" in detail else protocol).append((r, detail))
+
+        print(f"\n{len(contract)} run(s) produced a frame the verifier could not score:")
+        if rendering:
+            print(f"  {len(rendering)} from a rendering bug — the program drew "
+                  f"outside the terminal it was given:")
+            for r, detail in rendering:
+                print(f"    {r['label']}: {detail[:90]}")
+            print("    These are agent failures, not protocol mistakes, and are")
+            print("    excluded from the score medians above.")
+        if protocol:
+            print(f"  {len(protocol)} from a protocol mistake — the dump format "
+                  f"itself was wrong:")
+            for r, detail in protocol:
+                reason = detail or r.get("run_error", "malformed frame dump")
+                print(f"    {r['label']}: {reason[:90]}")
     return 0
 
 
