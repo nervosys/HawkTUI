@@ -10,7 +10,7 @@
 
 Hawk TUI combines the best of modern TUI frameworks (ratatui, bubbletea, ink, etc) with a structured metadata layer that lets AI agents discover, inspect, and interact with every widget in your application — no hardcoded assumptions, no trial-and-error.
 
-Speed is not a side effect here: on an identical full redraw loop Hawk TUI sustains **4.9× the frames per second of ratatui** at 91 % of the memory, and it is the fastest of the three frameworks in all sixteen measured workloads — by 1.6× to 15×. See [Performance](#performance) for the numbers and how to reproduce them.
+Speed is not a side effect here: on an identical full redraw loop Hawk TUI sustains **4.3× the frames per second of ratatui** at 92 % of the memory, and it is the fastest of the three frameworks in all sixteen measured workloads — by 1.7× to 17×. See [Performance](#performance) for the numbers and how to reproduce them.
 
 ## Why Hawk TUI?
 
@@ -404,21 +404,21 @@ Measured against other frameworks on identical workloads, on one machine, with
 the harness in [`benchmarks/`](benchmarks). Lower is better; the last column is
 Hawk TUI's speedup.
 
-| Workload (200×50 screen)      | Hawk TUI | ratatui  | SuperLightTUI | Speedup vs ratatui |
-| ----------------------------- | -------- | -------- | ------------- | ------------------ |
-| Overlay compositing           | 1.6 µs   | 31.6 µs  | —             | **15.3×**          |
-| `set_string`, full screen     | 13.5 µs  | 201.6 µs | 928.6 µs      | **14.2×**          |
-| Styled spans, full screen     | 12.1 µs  | 151.5 µs | —             | **11.6×**          |
-| Buffer allocation             | 3.2 µs   | 21.7 µs  | 110.8 µs      | **6.8×**           |
-| Dashboard render (5 widgets)  | 31.8 µs  | 168.0 µs | —             | **4.2×**           |
-| Buffer reset                  | 3.1 µs   | 12.6 µs  | 97.2 µs       | **4.1×**           |
-| Diff, 5 % of cells changed    | 50.1 µs  | 162.5 µs | 70.5 µs       | **3.2×**           |
-| Paragraph word-wrap           | 44.6 µs  | 144.4 µs | —             | **3.1×**           |
-| Escape-sequence emit          | 92.1 µs  | 223.5 µs | —             | **2.4×**           |
-| Table render, 200 rows        | 77.1 µs  | 173.7 µs | —             | **2.3×**           |
-| List scroll, 1000 items       | 62.6 µs  | 200.7 µs | —             | **2.3×**           |
-| Nested layout solve           | 136 ns   | 314 ns   | —             | **2.1×**           |
-| Unicode text, full screen     | 121.2 µs | 199.0 µs | —             | **1.6×**           |
+| Workload (200×50 screen)     | Hawk TUI | ratatui  | SuperLightTUI | Speedup vs ratatui |
+| ---------------------------- | -------- | -------- | ------------- | ------------------ |
+| Overlay compositing          | 2.1 µs   | 36.4 µs  | —             | **17.1×**          |
+| Buffer allocation            | 2.9 µs   | 48.1 µs  | 104.6 µs      | **12.0×**          |
+| `set_string`, full screen    | 19.7 µs  | 219.1 µs | 1.27 ms       | **10.6×**          |
+| Styled spans, full screen    | 23.1 µs  | 222.9 µs | —             | **9.7×**           |
+| Dashboard render (5 widgets) | 29.5 µs  | 119.4 µs | —             | **4.0×**           |
+| Table render, 200 rows       | 82.0 µs  | 268.0 µs | —             | **3.3×**           |
+| Paragraph word-wrap          | 33.2 µs  | 105.6 µs | —             | **3.2×**           |
+| Buffer reset                 | 3.7 µs   | 11.6 µs  | 94.7 µs       | **3.1×**           |
+| Escape-sequence emit         | 102.1 µs | 309.9 µs | —             | **3.0×**           |
+| Diff, 5 % changed            | 38.4 µs  | 114.4 µs | 84.4 µs       | **2.9×**           |
+| List scroll, 1000 items      | 109.2 µs | 265.7 µs | —             | **2.4×**           |
+| Nested layout solve          | 194 ns   | 441 ns   | —             | **2.3×**           |
+| Unicode text, full screen    | 151.2 µs | 258.2 µs | 1.51 ms       | **1.7×**           |
 
 Sixteen workloads are measured in total; Hawk TUI is fastest in every one, in
 each of two full runs. Times are from one run; the speedup column is the lower
@@ -430,8 +430,8 @@ five-widget dashboard, each framework in its own process:
 
 | Framework | Frames/s   | Peak RSS | Cells repainted | Bytes emitted |
 | --------- | ---------- | -------- | --------------- | ------------- |
-| Hawk TUI  | **24,528** | 4.90 MB  | 4,868,506       | 12,016,088    |
-| ratatui   | 4,979      | 5.36 MB  | 4,868,107       | 12,013,929    |
+| Hawk TUI  | **12,520** | 5.01 MB  | 4,868,506       | 12,016,088    |
+| ratatui   | 2,820      | 5.47 MB  | 4,868,107       | 12,013,929    |
 
 Both frameworks repaint the same cells and send the same number of bytes to the
 terminal — within 0.02 % — so the gap is engine cost rather than one of them
