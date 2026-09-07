@@ -100,21 +100,35 @@ def main() -> int:
     print(f"{len(records)} valid runs" + (f", {invalid} invalid (excluded)" if invalid else ""))
     print(f"agent mode: {'bare' if modes == {True} else 'non-bare (confounds recorded)'}\n")
 
+    # The working-constraint paragraph is part of the treatment, not a detail of
+    # how a run was launched: forbid, permit and none are three different
+    # prompts. Merging them into one cell would average an experiment together
+    # with its own control, so the note joins the key whenever a file carries
+    # more than one.
+    notes = {r.get("source_note") or "none" for r in records}
+    split_note = len(notes) > 1
+    if split_note:
+        print(f"working-constraint notes present: {', '.join(sorted(notes))} "
+              f"— reported as separate cells\n")
+
     cells: dict[tuple, list[dict]] = defaultdict(list)
     for r in records:
-        cells[(r["task"], r["framework"], r["condition"])].append(r)
+        note = (r.get("source_note") or "none") if split_note else ""
+        cells[(r["task"], r["framework"], r["condition"], note)].append(r)
 
     # ------------------------------------------------------------ per-cell
     print("per cell — median (IQR)\n")
-    head = f"{'task':<14}{'framework':<15}{'cond':<6}{'n':>3}  " + "".join(
+    head = (f"{'task':<14}{'framework':<15}{'cond':<6}"
+            + (f"{'note':<8}" if split_note else "") + f"{'n':>3}  ") + "".join(
         f"{label:>16}" for _, label, _, _ in METRICS
     )
     print(head)
     print("-" * len(head))
     for key in sorted(cells):
-        task, fw, cond = key
+        task, fw, cond, note = key
         rows = cells[key]
-        line = f"{task:<14}{fw:<15}{cond:<6}{len(rows):>3}  "
+        line = (f"{task:<14}{fw:<15}{cond:<6}"
+                + (f"{note:<8}" if split_note else "") + f"{len(rows):>3}  ")
         for metric, _, places, _ in METRICS:
             # A contract failure means the program never produced a scorable
             # screen. Folding it in as a zero would conflate "ignored the dump
@@ -135,10 +149,11 @@ def main() -> int:
     print("\nontology effect within Hawk TUI — median difference vs C1")
     print("(negative is better for every metric except score)\n")
     for target in ("c2", "c3", "c4", "c5"):
-        pairs = sorted({t for (t, f, c) in cells if f == "hawktui" and c in ("c1", target)})
+        pairs = sorted({t for (t, f, c, _n) in cells if f == "hawktui" and c in ("c1", target)})
         for task in pairs:
-            base = cells.get((task, "hawktui", "c1"))
-            comp = cells.get((task, "hawktui", target))
+            note = "none" if split_note else ""
+            base = cells.get((task, "hawktui", "c1", note))
+            comp = cells.get((task, "hawktui", target, note))
             if not base or not comp:
                 continue
             print(f"  {task}  c1 (n={len(base)}) -> {target} (n={len(comp)})")
@@ -195,8 +210,9 @@ def main() -> int:
     thin = [k for k, v in cells.items() if len(v) < 3]
     if thin:
         print("cells with fewer than 3 valid runs — not enough for an interval:")
-        for task, fw, cond in sorted(thin):
-            print(f"  {task} {fw} {cond} (n={len(cells[(task, fw, cond)])})")
+        for key in sorted(thin):
+            label = " ".join(x for x in key if x)
+            print(f"  {label} (n={len(cells[key])})")
     contract = [r for r in records if r.get("contract_failed")]
     if contract:
         # A malformed frame can come from a protocol mistake (no dump, wrong
