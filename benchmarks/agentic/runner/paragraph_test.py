@@ -128,6 +128,27 @@ def main() -> int:
             print("\n  Above 0.05. No evidence the paragraph changes the failure rate;")
             print("  if the untreated arm came in low, the earlier 2-of-5 overstated")
             print("  the rate and the effect is smaller than it appeared.")
+    # ------------------------------------------------------- exploratory only
+    # Added before the data existed, and labelled for what it is. Conditioning
+    # on source reads conditions on a choice the agent made after seeing its
+    # prompt, so this cannot carry a causal claim -- but the untreated failures
+    # so far have all come from runs that read nothing, which makes zero-read
+    # runs the risk set and makes the untreated failure rate a function of how
+    # often the agent happens to skip the source. That is not a stable property
+    # and it is worth seeing rather than averaging away.
+    print("\nexploratory, not the pre-registered test — outcome by whether the "
+          "run read source\n")
+    for note in ("none", "forbid", "permit"):
+        runs = [r for r in (arms.get(note) or []) if r.get("source_reads") is not None]
+        if not runs:
+            continue
+        for label, subset in (
+            ("read nothing", [r for r in runs if not r["source_reads"]]),
+            ("read source", [r for r in runs if r["source_reads"]]),
+        ):
+            if subset:
+                bad = sum(1 for r in subset if failed(r))
+                print(f"  {note:<8} {label:<13} {bad} failures in {len(subset)}")
     return 0
 
 
