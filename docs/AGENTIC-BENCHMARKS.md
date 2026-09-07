@@ -999,6 +999,36 @@ calls up, together. Either alone is not redirection: reads falling with no rise
 in consultation is deprivation, which `forbid` already does, and consultation
 rising while reads stay flat is an agent doing both and paying for both.
 
+**Result: a floor, and nothing to move** (`results/redirect-none`,
+`results/redirect-redirect`).
+
+| arm | n | score | source reads | ontology calls | turns | cost |
+|---|---|---|---|---|---|---|
+| C5, no paragraph | 5 | 1.000 | 0 (0,0,0,0,2) | 10 | 39 | $0.58 |
+| C5, redirect | 5 | 1.000 | 0 (0,0,0,0,3) | 12 | 35 | $0.58 |
+
+The control arm was already at zero source reads and ten ontology calls, so the
+paragraph had nothing to redirect. The registered criterion cannot be met from a
+floor, and the arm answers nothing about redirection.
+
+**The control arm is the interesting half.** On this rung C5 barely touches the
+source, against 98 % of 55 historical C5 runs reading it a median of 19 times.
+
+*It is not the server.* Nineteen of those historical runs were served the same
+ten tools this arm was, and all nineteen read the source, 11–28 times each. The
+rebuilt binary explains nothing, and an earlier draft of this section said it
+might.
+
+*It is the rung, and the ontology together.* Holding the task fixed, Hawk TUI at
+C1 read the source in **5 of 5** runs; at C5, **1 of 5** — one-sided Fisher's
+exact p = 0.024. So the ontology does displace source reading here, with no
+prompt intervention at all. On every harder rung it displaces nothing, which is
+the same pattern the whole benchmark shows: `t16-straddle` needs one small
+answer, and the ontology is good at exactly that.
+
+Scores are 1.000 in all ten runs, as they are everywhere for Hawk TUI on this
+rung. Nothing here is evidence about reliability.
+
 **Two defensible summaries, and they disagree.** Unconditionally there is no
 evidence the paragraph does anything. Conditioned on the behaviour that predicts
 failure there is a significant difference with a selection objection attached.
