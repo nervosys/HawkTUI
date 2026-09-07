@@ -916,6 +916,29 @@ administered rather than quietly averaged.
 the injected-space failure. One is enough to show the paragraph does not
 prevent it, whatever the rates turn out to be.
 
+**Result, untreated arm (`results/none-ratatui-10/`).** Three failures in
+fifteen, not the six the 2-of-5 pilot implied. **The baseline is 20 %, and that
+settles the design's fate before the treated arm finishes:** even a perfect
+prohibition arm gives 3/15 against 0/15, p = 0.112. The twenty runs cannot reach
+the 0.05 they were bought for, because the effect they were sized against was
+half again larger than the real rate.
+
+This is the pre-registered branch that said a low untreated rate would mean the
+original 2 of 5 overstated it. It did. Reaching p ≤ 0.05 against a 20 % baseline
+needs twenty per arm; p ≤ 0.01 needs thirty. The arithmetic is recorded here so
+the next person does not re-derive it after spending:
+
+| per arm | untreated failures at 20 % | p with a clean treated arm |
+|---|---|---|
+| 15 | 3 | 0.112 |
+| 20 | 4 | 0.053 |
+| 25 | 5 | 0.025 |
+| 30 | 6 | 0.012 |
+
+The treated arm is still worth finishing, because the falsifier does not need
+power: one prohibition failure would end the hypothesis outright, and no sample
+size changes that.
+
 ### Pre-registration: redirecting to the ontology
 
 `forbid` closes a door without opening one — it stops the agent reading the
