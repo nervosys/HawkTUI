@@ -940,6 +940,35 @@ The treated arm is still worth finishing, because the falsifier does not need
 power: one prohibition failure would end the hypothesis outright, and no sample
 size changes that.
 
+**Result: the falsifier fired.** `t16-straddle__ratatui__c1__r9` of the
+prohibition ten produced the injected-space failure with zero source reads, and
+its dump is byte-identical to the four before it.
+
+| arm | failures | compliance |
+|---|---|---|
+| none | 3 of 15 | reads source in 13 of 15 |
+| forbid | **1 of 15** | zero reads in 14 of 15 |
+| permit | 0 of 5 | reads source in 5 of 5 |
+
+One-sided Fisher's exact on the registered comparison: **p = 0.30.** The
+paragraph does not prevent the failure. It was the last surviving explanation
+for it, and it is now gone on its own pre-registered terms rather than by
+reinterpretation.
+
+Note the compliance line as well: one prohibition run read the source once, so
+by the registered rule the arm is *partially administered* and the p-value above
+is not strictly the registered comparison. It does not matter here — the
+falsifier needs one failure, and the failing run read nothing at all.
+
+**What is left after everything this experiment removed.** Not the framework:
+both frameworks pass under the paragraph. Not source access: the arm without it
+fails least often. Not the ontology: never consulted by the failing runs, and
+never involved. Not the paragraph: it just failed its own test. The failure is
+deterministic — five byte-identical dumps across four separate grids and three
+prompt conditions — and nothing measured here predicts which runs produce it.
+That is a sharper description of the problem than this document had before, and
+it is worth more than the effect it went looking for.
+
 ### Pre-registration: redirecting to the ontology
 
 `forbid` closes a door without opening one — it stops the agent reading the
