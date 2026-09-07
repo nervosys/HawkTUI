@@ -851,8 +851,45 @@ find out.
 
 What the arm does establish is narrower and still useful: **whatever protects
 these runs travels with the prompt, not with the crate and not with the source
-tree.** The remaining candidates are the prohibition's content and the mere
-presence of a paragraph on the subject, which `--source-note permit` separates.
+tree.**
+
+### The placebo, and why it does not control what it was built to control
+
+`--source-note permit` matches the prohibition's length, position and subject
+and inverts the instruction. Run on ratatui (`results/permit-ratatui/`) it gave
+1.000 five times of five — and its source reads give the reason:
+
+| arm | source reads per run | failures |
+|---|---|---|
+| no note | 0, 0, 4, 4, 8 | 2 of 5 |
+| prohibition | 0, 0, 0, 0, 0 | 0 of 5 |
+| placebo (permit) | 4, 5, 6, 12, 12 | 0 of 5 |
+
+The placebo arm read the source freely, so it is not a control for "a paragraph
+on this subject" — it is a re-run of the untreated runs that read source and
+passed. **The only lever that drives reads to zero is the prohibition itself**,
+so paragraph-content and zero-reading cannot be separated by any arm available
+here. That is a structural limit of the design, not a missing grid.
+
+The sharpest comparison the data supports conditions on reading:
+
+| among runs that read no source | failures |
+|---|---|
+| no note | **2 of 2** |
+| prohibition | 0 of 5 |
+
+One-sided Fisher's exact gives p = 0.048. But reads are chosen by the agent
+after it sees the prompt, so selecting untreated runs by their read count
+conditions on a post-treatment variable and can manufacture an association from
+nothing. The assignment-respecting comparison — every untreated run against
+every prohibition run — stays at p = 0.22.
+
+**Two defensible summaries, and they disagree.** Unconditionally there is no
+evidence the paragraph does anything. Conditioned on the behaviour that predicts
+failure there is a significant difference with a selection objection attached.
+The first is the result; the second is the reason to keep looking. Twenty
+prohibition runs against the existing untreated cell would reach p = 0.03 and
+settle it.
 
 Running total across the whole benchmark: **four agent failures in ~260 runs,
 every one the same wrong belief, every one a ratatui run.** The confound stated
