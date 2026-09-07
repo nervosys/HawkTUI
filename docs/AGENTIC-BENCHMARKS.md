@@ -829,8 +829,30 @@ to read nothing by their own choice — a different condition and a different
 prompt. And the prohibition is extra prompt text naming the public API and the
 implementation, which may cue careful handling whether or not it is obeyed;
 `--source-note permit` exists to control for exactly that and has not been run.
-So the live readings are now: the framework differs, or the prohibition text
-does work the control has never measured.
+The ratatui arm has since finished, and it removes the framework reading
+(`results/forbid-ratatui/`):
+
+| ratatui on T16 | compliance | failures |
+|---|---|---|
+| no note, source available | — (0 reads in 2 of 5 by the agent's own choice) | **2 of 5** |
+| prohibition, source withheld | 5/5, zero reads | **0 of 5** |
+
+Both frameworks pass five for five with the paragraph, and ratatui failed twice
+in five without it. So the failure is not a property of ratatui that Hawk TUI
+lacks, and it is not caused by the absence of source access — the arm that
+*removed* source access is the arm with no failures.
+
+**But 2 of 5 against 0 of 5 is not a result.** One-sided Fisher's exact gives
+p = 0.22: two failures in five is entirely compatible with a rate that would
+also produce none in the next five. Pooling a placebo arm at 0 of 5 would give
+p = 0.10, and reaching p = 0.03 needs about twenty treated runs. Nothing here
+licenses "the paragraph fixes it", and the arithmetic says what it would cost to
+find out.
+
+What the arm does establish is narrower and still useful: **whatever protects
+these runs travels with the prompt, not with the crate and not with the source
+tree.** The remaining candidates are the prohibition's content and the mere
+presence of a paragraph on the subject, which `--source-note permit` separates.
 
 Running total across the whole benchmark: **four agent failures in ~260 runs,
 every one the same wrong belief, every one a ratatui run.** The confound stated
