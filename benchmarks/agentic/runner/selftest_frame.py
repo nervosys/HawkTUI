@@ -31,8 +31,15 @@ INNER = 10
 
 
 def frame(pad_by_chars: bool = False, inject_spaces: bool = False,
-          inner_value: int | None = None) -> str:
-    """Render the box, optionally with one of the two real failure modes."""
+          inner_value: int | None = None, fills_screen: bool = False) -> str:
+    """Render the box, optionally with one of the real failure modes.
+
+    `fills_screen` is the reading the first version of the prompt accidentally
+    permitted: a box stretched across the whole screen, where the right border
+    lines up no matter how the padding is computed. The rung is meant to be
+    about display width, so that reading has to fail.
+    """
+    inner = 28 if fills_screen else INNER
     body = []
     for line in LINES:
         shown = line
@@ -44,17 +51,20 @@ def frame(pad_by_chars: bool = False, inject_spaces: bool = False,
                 if display_width(ch) == 2:
                     out += " "
             shown = out
-        pad = INNER - (len(shown) if pad_by_chars else display_width(shown))
+        pad = inner - (len(shown) if pad_by_chars else display_width(shown))
         body.append(shown + " " * max(0, pad))
 
-    rows = ["┌─ Frame " + "─" * (INNER - 8) + "┐"]
-    for i in range(H - 3):
-        inner = body[i] if i < len(body) else " " * INNER
-        rows.append("│" + inner + "│")
-    rows.append("└" + "─" * INNER + "┘")
-    rows = rows[: H - 1]
-    n = INNER if inner_value is None else inner_value
-    rows.append(f"inner: {n}".ljust(W))
+    rows = ["┌─ Frame " + "─" * (inner - 8) + "┐"]
+    rows += ["│" + b + "│" for b in body]
+    if fills_screen:
+        # Stretch vertically too, so the box occupies every row but the status.
+        while len(rows) < H - 2:
+            rows.append("│" + " " * inner + "│")
+    rows.append("└" + "─" * inner + "┘")
+    while len(rows) < H - 1:
+        rows.append("")
+    n = (28 if fills_screen else INNER) if inner_value is None else inner_value
+    rows.append(f"inner: {n}")
     return "\n".join(rows)
 
 
@@ -88,6 +98,12 @@ def main() -> int:
     # The reported inner width is wrong while the layout is right.
     expect("wrong inner width", score(t15, frame(inner_value=11)),
            want_failed_ids={"inner-width"})
+
+    # A screen-filling box aligns its border trivially, so it must not pass:
+    # the rung would otherwise test nothing.
+    expect("box fills the screen", score(t15, frame(fills_screen=True)),
+           want_failed_ids={"border-is-aligned", "box-not-screen-wide",
+                            "inner-width"})
 
     print()
     if selftest.FAILURES:

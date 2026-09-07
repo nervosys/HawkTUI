@@ -15,7 +15,9 @@
     { "id": "line-emoji", "kind": "contains", "frame": 0, "pattern": "🙂 ok" },
     { "id": "line-mixed", "kind": "contains", "frame": 0, "pattern": "mixed 語 x" },
 
-    { "id": "border-is-aligned", "kind": "border_column", "frame": 0, "pattern": "[│|┃]" },
+    { "id": "border-is-aligned", "kind": "border_column", "frame": 0, "pattern": "[│|┃]", "equals": 11 },
+
+    { "id": "box-not-screen-wide", "kind": "row_matches", "frame": 0, "row": -2, "pattern": "^\\s*$" },
 
     { "id": "no-injected-spaces-cjk", "kind": "absent", "frame": 0, "pattern": "日 本 語" },
     { "id": "no-injected-spaces-mixed", "kind": "absent", "frame": 0, "pattern": "mixed 語  x" },

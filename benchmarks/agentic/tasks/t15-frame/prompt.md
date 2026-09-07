@@ -12,8 +12,15 @@ the character before it. An ASCII letter occupies one.
 
 ## Layout
 
-The screen is 30 columns × 10 rows. A bordered box titled `Frame` fills
-everything except the bottom row, which is a status line exactly one row tall.
+The screen is 30 columns × 10 rows. The bottom row is a status line exactly one
+row tall.
+
+A bordered box titled `Frame` sits in the top-left corner, its left border in
+display column 0 and its top border on row 0. The box is **sized to its
+contents**: its inner width is the display width of the widest line it holds and
+its inner height is the number of those lines, so the box does not fill the
+screen. Every column to the right of the box, and every row between the box and
+the status line, is blank.
 
 ## Contents
 

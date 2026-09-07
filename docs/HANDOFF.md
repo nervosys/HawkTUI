@@ -167,3 +167,10 @@ evidence, that is the failure mode to expect.
   failure in roughly 235 runs. Note also that if the box fills the screen, the
   border aligns trivially — the rung is easier than intended, which is the more
   useful thing to fix.
+
+  **Reworded since.** The prompt now pins the box to the top-left corner and
+  sizes it to its contents, and `checks.json` pins the border to display column
+  11 with a blank row below the box. `selftest_frame.py` gained a case that
+  renders the screen-filling reading and requires it to fail. The five runs
+  above were scored against the old wording and **do not carry over**; the rung
+  has to be re-run before its numbers mean anything.
