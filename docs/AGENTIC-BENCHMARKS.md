@@ -1089,6 +1089,24 @@ of ontology addressed. Note that superlighttui ships 487 KB of agent-targeted
 documentation and still finished last, which is evidence against the volume of
 documentation being the lever either.
 
+### Two rules this work paid for
+
+**The instrument's failures are one-sided, and that is structural.** Twelve
+harness faults, every one making an agent or a competitor look worse than
+reality. A check encodes what its author expected; when an agent does something
+correct the author did not anticipate, the check fires. A fault in the other
+direction would score a broken program as passing and nothing here would report
+it — so the one-sidedness describes what this instrument can notice, not the
+true distribution, and the real fault count is unknown.
+
+**Exhaust the transcripts before buying runs.** The two most expensive
+experiments in this document were each answered, or pre-empted, by data already
+on disk. Twenty pre-registered runs settled a question the stored transcripts
+had already narrowed. The redirect grids hit a floor the existing C1/C5 pairs
+would have predicted for free — and those same pairs then retracted the result
+the grids appeared to produce. The free analysis was repeatedly the more
+informative one, and was repeatedly run second.
+
 ### Scoring corrections
 
 Two runs were recorded as 0.00 by a verifier bug that stripped trailing blank

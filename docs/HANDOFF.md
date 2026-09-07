@@ -214,8 +214,8 @@ failed to control.
 
 ## 3. Read this before trusting any number
 
-**Nine harness faults were found in this work, and every one made an agent or a
-competitor look worse than reality. Never once the reverse.**
+**Twelve harness faults were found in this work, and every one made an agent or
+a competitor look worse than reality. Never once the reverse.**
 
 | Fault | Recorded | Truth |
 |---|---|---|
@@ -230,6 +230,9 @@ competitor look worse than reality. Never once the reverse.**
 | `t15-frame`'s own prompt admitted two readings | 0.917 | agent was right |
 | Rescoring a jsonl copied away from its runs | `built: false` ×10 | all built |
 | `--no-source` withheld nothing for 24 runs | a null | no treatment given |
+| Crate written to `/tmp`, not `%TEMP%` | `built: false`, 0.00 | 1.000 |
+| MCP attachment never verified | a C5 label | possibly C1 |
+| A four-day-stale `hawktui-mcp` binary | current catalog | an older one |
 
 The tenth is the dangerous one and breaks the pattern: it made the *harness*
 look capable rather than making an agent look bad. `--no-source` only dropped
@@ -240,11 +243,26 @@ nothing, and this benchmark has now produced two of those. Every run therefore
 records `source_reads`, and `analyze.py` states whether a withheld-source
 treatment held before it prints a table.
 
-The pattern in the other nine is not coincidence. A check encodes its author's model of the
+The pattern in the other eleven is not coincidence. A check encodes its author's model of the
 problem; when an agent does something correct the author did not anticipate, the
 check fires. The eighth fault is the clearest case — `t15-frame` exists to test
 whether an agent knows that display columns are not characters, and the verifier
 did not know it either, so it failed three runs whose output was exactly right.
+
+**The streak is structural, not luck.** A check encodes what its author expected
+the agent to do. When the agent does something correct the author did not
+anticipate — pads to display width, sizes a box to content, writes to a POSIX
+path — the check fires and records a failure. Faults in the *other* direction
+would score a broken program as passing, and nothing in this harness would ever
+report one. So the observed one-sidedness is a property of what this instrument
+can notice, and the true fault count is unknown.
+
+**Exhaust the transcripts before buying runs.** The two most expensive
+experiments in this work were each answered, or pre-empted, by data already on
+disk: twenty pre-registered runs settled a question the stored transcripts had
+already narrowed, and the redirect grids hit a floor that the existing C1/C5
+pairs would have predicted for nothing. The free analysis was repeatedly more
+informative than the paid one, and it was repeatedly run second.
 
 **Practical rule: open the frames before believing an unfavourable result.**
 `runner/rescore.py` replays stored dumps through the current verifier, and every
