@@ -726,8 +726,9 @@ belief about how wide a character *is* — it is a belief about what emitting on
 **The two failing dumps are byte-identical.** Independent runs, no shared state,
 the same wrong output character for character. That makes this a deterministic
 response to the input rather than an error the agent occasionally falls into,
-which is why a rung aimed at it fires at 2 in 5 where the ladder fired at 1 in
-225.
+which is why a rung aimed at it fires at roughly 1 in 5 — three failures in
+fifteen untreated runs — where the ladder fired at 1 in 225. These first five
+gave 2 of 5, which the fuller arm shows was high.
 
 ### What actually separates the failures: reading the source
 

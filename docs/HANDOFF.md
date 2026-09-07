@@ -78,8 +78,9 @@ computed the wrap correctly from true display widths and then emitted each wide
 glyph followed by a space, drawing 27 and 29 columns onto a 20-column screen.
 **Their dumps are byte-identical** — independent runs, same wrong output
 character for character — so this is a deterministic response to the input, not
-noise. A rung aimed at the seam fires at 2 in 5 where the ladder fired at 1 in
-225.
+noise. A rung aimed at the seam fires at 1 in 5 — three failures in fifteen
+untreated runs — where the ladder fired at 1 in 225. (The first five gave 2 of
+5; that pilot overstated it and should not be quoted.)
 
 That also sharpens what the failure *is*. The correct wrap arithmetic proves the
 agent knew a wide character is two columns; it padded anyway. The wrong belief
@@ -149,14 +150,18 @@ failed to control.
 - Whether the cost gap versus ratatui (2–4×) is closable at all. It tracks
   training-data presence, which no artifact changes quickly.
 - **Whether the working-constraint paragraph does anything.** Untreated ratatui
-  fails 2 of 5; with the paragraph, 0 of 10 across both frameworks. One-sided
-  Fisher's exact on the assignment-respecting comparison is p = 0.22 — no
-  evidence. Conditioned on runs that read no source it is 2 of 2 against 0 of 5,
-  p = 0.048, but that conditions on a post-treatment choice and can manufacture
-  an association from nothing. **Report the first; the second is only a reason
-  to keep looking.** Roughly twenty prohibition runs against the existing
-  untreated cell would reach p = 0.03.
-- Any *rate*. The benchmark now observes failure — `t16-straddle` fails 2 of 5
+  fails 3 of 15; with the paragraph, 0 of 10 across both frameworks. One-sided
+  Fisher's exact is p = 0.40 as it stands, and **p = 0.112 even if the
+  prohibition arm finishes perfectly clean at fifteen** — the design was sized
+  against a 40 % baseline that turned out to be 20 %. Reaching p ≤ 0.05 needs
+  twenty per arm; p ≤ 0.01 needs thirty.
+
+  Do not cite the conditional analysis. Splitting untreated runs by whether they
+  read source gave 2 of 2 against 0 of 5, p = 0.048, and an untreated run then
+  failed having read the source four times, with a dump byte-identical to the
+  zero-read failures. Reading the source does not protect a run; that split
+  separates nothing.
+- Any *rate*. The benchmark now observes failure — `t16-straddle` fails 3 of 15
   ratatui runs — so it is no longer an instrument that cannot measure
   reliability. But four events on one failure mode support the mode's existence
   and character, not a number attached to it, and every rung outside the
@@ -213,8 +218,8 @@ run directory keeps its prompt, transcript and dump for exactly this.
 2. **Do not build more structural rungs.** Twelve produced no failures.
 3. **Mine the rendering surface — it is the only productive seam.** All four
    failures came from it. `t15-frame` produced one on its first grid after
-   rewording and `t16-straddle` produced two of five, so the seam yields at
-   1-in-5 to 2-in-5 rather than 1 in 225. Narrow the way T16 did: the failure is
+   rewording and `t16-straddle` produced three of fifteen, so the seam yields at
+   roughly 1 in 5 rather than 1 in 225. Narrow the way T16 did: the failure is
    specifically *emitting* a wide glyph, and it fires hardest where the emission
    and the arithmetic can disagree. Grapheme clusters, bidirectional text and
    terminal resize are the untried candidates. A rung that never asks the agent
