@@ -77,6 +77,22 @@ def main() -> int:
         print("no valid runs")
         return 1
 
+    # A treatment the agent ignored measures nothing. --no-source only drops
+    # --add-dir; the manifest still names the framework's path and the registry
+    # is a known location, so an agent with a shell reads the source anyway.
+    # Say so loudly rather than let a null be read as a result.
+    withheld = [r for r in records if r.get("source_withheld")]
+    violated = [r for r in withheld if r.get("source_reads")]
+    if violated:
+        print(f"WARNING: {len(violated)} of {len(withheld)} runs marked "
+              f"source-withheld read the framework's source anyway "
+              f"(median {st.median([r['source_reads'] for r in violated]):.0f} "
+              f"reads). The treatment was not administered; these runs measure "
+              f"nothing about withheld source.\n")
+    elif withheld:
+        print(f"{len(withheld)} source-withheld runs, none of which read the "
+              f"source. Treatment held.\n")
+
     modes = {r.get("bare_mode") for r in records}
     if len(modes) > 1:
         print("WARNING: runs mix --bare and non-bare agent modes; do not "

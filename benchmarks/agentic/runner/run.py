@@ -151,7 +151,8 @@ MCP_BINARY = Path.home() / ".cargo-target" / "release" / "hawktui-mcp.exe"
 # ------------------------------------------------------------------- prompting
 
 
-def build_prompt(task: str, framework: str, seeded: list[str]) -> str:
+def build_prompt(task: str, framework: str, seeded: list[str],
+                 forbid_source: bool = False) -> str:
     fw = FRAMEWORKS[framework]
     prompt = (TASKS_DIR / task / "prompt.md").read_text(encoding="utf-8")
     contract = (TASKS_DIR / "contract.md").read_text(encoding="utf-8")
@@ -175,6 +176,19 @@ def build_prompt(task: str, framework: str, seeded: list[str]) -> str:
         text += (
             "\n## Reference material\n\n"
             "These files are in the working directory:\n\n" + listing + "\n"
+        )
+    # Withholding --add-dir does not withhold the source: the manifest carries
+    # the framework's path, or its registry directory is a well-known location,
+    # and the agent reaches either with a shell. Cargo cannot compile against a
+    # crate whose source is absent, so no flag can remove it. The only
+    # administrable treatment is to ask, and then to check the transcript.
+    if forbid_source:
+        text += (
+            "\n## Working constraint\n\n"
+            "Do not read the framework's own implementation. Work from its "
+            "public API, the reference material in this directory, and the "
+            "compiler's errors. Opening the crate's source files — wherever "
+            "they are on disk — is outside what this task allows.\n"
         )
     return text
 
@@ -475,7 +489,8 @@ def run_cell(task: str, framework: str, condition: str, rep: int, args, out_dir:
     }
 
     record["context_files"] = seed_context(workdir, framework, condition)
-    prompt = build_prompt(task, framework, record["context_files"])
+    prompt = build_prompt(task, framework, record["context_files"],
+                          forbid_source=bool(args.no_source))
     (workdir / "_prompt.md").write_text(prompt, encoding="utf-8")
 
     print(f"  ▸ {label} … ", end="", flush=True)
@@ -507,6 +522,17 @@ def run_cell(task: str, framework: str, condition: str, rep: int, args, out_dir:
 
     record.update(run_agent(prompt, workdir, args.model, args.agent_timeout, src,
                             mcp_config))
+
+    # Record what the agent actually read, every run. A treatment that was
+    # never administered is the most expensive kind of harness fault -- it
+    # returns a null that looks like a finding -- and --no-source was exactly
+    # that for 24 stored runs before anyone checked a transcript.
+    from source_usage import scan  # noqa: PLC0415  (keeps the CLI import light)
+    hits = scan(workdir / "_transcript.jsonl")
+    record["source_reads"] = hits["source_reads"]
+    record["first_source_turn"] = hits["first_source_turn"]
+    if args.no_source and hits["source_reads"]:
+        record["treatment_violated"] = True
 
     # An agent that never ran (auth failure, quota, transport error) is a broken
     # instrument, not a framework failure. Mark it invalid so it is excluded
