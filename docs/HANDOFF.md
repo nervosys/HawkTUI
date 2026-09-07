@@ -263,9 +263,17 @@ evidence, that is the failure mode to expect.
   been sent.
 - `cargo publish` has not been run. The crate packages and builds from its own
   tarball as `hawktui-rs 2.0.0`.
-- Phase 1.3 of the DX plan is partly done: `Frame`, `Terminal` and the `Model`
-  trait's methods are in the catalog, but the runtime half of the MCP server
-  (`execute_action`, `get_state`, `inject_event`) is unwired.
+- Phase 1.3 of the DX plan is done. The runtime half of the MCP server is
+  wired: `McpServer::with_runtime` takes any `RuntimeTarget`, implemented for
+  `HeadlessDriver`, and adds `get_tree`, `get_state`, `execute_action` and
+  `inject_event`. Tools map to `AgentRequest` variants by name and are built by
+  deserialising the tagged arguments, so a protocol variant that changes shape
+  breaks the bridge rather than silently accepting the old form. The tools are
+  **absent** from `tools/list` when nothing is attached, not merely inert — a
+  tool a model can see is a tool it will call. The standalone `hawktui-mcp`
+  binary therefore still serves the catalog alone; runtime tools require the
+  application to host the server, which is the only place a live program
+  exists. Covered by `tests/mcp_runtime_tests.rs`.
 - `t15-frame` finished: Hawk TUI 1.000 five times of five, ratatui 1.000 four
   times and 0.917 once. The single miss is **a flaw in the prompt, not an agent
   error** — it reported `inner: 28`, the box interior across a 30-column screen,

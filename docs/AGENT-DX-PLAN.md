@@ -203,7 +203,7 @@ instead of six. `SettingsList` implements **both** `Widget` and
 silently dropping the state pairing. That is the same drift that left the
 runtime registry 29% populated in §1.4 — caught in a minute this time.
 
-**1.3 Extend the ontology past widgets.** ✅ **Partly done.** `Layout`,
+**1.3 Extend the ontology past widgets.** ✅ **Done.** `Layout`,
 `Constraint`, `Rect`, `Style`, `Text` and `Buffer` are in the authoring catalog
 with their functions and, for enums, their variants. `Frame`, `Terminal` and the
 event types are declared in the generator's module list but carry few public
@@ -279,11 +279,24 @@ the model can read it, while a malformed request returns a JSON-RPC error; and
 the handshake accepts three protocol revisions, falling back to ours when a
 client names one we do not know.
 
-**Still to do:** the runtime half. `HeadlessDriver::process_request` already maps
-`AgentRequest` to `AgentResponse`, so `execute_action`, `get_state`,
-`inject_event` and `get_tree` are an adapter away — but they need a running
-model to drive, which means deciding how a client names the application to
-launch. Ontology tools work standalone, which is why they came first.
+**The runtime half is now wired.** `McpServer::with_runtime` takes a
+`RuntimeTarget`, implemented for `HeadlessDriver`, and adds `get_tree`,
+`get_state`, `execute_action` and `inject_event`. Each maps to an `AgentRequest`
+variant by name, built by tagging the tool arguments and deserialising, so a
+variant that changes shape breaks the bridge instead of silently accepting the
+old form.
+
+The question of "how does a client name the application to launch" did not need
+answering, because it was the wrong question: **the application hosts the
+server**, rather than the server launching an application. That is the only
+arrangement in which a live program exists to drive, and it is what DeweyGUI
+does too. The standalone `hawktui-mcp` binary consequently keeps serving the
+catalog alone.
+
+The runtime tools are absent from `tools/list` when nothing is attached, not
+merely inert. A tool a model can see is a tool it will call, and one that always
+fails costs a turn and teaches the model the server is unreliable. Covered by
+`tests/mcp_runtime_tests.rs`.
 
 **3.2 `llms.txt` on the docs site and in the package.** ✅ **Done** for the
 package (see 0.1). Still to do: serve it from the docs site.

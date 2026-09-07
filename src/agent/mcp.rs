@@ -27,7 +27,31 @@
 
 use serde_json::{json, Value};
 
+use crate::agent::driver::HeadlessDriver;
+use crate::agent::protocol::{AgentRequest, AgentResponse};
 use crate::ontology::{builtin_registry, registry::OntologyRegistry, report};
+use crate::runtime::Model;
+
+/// A running application an MCP client can inspect and drive.
+///
+/// The ontology tools answer from a static catalog and need no application.
+/// The runtime tools do: `get_state` has nothing to read and `inject_event`
+/// has nothing to send to unless a program is actually running. So they are
+/// served only when a target is attached, which is why the standalone
+/// `hawktui-mcp` binary offers the catalog alone — it has no program to drive.
+///
+/// Implemented for [`HeadlessDriver`], so an application that already runs
+/// headlessly can expose itself over MCP without a second driving mechanism.
+pub trait RuntimeTarget {
+    /// Handle one agent-protocol request against the running application.
+    fn process(&mut self, request: &AgentRequest) -> AgentResponse;
+}
+
+impl<M: Model> RuntimeTarget for HeadlessDriver<M> {
+    fn process(&mut self, request: &AgentRequest) -> AgentResponse {
+        self.process_request(request)
+    }
+}
 
 /// The MCP revision this server implements when a client does not name one.
 pub const DEFAULT_PROTOCOL_VERSION: &str = "2025-06-18";
@@ -103,6 +127,71 @@ const TOOLS: &[Tool] = &[
     },
 ];
 
+/// Tools that need a running application. Each maps to an [`AgentRequest`]
+/// variant by name: the tool's arguments are the variant's fields, so the
+/// request is built by tagging the arguments and deserialising, rather than by
+/// hand-writing a constructor per tool that would drift from the protocol.
+struct RuntimeTool {
+    name: &'static str,
+    description: &'static str,
+    schema: fn() -> Value,
+}
+
+const RUNTIME_TOOLS: &[RuntimeTool] = &[
+    RuntimeTool {
+        name: "get_tree",
+        description: "The running application's widget tree, with the agent_id of every \
+                      widget. Call this before get_state or execute_action: those address \
+                      a widget by agent_id, and this is where the ids come from.",
+        schema: || json!({ "type": "object", "properties": {}, "additionalProperties": false }),
+    },
+    RuntimeTool {
+        name: "get_state",
+        description: "The current state of one widget in the running application — what a \
+                      list has selected, what an input contains. Reads live state, not the \
+                      schema; get_widget_schema describes the type instead.",
+        schema: || json!({
+            "type": "object",
+            "properties": { "agent_id": { "type": "string", "description": "agent_id from get_tree." } },
+            "required": ["agent_id"],
+            "additionalProperties": false,
+        }),
+    },
+    RuntimeTool {
+        name: "execute_action",
+        description: "Run one of a widget's declared actions in the running application. \
+                      The actions a widget accepts, and their parameters, come from \
+                      get_widget_schema.",
+        schema: || json!({
+            "type": "object",
+            "properties": {
+                "agent_id": { "type": "string", "description": "agent_id from get_tree." },
+                "action": { "type": "string", "description": "Action name from the widget's schema." },
+                "params": { "type": "object", "description": "Action parameters, if it takes any." },
+            },
+            "required": ["agent_id", "action"],
+            "additionalProperties": false,
+        }),
+    },
+    RuntimeTool {
+        name: "inject_event",
+        description: "Send a key or mouse event to the running application, as though a \
+                      user had produced it. Use this to drive the program through its own \
+                      event loop when no declared action does what you need.",
+        schema: || json!({
+            "type": "object",
+            "properties": {
+                "event": {
+                    "type": "object",
+                    "description": "e.g. {\"kind\":\"key\",\"code\":\"Down\"}.",
+                },
+            },
+            "required": ["event"],
+            "additionalProperties": false,
+        }),
+    },
+];
+
 fn tool_schema(tool: &Tool) -> Value {
     match tool.argument {
         Some((name, description)) => json!({
@@ -118,6 +207,7 @@ fn tool_schema(tool: &Tool) -> Value {
 pub struct McpServer {
     registry: OntologyRegistry,
     initialized: bool,
+    runtime: Option<Box<dyn RuntimeTarget + Send>>,
 }
 
 impl Default for McpServer {
@@ -132,6 +222,7 @@ impl McpServer {
         Self {
             registry: builtin_registry(),
             initialized: false,
+            runtime: None,
         }
     }
 
@@ -140,7 +231,24 @@ impl McpServer {
         Self {
             registry,
             initialized: false,
+            runtime: None,
         }
+    }
+
+    /// Attach a running application, adding the runtime tools.
+    ///
+    /// Without this the server answers from the catalog alone. The runtime
+    /// tools are not merely inert when unattached — they are absent from
+    /// `tools/list`, because a tool a model can see is a tool it will call, and
+    /// one that always fails is worse than one that was never offered.
+    pub fn with_runtime(mut self, target: Box<dyn RuntimeTarget + Send>) -> Self {
+        self.runtime = Some(target);
+        self
+    }
+
+    /// Whether a running application is attached.
+    pub fn has_runtime(&self) -> bool {
+        self.runtime.is_some()
     }
 
     /// Whether the client has completed the initialize handshake.
@@ -219,7 +327,7 @@ impl McpServer {
     }
 
     fn tools_list(&self) -> Value {
-        let tools: Vec<Value> = TOOLS
+        let mut tools: Vec<Value> = TOOLS
             .iter()
             .map(|tool| {
                 json!({
@@ -229,15 +337,58 @@ impl McpServer {
                 })
             })
             .collect();
+        if self.runtime.is_some() {
+            tools.extend(RUNTIME_TOOLS.iter().map(|tool| {
+                json!({
+                    "name": tool.name,
+                    "description": tool.description,
+                    "inputSchema": (tool.schema)(),
+                })
+            }));
+        }
         json!({ "tools": tools })
     }
 
-    fn tools_call(&self, params: &Value) -> Result<Value, McpError> {
+    /// Dispatch a runtime tool by tagging its arguments with the protocol's
+    /// own discriminator and deserialising. The tool names are the protocol's
+    /// names, so a variant that changes shape breaks here rather than silently
+    /// accepting the old one.
+    fn runtime_call(&mut self, name: &str, arguments: &Value) -> Result<String, McpError> {
+        let mut body = arguments.clone();
+        if !body.is_object() {
+            return Err(McpError::InvalidParams(format!(
+                "{name} takes an arguments object"
+            )));
+        }
+        body["type"] = json!(name);
+        let request: AgentRequest = serde_json::from_value(body)
+            .map_err(|e| McpError::InvalidParams(format!("{name}: {e}")))?;
+
+        let target = self
+            .runtime
+            .as_mut()
+            .expect("runtime_call is only reached when a target is attached");
+        let response = target.process(&request);
+        serde_json::to_string_pretty(&response)
+            .map_err(|e| McpError::Tool(format!("could not serialise the response: {e}")))
+    }
+
+    fn tools_call(&mut self, params: &Value) -> Result<Value, McpError> {
         let name = params
             .get("name")
             .and_then(Value::as_str)
             .ok_or_else(|| McpError::InvalidParams("missing tool \"name\"".into()))?;
         let arguments = params.get("arguments").cloned().unwrap_or(json!({}));
+
+        if RUNTIME_TOOLS.iter().any(|t| t.name == name) {
+            if self.runtime.is_none() {
+                return Err(McpError::Tool(format!(
+                    "{name} needs a running application; this server was started                      without one and serves the widget catalog only"
+                )));
+            }
+            let text = self.runtime_call(name, &arguments)?;
+            return Ok(json!({ "content": [{ "type": "text", "text": text }] }));
+        }
 
         let tool = TOOLS
             .iter()
