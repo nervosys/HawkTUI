@@ -1,0 +1,32 @@
+{
+  "id": "t16-straddle",
+  "name": "straddle",
+  "rung": 16,
+  "grid": { "w": 20, "h": 8 },
+  "script": ["q"],
+  "checks": [
+    { "id": "shape", "kind": "grid_shape", "frame": 0, "contract": true },
+    { "id": "quits", "kind": "frame_count", "equals": 1 },
+
+    { "id": "straddle-stays-off-row-0", "kind": "row_matches", "frame": 0, "row": 0,
+      "pattern": "^x日本語日本語日本語\\s*$" },
+    { "id": "straddle-moves-to-row-1", "kind": "row_matches", "frame": 0, "row": 1,
+      "pattern": "^日\\s*$" },
+
+    { "id": "emoji-fills-a-row", "kind": "row_matches", "frame": 0, "row": 2,
+      "pattern": "^🙂{10}\\s*$" },
+    { "id": "emoji-continuation", "kind": "row_matches", "frame": 0, "row": 3,
+      "pattern": "^🙂\\s*$" },
+
+    { "id": "ascii-line", "kind": "row_matches", "frame": 0, "row": 4,
+      "pattern": "^abc def\\s*$" },
+    { "id": "text-ends-at-row-4", "kind": "row_matches", "frame": 0, "row": 5,
+      "pattern": "^\\s*$" },
+
+    { "id": "no-injected-spaces-cjk", "kind": "absent", "frame": 0, "pattern": "日 本" },
+    { "id": "no-injected-spaces-emoji", "kind": "absent", "frame": 0, "pattern": "🙂 🙂" },
+
+    { "id": "row-count", "kind": "row_matches", "frame": 0, "row": -1,
+      "pattern": "rows:\\s*5" }
+  ]
+}
