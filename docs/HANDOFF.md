@@ -100,6 +100,24 @@ predicts failure only on the rendering-surface rungs — 3 of 4 runs that read
 nothing failed there, against 1 of 25 that read something — and predicts nothing
 at all elsewhere.
 
+**A second project's transcripts replicate the prompt-text finding.** DeweyGUI
+is an egui/wgpu GUI framework with its own ontology, its own MCP server, and its
+own agentic benchmark by a different author. Running `source_usage.py` over its
+22 stored transcripts:
+
+| condition | read the source | src reads | MCP calls |
+|---|---|---|---|
+| bare | 88 % | 17 | 0 |
+| mcp (ontology attached) | **100 %** | 14 | 7 |
+| warned (prompt says look first) | **29 %** | 2 | 15 |
+
+Attaching the ontology over MCP did not reduce source reading; it stayed at
+100 %. A paragraph in the prompt cut it to 29 % and tripled ontology calls.
+Different framework, different UI paradigm, different harness, same result as
+`results/forbid-*`: **the lever is prompt text, not ontology availability.**
+Their warning names the crate's examples and its attached tools; ours forbids
+reading the implementation. Neither is an ontology improvement.
+
 **Three explanations for the wide-glyph failure are eliminated.** A full day of
 grids on `t16-straddle` (`results/straddle`, `forbid-source`, `forbid-ratatui`,
 `permit-ratatui`) rules out:
@@ -197,13 +215,25 @@ run directory keeps its prompt, transcript and dump for exactly this.
    Twenty prohibition runs against the existing untreated cell settle it. If it
    holds, the lever is a sentence in the prompt — not the ontology, not the API,
    not source access — which is worth knowing precisely because it is cheap.
-5. **Run the harness against DeweyGUI.** Its scaffold benchmark measures
-   machine-side proxies — token counts, edit-compile latency — and never drives a
-   real agent, so it cannot have observed the source-reading behaviour. It
-   already assumes the opposite: its MCP tool descriptions "say why to call them
-   rather than read the source", asserted by a test but never measured. This
-   harness is framework-agnostic by construction; it needs a task set and a
-   headless dump contract, not a new benchmark.
+5. **DeweyGUI: use its transcripts, do not port the harness.** Two corrections
+   to what this document said before anyone read that code.
+
+   *It does drive a real agent.* `benches/agentic/runner/run.py:115` shells out
+   to the `claude` CLI and there are 22 checked-in transcripts. Only
+   `benches/scaffold/` and `benches/comparative/` are the machine-side proxies —
+   they say so themselves (`observation_cost.rs:15`: "Not model behaviour.
+   Nothing here calls a model"). The claim that it cannot have observed the
+   source-reading behaviour was wrong.
+
+   *Porting is blocked at the frame, not the CLI.* Its `--headless WxH --script
+   --dump` surface matches this contract character for character, but a frame is
+   a widget-tree dump — one line per widget — not a W×H character grid. It is
+   egui/wgpu with no terminal and no text rasteriser, and
+   `src/agent/protocol.rs:127-130` refuses to fabricate pixels for an agent on
+   purpose. Making it emit a grid means inventing a text renderer for a GPU
+   framework. The cheap direction is the reverse: make this verifier's frame
+   parser pluggable, since its checks are already regex over frame text.
+
 6. **Use `--isolate` for anything published.** A scaffolded crate edited
    `benchmarks/Cargo.toml` in an earlier grid.
 
