@@ -42,8 +42,12 @@ failure mode. Building harder *structures* will not produce a reliability
 signal.
 
 **Agents read the framework's source regardless of what else they are given.**
-100 % of Hawk TUI runs, 16–22 reads each, median first read at tool call #1.
-ratatui: 6 %. The asymmetry is the model's training, not the frameworks. Source
+100 % of Hawk TUI runs (58/58 at C1), 16–22 reads each, median first read at
+tool call #1. **ratatui's rate is not fixed**: 0 % on the structural ladder,
+24 % over all stored grids, 60–100 % on the rendering-surface rungs. The
+often-quoted 6 % came from the two earliest grids and does not hold. The
+asymmetry is the model's training, not the frameworks, and it shrinks as the
+task gets harder. Source
 reading is **42 % of everything tools return into context**, and the ontology
 answers comparable questions in 5.4× fewer tokens.
 
@@ -87,8 +91,12 @@ times out of twelve; it is drawing to a grid that breaks it.
 
 All four failures are ratatui runs and Hawk TUI has not produced one. **Do not read
 that as a framework difference.** Hawk TUI runs read the framework's source in
-100 % of cases and ratatui runs in 6 %, so the two arms differ in what the agent
-saw as well as which crate it used, and four events cannot separate those.
+100 % of cases and ratatui runs in 24 % overall (60 % on `t16-straddle`), so the
+two arms differ in what the agent saw as well as which crate it used, and four
+events cannot separate those. Across every stored transcript, source reading
+predicts failure only on the rendering-surface rungs — 3 of 4 runs that read
+nothing failed there, against 1 of 25 that read something — and predicts nothing
+at all elsewhere.
 
 ### Not established
 

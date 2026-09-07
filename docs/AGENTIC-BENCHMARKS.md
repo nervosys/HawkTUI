@@ -472,7 +472,15 @@ this document.
 | Framework | Runs reading the implementation | Reads per run | First read |
 |---|---:|---:|---:|
 | **Hawk TUI** | **100 %** | 16–22 | tool call #1 |
-| ratatui | 6 % | 0.1 | #8 |
+| ratatui (these two grids) | 6 % | 0.1 | #8 |
+
+**The ratatui figure is not a constant, and later grids revised it.** Over every
+stored transcript ratatui reads the implementation in 24 % of runs, and the rate
+tracks how hard the task is: 0 % on the structural ladder, 11 % on the complex
+rungs, 33 % on `t13-unicode`, 60 % on `t16-straddle`, 100 % on `t14-wrap`. Hawk
+TUI stays at ~100 % throughout. So the asymmetry is real but narrows as the task
+stops being something the model can write from memory — which is the same place
+the failures live.
 
 80 % of those reads are core and runtime files, not widgets:
 `backend/test.rs`, `event/mod.rs`, `core/buffer.rs`, `terminal.rs`,
@@ -666,7 +674,7 @@ rung asks for wide glyphs in a position where the arithmetic matters.
 
 Both failures are ratatui runs and Hawk TUI has produced none. That is not a
 framework result: Hawk TUI runs read the framework's source in 100 % of cases
-against ratatui's 6 %, so the arms differ in what the agent saw as well as which
+against ratatui's 24 % overall, so the arms differ in what the agent saw as well as which
 crate it used, and two events cannot separate those explanations.
 
 Note also that the medians are 1.000 in both arms. `analyze.py` alone hides this
@@ -756,6 +764,33 @@ opens the source may differ in other ways that also predict success. But the
 association is strong enough to test directly, and cheap enough that there is no
 excuse not to.
 
+**Widened to every stored transcript, the claim needs cutting down.** Across 212
+runs the relationship is not general:
+
+| | read the source | read none |
+|---|---|---|
+| rendering-surface rungs (T13, T15, T16) | 1/25 failed | **3/4 failed** |
+| every other rung | 7/165 failed | 0/18 failed |
+| whole corpus | 8/190 failed | 3/22 failed |
+
+Source reading predicts nothing outside the rendering-surface rungs — the rates
+there are 4 % against 0 %, in the wrong direction for the hypothesis and
+explained by superlighttui runs that read heavily and still scored 0.77–0.87.
+**Within the rendering rungs it predicts a great deal**: three of the four runs
+that opened nothing failed, against one of twenty-five that did.
+
+That one exception matters. `t15-frame__ratatui__c1__r5` read the source four
+times and produced the injected-space failure anyway, so reading is not
+sufficient. And the T16 result quoted above as a perfect 8/8 split is perfect
+only within T16; over all three rungs it is 24 of 25 against 1 of 4.
+
+So the honest statement is narrower than the one this section opened with.
+Source access is associated with success **on the specific tasks where the
+rendering surface can break the program**, and nowhere else. That is consistent
+with the mechanism — buffer code is where a cell's width is decided, and only
+these tasks care — but it is an association in four negative cases, with the
+agent choosing its own treatment.
+
 **Pre-registered prediction.** Running T16 on Hawk TUI with `--no-source` should
 produce failures at a rate resembling ratatui's, because the protection is
 hypothesised to come from reading the implementation rather than from the
@@ -771,7 +806,7 @@ not merely a cost to be optimised away. It is doing work.
 Running total across the whole benchmark: **four agent failures in ~260 runs,
 every one the same wrong belief, every one a ratatui run.** The confound stated
 under T15 still holds and is now load-bearing: Hawk TUI runs read the framework
-source in 100 % of cases against ratatui's 6 %, so the arms differ in what the
+source in 100 % of cases against ratatui's 24 % overall, so the arms differ in what the
 agent saw as well as which crate it used. Four events cannot separate a
 framework property from a training-data one, and nothing here should be read as
 Hawk TUI handling wide characters better.
