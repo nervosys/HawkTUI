@@ -51,6 +51,16 @@ def main() -> int:
         # for an unrelated package. The run directory still holds the evidence:
         # no manifest means nothing of the agent's was ever built.
         run_dir = run_root / record["label"]
+        # A missing *manifest* is evidence. A missing *directory* is not: it
+        # means this jsonl was copied away from its runs, most often after an
+        # --isolate grid. Rescoring anyway would silently mark every run
+        # unbuilt while leaving its score untouched, which is exactly the kind
+        # of plausible wrong answer this tooling keeps producing.
+        if not run_dir.is_dir():
+            print(f"\n{run_dir} does not exist. Run rescore.py against the "
+                  f"jsonl where the runs are, then copy both files.",
+                  file=sys.stderr)
+            return 1
         if record.get("built") and not (run_dir / "Cargo.toml").is_file():
             record["built"] = False
             record["build_error"] = (
