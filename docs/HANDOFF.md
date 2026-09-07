@@ -41,9 +41,11 @@ throughout. Compiler errors are a feedback loop an agent iterates through, not a
 failure mode. Building harder *structures* will not produce a reliability
 signal.
 
-**Agents read the framework's source regardless of what else they are given.**
-100 % of Hawk TUI runs (58/58 at C1), 16–22 reads each, median first read at
-tool call #1. **ratatui's rate is not fixed**: 0 % on the structural ladder,
+**Agents read the framework's source unless they are told not to.** 100 % of
+Hawk TUI runs (58/58 at C1), 16–22 reads each, median first read at tool call
+#1. One sentence in the prompt takes that to zero: 10 of 10 runs across both
+frameworks complied fully. Nothing else tried this session moved it — not the
+ontology at any quality level, not MCP delivery, not withholding `--add-dir`. **ratatui's rate is not fixed**: 0 % on the structural ladder,
 24 % over all stored grids, 60–100 % on the rendering-surface rungs. The
 often-quoted 6 % came from the two earliest grids and does not hold. The
 asymmetry is the model's training, not the frameworks, and it shrinks as the
@@ -98,12 +100,35 @@ predicts failure only on the rendering-surface rungs — 3 of 4 runs that read
 nothing failed there, against 1 of 25 that read something — and predicts nothing
 at all elsewhere.
 
+**Three explanations for the wide-glyph failure are eliminated.** A full day of
+grids on `t16-straddle` (`results/straddle`, `forbid-source`, `forbid-ratatui`,
+`permit-ratatui`) rules out:
+
+- *the framework* — both frameworks pass 5/5 under the prohibition;
+- *source access* — the arm that removed it has no failures, the opposite of
+  the prediction;
+- *the ontology* — never involved; the failing runs had it and ignored it.
+
+What survives is that something in the prompt carries the effect. It is not
+measurable with the arms available: the only lever that drives source reads to
+zero is the prohibition itself, so its content and its effect on reading cannot
+be separated. See AGENTIC-BENCHMARKS.md for the full design and the placebo that
+failed to control.
+
 ### Not established
 
 - Whether an ontology helps an agent trained to prefer it. Sufficiency is
   measured (193/193 source reads covered); the benefit is not.
 - Whether the cost gap versus ratatui (2–4×) is closable at all. It tracks
   training-data presence, which no artifact changes quickly.
+- **Whether the working-constraint paragraph does anything.** Untreated ratatui
+  fails 2 of 5; with the paragraph, 0 of 10 across both frameworks. One-sided
+  Fisher's exact on the assignment-respecting comparison is p = 0.22 — no
+  evidence. Conditioned on runs that read no source it is 2 of 2 against 0 of 5,
+  p = 0.048, but that conditions on a post-treatment choice and can manufacture
+  an association from nothing. **Report the first; the second is only a reason
+  to keep looking.** Roughly twenty prohibition runs against the existing
+  untreated cell would reach p = 0.03.
 - Any *rate*. The benchmark now observes failure — `t16-straddle` fails 2 of 5
   ratatui runs — so it is no longer an instrument that cannot measure
   reliability. But four events on one failure mode support the mode's existence
@@ -129,8 +154,18 @@ competitor look worse than reality. Never once the reverse.**
 | A scaffolded crate edited the host repository | silent | reverted |
 | `t15-frame`'s own prompt admitted two readings | 0.917 | agent was right |
 | Rescoring a jsonl copied away from its runs | `built: false` ×10 | all built |
+| `--no-source` withheld nothing for 24 runs | a null | no treatment given |
 
-The pattern is not coincidence. A check encodes its author's model of the
+The tenth is the dangerous one and breaks the pattern: it made the *harness*
+look capable rather than making an agent look bad. `--no-source` only dropped
+`--add-dir` while the generated manifest still named the framework's path, so
+every one of 24 runs read the source anyway, a median of 19 times. A treatment
+that was never administered returns a finding-shaped result that measures
+nothing, and this benchmark has now produced two of those. Every run therefore
+records `source_reads`, and `analyze.py` states whether a withheld-source
+treatment held before it prints a table.
+
+The pattern in the other nine is not coincidence. A check encodes its author's model of the
 problem; when an agent does something correct the author did not anticipate, the
 check fires. The eighth fault is the clearest case — `t15-frame` exists to test
 whether an agent knows that display columns are not characters, and the verifier
@@ -157,14 +192,19 @@ run directory keeps its prompt, transcript and dump for exactly this.
    and the arithmetic can disagree. Grapheme clusters, bidirectional text and
    terminal resize are the untried candidates. A rung that never asks the agent
    to place a wide glyph will not fire.
-4. **Run the harness against DeweyGUI.** Its scaffold benchmark measures
+4. **Decide whether the paragraph is worth twenty runs.** It is the only
+   surviving candidate for a reliability lever and it currently sits at p = 0.22.
+   Twenty prohibition runs against the existing untreated cell settle it. If it
+   holds, the lever is a sentence in the prompt — not the ontology, not the API,
+   not source access — which is worth knowing precisely because it is cheap.
+5. **Run the harness against DeweyGUI.** Its scaffold benchmark measures
    machine-side proxies — token counts, edit-compile latency — and never drives a
    real agent, so it cannot have observed the source-reading behaviour. It
    already assumes the opposite: its MCP tool descriptions "say why to call them
    rather than read the source", asserted by a test but never measured. This
    harness is framework-agnostic by construction; it needs a task set and a
    headless dump contract, not a new benchmark.
-5. **Use `--isolate` for anything published.** A scaffolded crate edited
+6. **Use `--isolate` for anything published.** A scaffolded crate edited
    `benchmarks/Cargo.toml` in an earlier grid.
 
 ---
@@ -229,3 +269,11 @@ evidence, that is the failure mode to expect.
   since every row is padded to width; that is now scoped to spaces between the
   characters of the text. The published grid ran under the old wording, and no
   run failed on account of it — both failures padded their rows correctly.
+
+- The working-constraint experiment ran four grids on `t16-straddle`, all at C1:
+  `results/straddle` (no note, both frameworks), `results/forbid-source` (Hawk
+  TUI, prohibition), `results/forbid-ratatui` (ratatui, prohibition),
+  `results/permit-ratatui` (ratatui, placebo). Per-run directories live outside
+  the repository — these grids used `--isolate` — so only the metrics are
+  committed. `runner/source_usage.py` regenerates the read counts from a
+  transcript tree if one is still on disk.
