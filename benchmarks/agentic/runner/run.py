@@ -152,7 +152,7 @@ MCP_BINARY = Path.home() / ".cargo-target" / "release" / "hawktui-mcp.exe"
 
 
 def build_prompt(task: str, framework: str, seeded: list[str],
-                 source_note: str = "none") -> str:
+                 source_note: str = "none", condition: str = "c1") -> str:
     fw = FRAMEWORKS[framework]
     prompt = (TASKS_DIR / task / "prompt.md").read_text(encoding="utf-8")
     contract = (TASKS_DIR / "contract.md").read_text(encoding="utf-8")
@@ -207,6 +207,39 @@ def build_prompt(task: str, framework: str, seeded: list[str],
             "wherever they are on disk — is entirely within what this task "
             "allows.\n"
         )
+    elif source_note == "redirect":
+        # `forbid` closes a door without opening one: it stops the agent
+        # reading the implementation and says nothing about where the same
+        # answers live. This names the ontology the condition actually
+        # supplies, so the arm tests redirection rather than deprivation. It
+        # names nothing under C0/C1, which supply no ontology — a paragraph
+        # pointing at absent tools would measure the agent's reaction to a
+        # broken instruction.
+        where = {
+            "c2": "the ontology files in this directory describe every widget: "
+                  "its properties, their types and constraints, and how it is "
+                  "rendered",
+            "c3": "the `hawktui ontology` command answers questions about the "
+                  "API on demand — `search`, `schema`, `api`, `skeleton` and "
+                  "`prelude` subcommands",
+            "c4": "the ontology tools attached to this session describe every "
+                  "widget and the program around it",
+            "c5": "the ontology tools attached to this session answer this "
+                  "directly: `program_skeleton` for the shape of a program, "
+                  "`widget_api` for a type's constructors and builder "
+                  "signatures, `stateful_widgets` for which widgets need a "
+                  "companion state, `api_search` when you know what a thing "
+                  "should do but not its name",
+        }.get(condition)
+        if where:
+            text += (
+                "\n## Working constraint\n\n"
+                "Before reading the framework's implementation, ask its "
+                f"ontology: {where}. It is derived from the same signatures the "
+                "source declares, so it answers the same questions in a "
+                "fraction of the reading. Go to the source when the ontology "
+                "does not cover what you need — not before.\n"
+            )
     return text
 
 
@@ -509,7 +542,7 @@ def run_cell(task: str, framework: str, condition: str, rep: int, args, out_dir:
     note = args.source_note or ("forbid" if args.no_source else "none")
     record["source_note"] = note
     prompt = build_prompt(task, framework, record["context_files"],
-                          source_note=note)
+                          source_note=note, condition=condition)
     (workdir / "_prompt.md").write_text(prompt, encoding="utf-8")
 
     print(f"  ▸ {label} … ", end="", flush=True)
@@ -624,10 +657,13 @@ def main() -> int:
                     help="shared CARGO_TARGET_DIR for every run "
                          "(default: <out>/_target)")
     ap.add_argument("--no-prewarm", action="store_true")
-    ap.add_argument("--source-note", choices=("none", "forbid", "permit"),
+    ap.add_argument("--source-note", choices=("none", "forbid", "permit", "redirect"),
                     default=None,
                     help="the working-constraint paragraph appended to the "
-                         "prompt. 'forbid' asks the agent not to read the "
+                         "prompt. 'redirect' names the ontology this condition "
+                         "actually provides and asks the agent to consult it "
+                         "before the implementation. 'forbid' asks the agent "
+                         "not to read the "
                          "framework's implementation; 'permit' is its placebo, "
                          "matched in length and subject but inverting the "
                          "instruction, so the two isolate the withholding from "

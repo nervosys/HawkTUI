@@ -911,6 +911,36 @@ administered rather than quietly averaged.
 the injected-space failure. One is enough to show the paragraph does not
 prevent it, whatever the rates turn out to be.
 
+### Pre-registration: redirecting to the ontology
+
+`forbid` closes a door without opening one — it stops the agent reading the
+implementation and says nothing about where the same answers live.
+`--source-note redirect` names the ontology the condition actually supplies and
+asks the agent to consult it first. It deliberately adds nothing under C0 and
+C1, which supply no ontology; a paragraph pointing at absent tools would measure
+the agent's reaction to a broken instruction.
+
+**Design.** `t16-straddle`, Hawk TUI, C5 (the authoring ontology as MCP tools),
+five runs with the redirect paragraph against five with none.
+
+**Primary outcomes are behavioural, and this is the important caveat.** Source
+reads per run, and ontology tool calls per run. **Score is not the primary
+outcome and cannot be**: Hawk TUI has never failed this rung, so there is no
+variance for the paragraph to move. This experiment can show that a paragraph
+redirects an agent from the source to the ontology. It cannot show that doing so
+makes anything more reliable, and a clean sweep must not be reported as though
+it had.
+
+**Secondary outcomes.** Turns, cost, and API errors — where a redirect could
+plausibly hurt. C5 already costs turns and introduces API errors on the two
+hardest rungs, so "the agent consulted the ontology more and did worse" is a
+live outcome, not a strawman.
+
+**What would count as the paragraph working.** Source reads down and ontology
+calls up, together. Either alone is not redirection: reads falling with no rise
+in consultation is deprivation, which `forbid` already does, and consultation
+rising while reads stay flat is an agent doing both and paying for both.
+
 **Two defensible summaries, and they disagree.** Unconditionally there is no
 evidence the paragraph does anything. Conditioned on the behaviour that predicts
 failure there is a significant difference with a selection objection attached.
