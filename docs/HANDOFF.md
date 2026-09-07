@@ -55,22 +55,30 @@ task gets harder. Source
 reading is **42 % of everything tools return into context**, and the ontology
 answers comparable questions in 5.4× fewer tokens.
 
-**The ontology displaced source reading once, on the smallest rung.** Holding
-the task fixed at `t16-straddle`, Hawk TUI read the framework's source in 5 of 5
-runs at C1 and 1 of 5 at C5 — one-sided Fisher's exact p = 0.024, with no prompt
-intervention in either arm (`results/redirect-none`). This is the **first
-positive result the ontology has produced in this benchmark**, and it is about
-behaviour, not outcomes: every run scored 1.000 either way.
+**The ontology does not displace source reading.** Every task with matched C1
+and C5 Hawk TUI runs, paragraph arms excluded:
 
-It does not generalise as it stands. On every harder rung C5 reads the source
-anyway — 98 % of 55 historical C5 runs, a median of 19 times — including 19 runs
-served the identical ten tools. The distinguishing feature of `t16-straddle` is
-that it needs *one small answer*. The working hypothesis, untested, is that the
-ontology displaces source reading when the question is small enough to be
-answered by a signature, and loses to the source when the agent needs to
-understand how a program is put together. **Testing that is the most promising
-open experiment**, and it is cheap: two conditions on two or three rungs of
-varying size.
+| task | C1 reads source | C5 reads source | p | median reads |
+|---|---|---|---|---|
+| t8-meters | 9/9 | 11/12 | 0.571 | 17 → 17 |
+| t9-atlas | 9/9 | 12/12 | 1.000 | 18 → 19 |
+| t10-repo | 9/9 | 12/12 | 1.000 | 22 → 20 |
+| t11-monitor | 9/9 | 12/12 | 1.000 | 8 → 22 |
+| t13-unicode | 3/3 | 3/3 | 1.000 | 15 → 20 |
+| t14-wrap | 4/4 | 4/4 | 1.000 | 13 → 20 |
+| t16-straddle | 5/5 | **1/5** | **0.024** | 2 → 0 |
+
+**One rung in seven, and it does not survive the company it keeps.** Seven
+comparisons make a p of 0.024 unremarkable — the chance of seeing one that small
+somewhere in seven null tests is 16 %, and the Bonferroni threshold here is
+0.0071. `t16-straddle` is also the rung with the least source reading to begin
+with: a C1 median of 2 against 8–22 everywhere else, so it had almost nothing to
+displace.
+
+This retracts a claim made earlier in this session — that the C5 control arm
+showed the ontology's first positive result — which was drawn from that single
+rung before the matched pairs were computed. The correction cost nothing: every
+number above came from stored transcripts.
 
 **The ontology has still never moved an outcome**, across seven grids and every
 quality level: incomplete, complete, sufficient, delivered as files, as a CLI, as MCP
@@ -246,14 +254,12 @@ run directory keeps its prompt, transcript and dump for exactly this.
 
 ## 4. What I would do next
 
-1. **Test where the ontology displaces source reading.** This replaced "stop
-   funding the ontology for authoring", which seven null grids had earned and
-   one result has now complicated. On `t16-straddle` the ontology took source
-   reading from 5 of 5 runs to 1 of 5 (p = 0.024) with no prompt involved; on
-   every larger rung it does nothing. If the boundary is question size, that is
-   a scope claim worth designing around — and it is two conditions on three
-   rungs to find out. Outcomes stay flat either way; the payoff is token cost,
-   where source reading is 42 % of everything tools return.
+1. **Stop funding the ontology for authoring.** Seven null grids on outcomes,
+   and now seven matched C1/C5 pairs showing it does not displace source reading
+   either. The one rung that looked like an exception does not survive being
+   counted alongside the other six. Keep the ontology: it is accurate generated
+   documentation and it serves the runtime introspection case it was designed
+   for. Do not buy more authoring grids expecting it to pay.
 2. **Do not build more structural rungs.** Twelve produced no failures.
 3. **Mine the rendering surface — it is the only productive seam.** All four
    failures came from it. `t15-frame` produced one on its first grid after
