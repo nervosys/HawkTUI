@@ -199,11 +199,14 @@ hawktui-ontology schema Gauge     # one widget in full
 hawktui-ontology search scroll
 ```
 
-**Scope, stated plainly:** the ontology describes a widget's *runtime state* and
-semantic role — what it holds and what an agent can do to it while the program
-runs. It is not a catalog of builder methods. Use it to choose a widget; read
-the rustdoc for the methods that construct one. [`AGENTS.md`](AGENTS.md) covers
-the authoring side.
+**Scope, stated plainly:** there are two halves. The widget ontology describes
+*runtime state* and semantic role — what a widget holds and what an agent can do
+to it while the program runs. The authoring ontology, generated from the
+signatures by `scripts/gen_api_ontology.py`, is a catalog of constructors and
+builder methods: 93 types and 480 functions, including which widgets need a
+companion state type. `hawktui-ontology api <Type>` and the `widget_api`,
+`api_search` and `stateful_widgets` MCP tools serve it.
+[`AGENTS.md`](AGENTS.md) covers the authoring side in prose.
 
 ## Widget Set
 
@@ -506,12 +509,15 @@ can fix quickly — but it is the current state of things and worth knowing befo
 you choose.
 
 See [docs/HANDOFF.md](docs/HANDOFF.md) for the state of this work, what is
-solid, and the eight harness faults found while producing it.
+solid, and the ten harness faults found while producing it.
 
-The same study found that supplying the widget ontology to the authoring agent
-made **no measurable difference** on any pre-registered metric. Its value is
-runtime introspection — an agent *driving* a running program — not code
-generation. The results, including the ones that went against us, are in
+The same study found that supplying the ontology to the authoring agent made
+**no measurable difference** on any pre-registered metric, at every quality
+level and through every delivery mechanism tried. The reason is that the agent
+mostly did not consult it: it read the framework's source instead, in 100 % of
+Hawk TUI runs, 16–22 times each. The one thing shown to change that is a
+paragraph in the prompt — which is a finding about prompts, not about
+ontologies. The results, including the ones that went against us, are in
 [docs/AGENTIC-BENCHMARKS.md](docs/AGENTIC-BENCHMARKS.md).
 
 ## License

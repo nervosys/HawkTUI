@@ -43,10 +43,17 @@ Or register the MCP server and call the ontology as tools:
 ```
 
 Tools: `list_widgets`, `get_widget_schema`, `search_widgets`, `widget_roles`,
-`ontology_digest`.
+`ontology_digest`, `program_skeleton`, `prelude`, `widget_api`, `api_search`,
+`stateful_widgets`.
+
+The standalone binary serves the catalog only. An application that hosts the
+server itself — `McpServer::new().with_runtime(Box::new(driver))` — additionally
+offers `get_tree`, `get_state`, `execute_action` and `inject_event` against the
+running program. Those four are absent from `tools/list` when nothing is
+attached, so what a client sees is always what it can actually call.
 
 Two catalogs, two questions. `api`, `api-search` and `stateful` are the
-**authoring** view — 72 types and 350 functions, with constructors, builder
+**authoring** view — 93 types and 480 functions, with constructors, builder
 signatures, enum variants, and which widgets need a companion state value.
 `list`, `schema`, `roles` and `search` are the **runtime** view, describing what
 a widget holds and what an agent driving a live application can do to it.
