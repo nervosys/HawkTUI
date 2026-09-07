@@ -623,6 +623,74 @@ So the discriminating axis is narrower than "display correctness". It is
 thing shown to break this agent in ~215 runs, and it is where a further rung
 should aim.
 
+### T15: the seam reproduces
+
+T15 (`t15-frame`) puts five lines of different scripts in a bordered box and
+asks that the right border land in the same display column on every row. Four of
+the five lines are exactly 10 display columns wide while having 10, 5, 11 and 9
+characters, so padding by character count makes the border visibly ragged.
+
+**Its first grid was invalid and the reason is instructive.** The prompt said the
+box "fills everything except the bottom row" *and* that lines are padded so the
+border aligns, which implies a box sized to content. One run took the first
+reading and was scored 0.917 for it. Worse than the miscount: a screen-filling
+box aligns its right border no matter how the padding is computed, so under that
+reading the rung tested nothing. The prompt now pins the box to the top-left
+corner and sizes it to its contents; `checks.json` pins the border to display
+column 11; and `selftest_frame.py` renders the screen-filling reading and
+requires it to fail.
+
+The re-run, ten runs at C1:
+
+| framework | scores |
+|---|---|
+| Hawk TUI | 1.000 × 5 |
+| ratatui | 1.000 × 4, **0.538** × 1 |
+
+The miss is the T13 failure reproduced exactly:
+
+```
+│日 本 語 で す │
+│🙂  ok     │
+│mixed 語  x│
+```
+
+One space after every wide glyph, so the border leaves column 11 for 12 and 16
+on precisely those rows and nowhere else. The box is otherwise correct, down to
+the reported `inner: 10`, and it compiled with zero API errors.
+
+Two things follow. **The failure mode is reproducible**, which one event in ~225
+runs did not establish — it is a stable property of the agent on this seam, not
+a fluke. And **the seam yields at roughly 1 in 5 rather than 1 in 225** once a
+rung asks for wide glyphs in a position where the arithmetic matters.
+
+Both failures are ratatui runs and Hawk TUI has produced none. That is not a
+framework result: Hawk TUI runs read the framework's source in 100 % of cases
+against ratatui's 6 %, so the arms differ in what the agent saw as well as which
+crate it used, and two events cannot separate those explanations.
+
+Note also that the medians are 1.000 in both arms. `analyze.py` alone hides this
+entirely; the per-run rows in `results/frame/` are where it shows.
+
+### T16: narrowing to the wrap boundary
+
+T16 (`t16-straddle`) aims at the same seam at the point the arithmetic is
+easiest to get wrong — the end of a row, where a double-width character needs
+two columns and one is left. The correct answer leaves that column empty and
+starts the character on the next row. The content is chosen so the boundary
+falls mid-run: a leading ASCII letter puts the CJK on odd parity so the tenth
+ideograph cannot fit, and the emoji line fills a row exactly and spills one.
+
+`selftest_straddle.py` encodes four wrong answers — wrapping by character count,
+overhanging the last column, injecting a space after each wide glyph, and
+miscounting the rows. Overhanging draws 21 columns on a 20-column screen, so it
+fails the contract as well as the layout, which `analyze.py` reports as a
+rendering bug rather than a protocol mistake.
+
+The rung cannot distinguish wrapping-by-characters from overhanging: both are
+wrong and both fail the same seven checks. Reading the dump is the only way to
+tell which mistake was made.
+
 ### The ontology condition is worse on the hardest rungs
 
 Across T13 and T14, with identical scores everywhere:
