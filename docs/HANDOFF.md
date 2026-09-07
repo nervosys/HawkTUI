@@ -42,8 +42,10 @@ failure mode. Building harder *structures* will not produce a reliability
 signal.
 
 **Agents read the framework's source unless they are told not to.** 100 % of
-Hawk TUI runs (58/58 at C1), 16–22 reads each, median first read at tool call
-#1. One sentence in the prompt takes that to zero: 10 of 10 runs across both
+the 58 C1 Hawk TUI runs whose transcripts are on disk, 16–22 reads each, median
+first read at tool call #1. (Committed grids hold 75 Hawk TUI C1 runs; the
+`--isolate` grids keep their transcripts outside the repository, so the read
+counts cover the 58 that can still be checked.) One sentence in the prompt takes that to zero: 10 of 10 runs across both
 frameworks complied fully. Nothing else tried this session moved it — not the
 ontology at any quality level, not MCP delivery, not withholding `--add-dir`. **ratatui's rate is not fixed**: 0 % on the structural ladder,
 24 % over all stored grids, 60–100 % on the rendering-surface rungs. The
@@ -62,7 +64,14 @@ no such model exists to test against.
 
 ### Thin
 
-**Four agent failures in ~260 runs, and they are all the same failure.** Two
+**Four agent failures in 231 committed runs, and they are all the same
+failure.** Recomputing from `results/` finds eleven runs below 1.000, which is
+not a contradiction and is worth spelling out before someone else finds it:
+three are superlighttui partials on the main ladder (0.77–0.87), three are
+discovery-rung partials (0.92), and one — `discovery-fill/t9-atlas c3 r2`, a
+0.000 with `built: false` — is the ancestor-manifest harness fault from §3,
+where cargo walked up and built the wrong package. That leaves the four
+described here. Two
 came from `t16-straddle`, the rung aimed squarely at the seam: at a row boundary
 where a double-width character needs two columns and one is left, both runs
 computed the wrap correctly from true display widths and then emitted each wide

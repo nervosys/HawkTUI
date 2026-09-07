@@ -891,7 +891,8 @@ The first is the result; the second is the reason to keep looking. Twenty
 prohibition runs against the existing untreated cell would reach p = 0.03 and
 settle it.
 
-Running total across the whole benchmark: **four agent failures in ~260 runs,
+Running total across the whole benchmark: **four agent failures in 231
+committed runs,
 every one the same wrong belief, every one a ratatui run.** The confound stated
 under T15 still holds and is now load-bearing: Hawk TUI runs read the framework
 source in 100 % of cases against ratatui's 24 % overall, so the arms differ in what the
