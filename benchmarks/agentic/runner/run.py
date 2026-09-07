@@ -148,6 +148,30 @@ CONDITIONS = ("c0", "c1", "c2", "c3", "c4", "c5")
 MCP_BINARY = Path.home() / ".cargo-target" / "release" / "hawktui-mcp.exe"
 
 
+def _mcp_tools_offered(transcript: Path) -> int:
+    """How many hawktui MCP tools the agent was actually handed.
+
+    The stream-json init event lists the tool names available for the session,
+    so an MCP condition can be verified rather than trusted.
+    """
+    if not transcript.is_file():
+        return 0
+    for line in transcript.read_text(encoding="utf-8", errors="replace").splitlines():
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if event.get("type") == "system" and event.get("subtype") == "init":
+            return sum(
+                1 for t in event.get("tools", []) or []
+                if str(t).startswith("mcp__hawktui__")
+            )
+    return 0
+
+
 def _stale_mcp_binary() -> bool:
     """True when the built server predates the ontology it would serve."""
     if not MCP_BINARY.is_file():
@@ -615,6 +639,23 @@ def run_cell(task: str, framework: str, condition: str, rep: int, args, out_dir:
     # of the redirect arm, and an outcome that is not recorded at run time can
     # only be recovered from a transcript that --isolate keeps outside the
     # repository -- which is how three grids came to need backfilling.
+    # An MCP condition whose server did not attach is a C1 run wearing a C5
+    # label. The transcript's init event lists the tools the agent was actually
+    # given, so the claim is checkable rather than assumed -- and a condition
+    # that silently degraded is the same fault as a treatment never
+    # administered, which this harness has produced twice.
+    if condition in ("c4", "c5"):
+        served = _mcp_tools_offered(workdir / "_transcript.jsonl")
+        record["mcp_tools_offered"] = served
+        if not served:
+            record["invalid"] = True
+            record["agent_error"] = (
+                "the MCP server did not attach: the agent's tool list holds no "
+                "mcp__hawktui__ tools, so this run is not the condition it claims"
+            )
+            print(f"INVALID: {record['agent_error']}")
+            return record
+
     onto = scan_ontology(workdir / "_transcript.jsonl")
     record["ontology_calls"] = (
         onto["tool_calls"] + onto["pack_reads"] + onto["mcp_calls"]
