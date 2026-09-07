@@ -55,8 +55,25 @@ task gets harder. Source
 reading is **42 % of everything tools return into context**, and the ontology
 answers comparable questions in 5.4× fewer tokens.
 
-**The ontology never moved an outcome**, across seven grids and every quality
-level: incomplete, complete, sufficient, delivered as files, as a CLI, as MCP
+**The ontology displaced source reading once, on the smallest rung.** Holding
+the task fixed at `t16-straddle`, Hawk TUI read the framework's source in 5 of 5
+runs at C1 and 1 of 5 at C5 — one-sided Fisher's exact p = 0.024, with no prompt
+intervention in either arm (`results/redirect-none`). This is the **first
+positive result the ontology has produced in this benchmark**, and it is about
+behaviour, not outcomes: every run scored 1.000 either way.
+
+It does not generalise as it stands. On every harder rung C5 reads the source
+anyway — 98 % of 55 historical C5 runs, a median of 19 times — including 19 runs
+served the identical ten tools. The distinguishing feature of `t16-straddle` is
+that it needs *one small answer*. The working hypothesis, untested, is that the
+ontology displaces source reading when the question is small enough to be
+answered by a signature, and loses to the source when the agent needs to
+understand how a program is put together. **Testing that is the most promising
+open experiment**, and it is cheap: two conditions on two or three rungs of
+varying size.
+
+**The ontology has still never moved an outcome**, across seven grids and every
+quality level: incomplete, complete, sufficient, delivered as files, as a CLI, as MCP
 tools, consumed at 4 %, 42 % and 83 %. On the two hardest rungs it *costs*
 turns and introduces API errors. `runner/token_cost.py` quantifies the prize if
 a model were ever trained to prefer it — but that prize is unmeasured, because
@@ -229,10 +246,14 @@ run directory keeps its prompt, transcript and dump for exactly this.
 
 ## 4. What I would do next
 
-1. **Stop funding the ontology for authoring.** It is complete, sufficient,
-   correctly delivered, and consumed. Seven grids say it changes nothing. Keep
-   it: it is accurate generated documentation and it serves the runtime
-   introspection case it was designed for.
+1. **Test where the ontology displaces source reading.** This replaced "stop
+   funding the ontology for authoring", which seven null grids had earned and
+   one result has now complicated. On `t16-straddle` the ontology took source
+   reading from 5 of 5 runs to 1 of 5 (p = 0.024) with no prompt involved; on
+   every larger rung it does nothing. If the boundary is question size, that is
+   a scope claim worth designing around — and it is two conditions on three
+   rungs to find out. Outcomes stay flat either way; the payoff is token cost,
+   where source reading is 42 % of everything tools return.
 2. **Do not build more structural rungs.** Twelve produced no failures.
 3. **Mine the rendering surface — it is the only productive seam.** All four
    failures came from it. `t15-frame` produced one on its first grid after
