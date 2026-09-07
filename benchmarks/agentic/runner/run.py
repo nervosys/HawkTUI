@@ -152,7 +152,7 @@ MCP_BINARY = Path.home() / ".cargo-target" / "release" / "hawktui-mcp.exe"
 
 
 def build_prompt(task: str, framework: str, seeded: list[str],
-                 forbid_source: bool = False) -> str:
+                 source_note: str = "none") -> str:
     fw = FRAMEWORKS[framework]
     prompt = (TASKS_DIR / task / "prompt.md").read_text(encoding="utf-8")
     contract = (TASKS_DIR / "contract.md").read_text(encoding="utf-8")
@@ -182,13 +182,30 @@ def build_prompt(task: str, framework: str, seeded: list[str],
     # and the agent reaches either with a shell. Cargo cannot compile against a
     # crate whose source is absent, so no flag can remove it. The only
     # administrable treatment is to ask, and then to check the transcript.
-    if forbid_source:
+    #
+    # `permit` is the placebo. The prohibition is extra prompt text that names
+    # the public API and the implementation, and text like that may cue careful
+    # handling whether or not the agent obeys it. The placebo matches its
+    # length, position and subject and inverts only the instruction, so a
+    # forbid-vs-permit contrast measures the withholding rather than the
+    # mention. Comparing forbid against a prompt with no such section at all
+    # confounds the two, which is what the first version of this experiment did.
+    if source_note == "forbid":
         text += (
             "\n## Working constraint\n\n"
             "Do not read the framework's own implementation. Work from its "
             "public API, the reference material in this directory, and the "
             "compiler's errors. Opening the crate's source files — wherever "
             "they are on disk — is outside what this task allows.\n"
+        )
+    elif source_note == "permit":
+        text += (
+            "\n## Working constraint\n\n"
+            "Read the framework's own implementation if it helps. Its public "
+            "API, the reference material in this directory, and the compiler's "
+            "errors are all available too. Opening the crate's source files — "
+            "wherever they are on disk — is entirely within what this task "
+            "allows.\n"
         )
     return text
 
@@ -489,8 +506,10 @@ def run_cell(task: str, framework: str, condition: str, rep: int, args, out_dir:
     }
 
     record["context_files"] = seed_context(workdir, framework, condition)
+    note = args.source_note or ("forbid" if args.no_source else "none")
+    record["source_note"] = note
     prompt = build_prompt(task, framework, record["context_files"],
-                          forbid_source=bool(args.no_source))
+                          source_note=note)
     (workdir / "_prompt.md").write_text(prompt, encoding="utf-8")
 
     print(f"  ▸ {label} … ", end="", flush=True)
@@ -605,6 +624,14 @@ def main() -> int:
                     help="shared CARGO_TARGET_DIR for every run "
                          "(default: <out>/_target)")
     ap.add_argument("--no-prewarm", action="store_true")
+    ap.add_argument("--source-note", choices=("none", "forbid", "permit"),
+                    default=None,
+                    help="the working-constraint paragraph appended to the "
+                         "prompt. 'forbid' asks the agent not to read the "
+                         "framework's implementation; 'permit' is its placebo, "
+                         "matched in length and subject but inverting the "
+                         "instruction, so the two isolate the withholding from "
+                         "the mention. --no-source implies 'forbid'.")
     ap.add_argument("--no-source", action="store_true",
                     help="withhold --add-dir, so the agent cannot read the "
                          "framework's implementation. 100%% of Hawk TUI runs "
