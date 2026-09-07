@@ -580,9 +580,21 @@ def run_cell(task: str, framework: str, condition: str, rep: int, args, out_dir:
     # returns a null that looks like a finding -- and --no-source was exactly
     # that for 24 stored runs before anyone checked a transcript.
     from source_usage import scan  # noqa: PLC0415  (keeps the CLI import light)
+    from ontology_usage import scan as scan_ontology  # noqa: PLC0415
     hits = scan(workdir / "_transcript.jsonl")
     record["source_reads"] = hits["source_reads"]
     record["first_source_turn"] = hits["first_source_turn"]
+    # The other half of the same question. Consultation is the primary outcome
+    # of the redirect arm, and an outcome that is not recorded at run time can
+    # only be recovered from a transcript that --isolate keeps outside the
+    # repository -- which is how three grids came to need backfilling.
+    onto = scan_ontology(workdir / "_transcript.jsonl")
+    record["ontology_calls"] = (
+        onto["tool_calls"] + onto["pack_reads"] + onto["mcp_calls"]
+    )
+    record["ontology_detail"] = {
+        k: onto[k] for k in ("tool_calls", "pack_reads", "mcp_calls", "api_calls")
+    }
     if args.no_source and hits["source_reads"]:
         record["treatment_violated"] = True
 
