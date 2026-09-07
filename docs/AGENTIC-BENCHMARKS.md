@@ -721,6 +721,53 @@ response to the input rather than an error the agent occasionally falls into,
 which is why a rung aimed at it fires at 2 in 5 where the ladder fired at 1 in
 225.
 
+### What actually separates the failures: reading the source
+
+The ten T16 transcripts split perfectly on one variable, and it is not the
+framework.
+
+| run | score | source reads | first read at turn |
+|---|---|---|---|
+| hawktui r1 | 1.000 | 7 | 18 |
+| hawktui r2 | 1.000 | 2 | 21 |
+| hawktui r3 | 1.000 | 2 | 25 |
+| hawktui r4 | 1.000 | 1 | 13 |
+| hawktui r5 | 1.000 | 3 | 15 |
+| ratatui r1 | **0.000** | **0** | — |
+| ratatui r2 | 1.000 | 8 | 6 |
+| ratatui r3 | 1.000 | 4 | 12 |
+| ratatui r4 | **0.000** | **0** | — |
+| ratatui r5 | 1.000 | 4 | 9 |
+
+**Every run that opened the framework's source scored 1.000 — eight of eight.
+Both runs that opened none failed.** The separation is clean within the ratatui
+arm as well as across arms, which the framework explanation cannot produce: the
+three passing ratatui runs and the two failing ones used the same crate.
+
+The mechanism is plausible. Both frameworks handle double-width characters in
+their buffer code, so an agent that reads the implementation encounters the
+question of what a cell is and how a wide glyph occupies two of them. An agent
+that writes to the API without reading it has no occasion to meet that question,
+and falls back on whatever its training suggests — which, on this evidence, is
+that a wide character must be padded to width.
+
+This is two failures, and source reading is not randomly assigned: an agent that
+opens the source may differ in other ways that also predict success. But the
+association is strong enough to test directly, and cheap enough that there is no
+excuse not to.
+
+**Pre-registered prediction.** Running T16 on Hawk TUI with `--no-source` should
+produce failures at a rate resembling ratatui's, because the protection is
+hypothesised to come from reading the implementation rather than from the
+framework. If Hawk TUI stays at 1.000 with the source withheld, this explanation
+is wrong and the framework explanation survives. One failure is enough to
+falsify the framework reading; a clean sweep of five does not establish it,
+because five runs cannot separate a 40 % rate from a 10 % one.
+
+Note the direction this cuts. If the prediction holds, the benchmark's most
+robust finding — that agents read the source in preference to any ontology — is
+not merely a cost to be optimised away. It is doing work.
+
 Running total across the whole benchmark: **four agent failures in ~260 runs,
 every one the same wrong belief, every one a ratatui run.** The confound stated
 under T15 still holds and is now load-bearing: Hawk TUI runs read the framework
