@@ -148,6 +148,22 @@ CONDITIONS = ("c0", "c1", "c2", "c3", "c4", "c5")
 MCP_BINARY = Path.home() / ".cargo-target" / "release" / "hawktui-mcp.exe"
 
 
+def _stale_mcp_binary() -> bool:
+    """True when the built server predates the ontology it would serve."""
+    if not MCP_BINARY.is_file():
+        return False
+    built = MCP_BINARY.stat().st_mtime
+    sources = [
+        REPO / "src" / "ontology" / "api_generated.rs",
+        REPO / "src" / "ontology" / "api.rs",
+        REPO / "src" / "ontology" / "report.rs",
+        REPO / "src" / "ontology" / "builtin.rs",
+        REPO / "src" / "agent" / "mcp.rs",
+        REPO / "examples" / "skeleton.rs",
+    ]
+    return any(p.is_file() and p.stat().st_mtime > built for p in sources)
+
+
 # ------------------------------------------------------------------- prompting
 
 
@@ -564,6 +580,17 @@ def run_cell(task: str, framework: str, condition: str, rep: int, args, out_dir:
         if not MCP_BINARY.is_file():
             record["invalid"] = True
             record["agent_error"] = f"hawktui-mcp not built at {MCP_BINARY}"
+        elif _stale_mcp_binary():
+            # A binary older than the ontology it serves is a different
+            # treatment from the one the condition claims to administer, and
+            # nothing about the run would look wrong. It was four days stale
+            # once already, which would have served an older catalog than the
+            # repository ships while the prompt named the current tools.
+            record["invalid"] = True
+            record["agent_error"] = (
+                f"hawktui-mcp at {MCP_BINARY} is older than the ontology it "
+                f"serves; rebuild with `cargo build --release --bin hawktui-mcp`"
+            )
             print(f"INVALID: {record['agent_error']}")
             return record
         mcp_config = workdir / ".mcp.json"
