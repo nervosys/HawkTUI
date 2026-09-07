@@ -136,6 +136,14 @@ def main() -> int:
     # runs the risk set and makes the untreated failure rate a function of how
     # often the agent happens to skip the source. That is not a stable property
     # and it is worth seeing rather than averaging away.
+    #
+    # Amended after the run that falsified it, with the original left standing
+    # above: `t16-straddle__ratatui__c1__r7` of the untreated ten failed having
+    # read the source four times, producing a dump byte-identical to the
+    # zero-read failures. Reading the source does not protect a run, so
+    # zero-read runs are not the risk set and this split separates nothing.
+    # It is printed anyway, because a reader who was told the hypothesis
+    # should be able to see the table that killed it.
     print("\nexploratory, not the pre-registered test — outcome by whether the "
           "run read source\n")
     for note in ("none", "forbid", "permit"):

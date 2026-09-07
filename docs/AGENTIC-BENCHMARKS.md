@@ -878,10 +878,15 @@ The sharpest comparison the data supports conditions on reading:
 | no note | **2 of 2** |
 | prohibition | 0 of 5 |
 
-One-sided Fisher's exact gives p = 0.048. But reads are chosen by the agent
-after it sees the prompt, so selecting untreated runs by their read count
+One-sided Fisher's exact gave p = 0.048 on those fifteen runs. **The twenty-run
+grid then falsified the split itself.** `t16-straddle__ratatui__c1__r7`, an
+untreated run, failed having read the source four times, and its dump is
+byte-identical to the zero-read failures. Reading the source does not protect a
+run, so zero-read runs are not the risk set and this conditioning separates
+nothing. The objection to it was already on the record — reads are chosen by the
+agent after it sees the prompt, so selecting untreated runs by read count
 conditions on a post-treatment variable and can manufacture an association from
-nothing. The assignment-respecting comparison — every untreated run against
+nothing — and the data has now made the point without needing the argument. The assignment-respecting comparison — every untreated run against
 every prohibition run — stays at p = 0.22.
 
 ### Pre-registration: the twenty runs
