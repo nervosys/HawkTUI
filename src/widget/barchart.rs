@@ -86,7 +86,7 @@ pub enum BarDirection {
 ///
 /// # Example
 ///
-/// ```ignore
+/// ```
 /// use hawktui::widget::barchart::{BarChart, Bar, BarGroup};
 ///
 /// let chart = BarChart::new(vec![

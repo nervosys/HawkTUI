@@ -17,7 +17,7 @@ use crate::widget::Widget;
 ///
 /// # Example
 ///
-/// ```ignore
+/// ```
 /// use hawktui::widget::line_gauge::LineGauge;
 ///
 /// let gauge = LineGauge::new()

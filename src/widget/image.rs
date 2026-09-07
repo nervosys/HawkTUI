@@ -131,10 +131,13 @@ impl Pixels {
 ///
 /// # Example
 ///
-/// ```ignore
+/// ```
 /// use hawktui::widget::image::{Image, ImageProtocol};
 ///
-/// let img = Image::new(include_bytes!("logo.png").to_vec(), "image/png")
+/// // Any PNG bytes will do; `include_bytes!` works when the file is checked in.
+/// let png = std::fs::read("logo.png").unwrap_or_default();
+///
+/// let img = Image::new(png, "image/png")
 ///     .protocol(ImageProtocol::Kitty)
 ///     .fallback_text("[logo 64x64]");
 /// ```

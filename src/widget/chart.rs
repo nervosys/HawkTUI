@@ -138,7 +138,7 @@ impl Axis {
 ///
 /// # Example
 ///
-/// ```ignore
+/// ```
 /// use hawktui::widget::chart::{Chart, Dataset, Axis};
 ///
 /// let data = Dataset::new(vec![(0.0, 0.0), (1.0, 1.0), (2.0, 4.0), (3.0, 9.0)])

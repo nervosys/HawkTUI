@@ -113,7 +113,7 @@ impl Default for SettingsListState {
 ///
 /// # Example
 ///
-/// ```ignore
+/// ```
 /// use hawktui::widget::settings_list::{SettingsList, Setting, SettingsListState};
 ///
 /// let settings = vec![

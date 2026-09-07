@@ -6,7 +6,7 @@
 //!
 //! # Example
 //!
-//! ```ignore
+//! ```
 //! use hawktui::theme::{Theme, ThemeToken};
 //!
 //! let theme = Theme::dark();
