@@ -33,8 +33,10 @@ across a row boundary, and it never overhangs the last column.** When only one
 column is left and the next character needs two, that column stays empty and the
 character starts the next row.
 
-Do not insert spaces of your own anywhere. A double-width character is already
-two columns wide; nothing needs to be added to make it so.
+Do not insert spaces between the characters of the text. A double-width
+character is already two columns wide; nothing needs to be added to make it so.
+(Padding each row out to 20 columns with spaces is required by the dump format
+below, and is not what this forbids.)
 
 ## Status line
 

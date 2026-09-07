@@ -691,6 +691,44 @@ The rung cannot distinguish wrapping-by-characters from overhanging: both are
 wrong and both fail the same seven checks. Reading the dump is the only way to
 tell which mistake was made.
 
+**Results**, ten runs at C1:
+
+| framework | scored 1.000 | failed |
+|---|---|---|
+| Hawk TUI | 5 | 0 |
+| ratatui | 3 | **2** |
+
+Both failures are the injected-space mode, and both drew outside the terminal —
+27 and 29 display columns on a 20-column screen — so `analyze.py` reports them
+as rendering bugs and excludes them from the score medians. **The medians are
+1.000 in both arms.** A reader who consults only the table sees a rung nobody
+failed.
+
+Two things about these failures are worth more than the count.
+
+**The wrap arithmetic was right.** Nine ideographs after the leading `x` is
+exactly what fits in 20 columns if each is two wide, and the tenth is on row 1,
+and `rows: 5` is correct. The agent computed the layout from true display widths
+and then emitted each wide character followed by a space. T13 and T15 were both
+consistent with the agent simply not knowing the widths; this rules that out. It
+knew, used the knowledge correctly, and padded anyway. The failure is not a
+belief about how wide a character *is* — it is a belief about what emitting one
+*does*.
+
+**The two failing dumps are byte-identical.** Independent runs, no shared state,
+the same wrong output character for character. That makes this a deterministic
+response to the input rather than an error the agent occasionally falls into,
+which is why a rung aimed at it fires at 2 in 5 where the ladder fired at 1 in
+225.
+
+Running total across the whole benchmark: **four agent failures in ~260 runs,
+every one the same wrong belief, every one a ratatui run.** The confound stated
+under T15 still holds and is now load-bearing: Hawk TUI runs read the framework
+source in 100 % of cases against ratatui's 6 %, so the arms differ in what the
+agent saw as well as which crate it used. Four events cannot separate a
+framework property from a training-data one, and nothing here should be read as
+Hawk TUI handling wide characters better.
+
 ### The ontology condition is worse on the hardest rungs
 
 Across T13 and T14, with identical scores everywhere:
