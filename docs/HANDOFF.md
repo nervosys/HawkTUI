@@ -124,11 +124,35 @@ own agentic benchmark by a different author. Running `source_usage.py` over its
 Attaching the ontology over MCP did not reduce source reading; it stayed at
 100 %. A paragraph in the prompt cut it to 29 % and tripled ontology calls.
 Different framework, different UI paradigm, different harness, same result as
-`results/forbid-*`: **the lever is prompt text, not ontology availability.**
-Their warning names the crate's examples and its attached tools; ours forbids
-reading the implementation. Neither is an ontology improvement.
+`results/forbid-*`: **the lever on behaviour is prompt text, not ontology
+availability.** Their warning names the crate's examples and its attached tools;
+ours forbids reading the implementation. Neither is an ontology improvement.
 
-**Three explanations for the wide-glyph failure are eliminated.** A full day of
+Read that claim narrowly. Prompt text is the only thing shown to move *what an
+agent reads* — 100 % to zero here, 100 % to 29 % there. It is **not** shown to
+move whether the agent gets anything right: the same paragraph failed its own
+falsifier on `t16-straddle`. Behaviour and outcome are separate findings and the
+first does not imply the second.
+
+**Four explanations for the wide-glyph failure are eliminated, and the failure
+is deterministic.** Five dumps across four grids and three prompt conditions are
+byte-identical — same 27- and 29-column rows, same correct wrap arithmetic
+underneath. Roughly seventy runs at `t16-straddle` rule out:
+
+- *the framework* — both frameworks pass under the prohibition;
+- *source access* — the arm that removed it fails least often, and an untreated
+  run failed having read the source four times;
+- *the ontology* — never consulted by any failing run;
+- *the prompt* — the prohibition arm failed its own pre-registered falsifier.
+
+Nothing measured predicts which runs produce it. It is not a knowledge gap,
+because reading the implementation does not help; not a context gap, because
+neither the ontology nor the docs help. It looks like a stable mode the model
+falls into on this input, at roughly 20 %, independent of everything this
+harness can manipulate. **That is the finding** — sharper than the effect the
+experiment went looking for, and the reason to stop looking for one here.
+
+**Three earlier explanations, for the record.** A full day of
 grids on `t16-straddle` (`results/straddle`, `forbid-source`, `forbid-ratatui`,
 `permit-ratatui`) rules out:
 
@@ -149,18 +173,12 @@ failed to control.
   measured (193/193 source reads covered); the benefit is not.
 - Whether the cost gap versus ratatui (2–4×) is closable at all. It tracks
   training-data presence, which no artifact changes quickly.
-- **Whether the working-constraint paragraph does anything.** Untreated ratatui
-  fails 3 of 15; with the paragraph, 0 of 10 across both frameworks. One-sided
-  Fisher's exact is p = 0.40 as it stands, and **p = 0.112 even if the
-  prohibition arm finishes perfectly clean at fifteen** — the design was sized
-  against a 40 % baseline that turned out to be 20 %. Reaching p ≤ 0.05 needs
-  twenty per arm; p ≤ 0.01 needs thirty.
-
-  Do not cite the conditional analysis. Splitting untreated runs by whether they
-  read source gave 2 of 2 against 0 of 5, p = 0.048, and an untreated run then
-  failed having read the source four times, with a dump byte-identical to the
-  zero-read failures. Reading the source does not protect a run; that split
-  separates nothing.
+- ~~Whether the working-constraint paragraph prevents the failure.~~ **Settled:
+  it does not.** A prohibition run produced the failure with zero source reads,
+  firing the pre-registered falsifier. Untreated 3 of 15, prohibition 1 of 15,
+  p = 0.30. Do not cite the earlier conditional analysis either (2 of 2 against
+  0 of 5, p = 0.048): an untreated run later failed having read the source four
+  times, so that split separates nothing.
 - Any *rate*. The benchmark now observes failure — `t16-straddle` fails 3 of 15
   ratatui runs — so it is no longer an instrument that cannot measure
   reliability. But four events on one failure mode support the mode's existence
