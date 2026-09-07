@@ -803,6 +803,35 @@ Note the direction this cuts. If the prediction holds, the benchmark's most
 robust finding — that agents read the source in preference to any ontology — is
 not merely a cost to be optimised away. It is doing work.
 
+**The prediction was wrong.** The first attempt did not administer the
+treatment at all: `--no-source` only drops `--add-dir`, while the generated
+manifest still carries the framework's path, so the agent read the source with a
+shell in run one — as had every one of the 24 runs in the earlier `nosource`
+grid, a median of 19 times each. `--no-source` now also asks the agent not to
+read the implementation, and every run records `source_reads` so a treatment
+that was never administered can no longer pass for a null.
+
+Administered, on `t16-straddle` at C1 (`results/forbid-source/`):
+
+| | compliance | scores |
+|---|---|---|
+| Hawk TUI, source withheld | **5/5, zero reads** | 1.000 × 5 |
+
+Five for five, with the treatment demonstrably held. Hawk TUI runs do not need
+the implementation to place a wide glyph correctly, so source access is not what
+protects them, and the explanation this section was built on does not survive
+its own test.
+
+Two things keep this from being a framework result. The ratatui arm of the same
+experiment has not been reported here, so "Hawk TUI survives without source" has
+nothing to be compared against except two *untreated* ratatui runs that happened
+to read nothing by their own choice — a different condition and a different
+prompt. And the prohibition is extra prompt text naming the public API and the
+implementation, which may cue careful handling whether or not it is obeyed;
+`--source-note permit` exists to control for exactly that and has not been run.
+So the live readings are now: the framework differs, or the prohibition text
+does work the control has never measured.
+
 Running total across the whole benchmark: **four agent failures in ~260 runs,
 every one the same wrong belief, every one a ratatui run.** The confound stated
 under T15 still holds and is now load-bearing: Hawk TUI runs read the framework
