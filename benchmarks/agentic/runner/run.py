@@ -148,6 +148,34 @@ CONDITIONS = ("c0", "c1", "c2", "c3", "c4", "c5")
 MCP_BINARY = Path.home() / ".cargo-target" / "release" / "hawktui-mcp.exe"
 
 
+def _posix_twin(workdir: Path) -> Path | None:
+    """Where a POSIX shell may have put the crate instead of `workdir`.
+
+    Git Bash maps `/tmp` to `C:\tmp`, which is not `%TEMP%`. An agent that
+    reads its own location as a `/tmp/...` path and writes there produces a
+    complete, correct crate in a directory the harness never looks at, and the
+    run is recorded as having built nothing. That happened once and scored a
+    1.000 program as 0.000.
+    """
+    parts = workdir.parts
+    for i, part in enumerate(parts):
+        if part.lower() == "temp":
+            twin = Path(parts[0]) / "tmp" / Path(*parts[i + 1:])
+            return twin if twin != workdir else None
+    return None
+
+
+def resolve_crate_dir(workdir: Path) -> tuple[Path, bool]:
+    """The directory holding the agent's crate, and whether it had to be
+    recovered from somewhere other than the working directory."""
+    if (workdir / "Cargo.toml").is_file():
+        return workdir, False
+    twin = _posix_twin(workdir)
+    if twin is not None and (twin / "Cargo.toml").is_file():
+        return twin, True
+    return workdir, False
+
+
 def _mcp_tools_offered(transcript: Path) -> int:
     """How many hawktui MCP tools the agent was actually handed.
 
@@ -674,13 +702,22 @@ def run_cell(task: str, framework: str, condition: str, rep: int, args, out_dir:
         print(f"INVALID: {record['agent_error']}")
         return record
 
-    ok, build_log = builds(workdir, args.build_timeout)
+    # The agent may have written its crate to the POSIX twin of the working
+    # directory rather than the directory itself; build and score wherever it
+    # actually is, and record that it moved.
+    crate_dir, recovered = resolve_crate_dir(workdir)
+    if recovered:
+        record["crate_dir"] = str(crate_dir)
+        record["workdir_mismatch"] = True
+        print(f"[crate found at {crate_dir}] ", end="", flush=True)
+
+    ok, build_log = builds(crate_dir, args.build_timeout)
     record["built"] = ok
     if not ok:
         record["build_error"] = build_log
 
     if ok:
-        dump, err = capture_dump(workdir, spec["grid"], spec["script"], args.program_timeout)
+        dump, err = capture_dump(crate_dir, spec["grid"], spec["script"], args.program_timeout)
         if dump is None:
             record.update(
                 score=0.0, contract_failed=True, frames_rendered=0,
@@ -689,6 +726,8 @@ def run_cell(task: str, framework: str, condition: str, rep: int, args, out_dir:
             )
         else:
             (workdir / "_dump.txt").write_text(dump, encoding="utf-8")
+            if recovered:
+                (crate_dir / "_dump.txt").write_text(dump, encoding="utf-8")
             result = score_dump(TASKS_DIR / task, dump)
             record.update({k: v for k, v in result.items() if k != "task"})
     else:

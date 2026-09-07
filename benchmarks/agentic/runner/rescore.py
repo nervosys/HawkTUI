@@ -61,7 +61,9 @@ def main() -> int:
                   f"jsonl where the runs are, then copy both files.",
                   file=sys.stderr)
             return 1
-        if record.get("built") and not (run_dir / "Cargo.toml").is_file():
+        from run import resolve_crate_dir  # noqa: PLC0415
+        crate_dir, _recovered = resolve_crate_dir(run_dir)
+        if record.get("built") and not (crate_dir / "Cargo.toml").is_file():
             record["built"] = False
             record["build_error"] = (
                 "no Cargo.toml in the working directory; the crate was not "
@@ -70,6 +72,8 @@ def main() -> int:
             print(f"  {record['label']}: built True -> False (no manifest)")
 
         dump = run_root / record["label"] / "_dump.txt"
+        if not dump.is_file() and (crate_dir / "_dump.txt").is_file():
+            dump = crate_dir / "_dump.txt"
         if not dump.is_file():
             records.append(record)
             continue
