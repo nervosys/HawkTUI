@@ -884,6 +884,33 @@ conditions on a post-treatment variable and can manufacture an association from
 nothing. The assignment-respecting comparison — every untreated run against
 every prohibition run — stays at p = 0.22.
 
+### Pre-registration: the twenty runs
+
+Written before the runs, so the analysis cannot be chosen after seeing them.
+
+**Design.** Ten more ratatui runs at `t16-straddle` C1 with no working-constraint
+note, and ten more with the prohibition, pooled with the five of each already
+recorded. Fifteen per arm.
+
+**Why both arms and not twenty treated.** Adding fifteen treated runs against
+the existing five untreated would reach p = 0.033 if the treated arm stays
+clean, but it rests the whole comparison on a five-run baseline that could
+itself be a fluke. Growing both arms tests the baseline too. If the untreated
+rate is really the observed 40 %, six failures in fifteen against none gives
+p = 0.008; if it comes back at 2 in 15, the honest conclusion is that the
+original 2 of 5 overstated the failure rate and the effect is smaller than this
+section has been assuming. That outcome is a result, not a disappointment.
+
+**Analysis, fixed now.** One-sided Fisher's exact on failure counts, untreated
+against prohibition, pooled across replicates. A run counts as a failure if
+`score < 1.000` or `contract_failed`. Compliance is a gate: any prohibition run
+with `source_reads > 0` is reported and the arm is described as partially
+administered rather than quietly averaged.
+
+**What would falsify the paragraph hypothesis.** Any prohibition run producing
+the injected-space failure. One is enough to show the paragraph does not
+prevent it, whatever the rates turn out to be.
+
 **Two defensible summaries, and they disagree.** Unconditionally there is no
 evidence the paragraph does anything. Conditioned on the behaviour that predicts
 failure there is a significant difference with a selection objection attached.
