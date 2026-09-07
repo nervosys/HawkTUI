@@ -56,15 +56,25 @@ no such model exists to test against.
 
 ### Thin
 
-**One agent failure in ~225 runs.** A ratatui run on `t13-unicode` padded rows
-to 60 characters which, with spaces it had injected after each wide character,
-came to 63 display columns — a program drawing outside its terminal. It is the
-only failure the benchmark has ever produced, and one event supports nothing.
+**Two agent failures in ~245 runs, and they are the same failure.** A ratatui
+run on `t13-unicode` padded rows to 60 characters which, with spaces it had
+injected after each wide character, came to 63 display columns — a program
+drawing outside its terminal. A ratatui run on the reworded `t15-frame` did the
+identical thing: `日 本 語 で す`, `🙂  ok`, `mixed 語  x`, one space added after
+every wide glyph, which pushed the right border from column 11 to 12 and 16 on
+exactly those rows. Everything else in that run was right, including the box
+size and the reported `inner: 10`.
 
-**The failing axis looks like beliefs about the rendering surface**, not API
-knowledge: the same agent, asked for the same unicode reasoning in plain Rust
-(`t14-wrap`), scored 1.000 twelve times out of twelve. Two rungs built to
-exploit this (T14, T15) produced no further failures.
+**The failing axis is beliefs about the rendering surface**, not API knowledge.
+Both failures are the same wrong belief — that a wide character must be *made*
+two columns wide by adding a space, rather than already being two. Asked for the
+same unicode reasoning in plain Rust (`t14-wrap`), the agent scored 1.000 twelve
+times out of twelve; it is drawing to a grid that breaks it.
+
+Both failures are ratatui runs and Hawk TUI has not produced one. **Do not read
+that as a framework difference.** Hawk TUI runs read the framework's source in
+100 % of cases and ratatui runs in 6 %, so the two arms differ in what the agent
+saw as well as which crate it used, and two events cannot separate those.
 
 ### Not established
 
@@ -113,9 +123,13 @@ run directory keeps its prompt, transcript and dump for exactly this.
    it: it is accurate generated documentation and it serves the runtime
    introspection case it was designed for.
 2. **Do not build more structural rungs.** Twelve produced no failures.
-3. **If you want a reliability signal, mine the rendering surface.** It is the
-   only thing that has ever broken this agent. Grapheme clusters, bidirectional
-   text, terminal resize, double-width at a wrap boundary.
+3. **Mine the rendering surface — it is now the only productive seam.** Both
+   failures came from it, and the reworded `t15-frame` produced one on its first
+   grid, so the seam yields at roughly 1 failure in 5 runs rather than 1 in 225.
+   Narrow further: the failure is specifically *emitting* a wide character, so
+   aim at grapheme clusters, double-width at a wrap boundary, bidirectional
+   text, and terminal resize. A rung that never asks the agent to place a wide
+   glyph will not fire.
 4. **Run the harness against DeweyGUI.** Its scaffold benchmark measures
    machine-side proxies — token counts, edit-compile latency — and never drives a
    real agent, so it cannot have observed the source-reading behaviour. It
@@ -168,9 +182,15 @@ evidence, that is the failure mode to expect.
   border aligns trivially — the rung is easier than intended, which is the more
   useful thing to fix.
 
-  **Reworded since.** The prompt now pins the box to the top-left corner and
-  sizes it to its contents, and `checks.json` pins the border to display column
-  11 with a blank row below the box. `selftest_frame.py` gained a case that
-  renders the screen-filling reading and requires it to fail. The five runs
-  above were scored against the old wording and **do not carry over**; the rung
-  has to be re-run before its numbers mean anything.
+  **Reworded and re-run.** The prompt now pins the box to the top-left corner
+  and sizes it to its contents, and `checks.json` pins the border to display
+  column 11 with a blank row below the box. `selftest_frame.py` gained a case
+  that renders the screen-filling reading and requires it to fail. The five runs
+  above were scored against the old wording and do not carry over.
+
+  The re-run (`results/frame/`, 10 runs, c1) gives Hawk TUI 1.000 five times of
+  five and ratatui 1.000 four times and **0.538 once** — the injected-space
+  failure described in §2, on the rung's first grid under the new wording. That
+  is the second confirmed agent failure in this benchmark and the first the
+  rungs were designed to catch. Medians are 1.000 in both arms, so the analysis
+  table alone does not show it; read the per-run rows.
