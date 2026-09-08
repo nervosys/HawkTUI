@@ -61,6 +61,24 @@ def pub_fns(path: Path) -> set[str]:
     return {n for n in re.findall(r"pub fn (\w+)\s*\(", text)} - SKIP
 
 
+
+# Transcripts are not committed (see results/.gitignore), so a fresh clone has
+# the summary records but none of the per-run detail these tools read. Counting
+# what is missing turns a confident empty table into an honest "no data".
+def warn_if_missing(missing: list, total: int) -> bool:
+    """True when there is nothing to analyse. Prints why."""
+    if not missing:
+        return False
+    if len(missing) == total:
+        print(f"no transcripts found for any of the {total} runs.\n"
+              "Transcripts are not committed; re-run the grid, or point this at "
+              "a results directory that still has its per-run subdirectories.")
+        return True
+    print(f"warning: {len(missing)} of {total} runs have no transcript; "
+          f"the numbers below cover the remaining {total - len(missing)}.\n")
+    return False
+
+
 def main() -> int:
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -74,6 +92,8 @@ def main() -> int:
         return 2
 
     reads = Counter()
+    absent: list = []
+    seen = 0
     for jsonl in paths:
         root = jsonl.parent
         for line in jsonl.read_text(encoding="utf-8").splitlines():
@@ -81,7 +101,9 @@ def main() -> int:
                 continue
             record = json.loads(line)
             t = root / record["label"] / "_transcript.jsonl"
+            seen += 1
             if not t.is_file():
+                absent.append(record["label"])
                 continue
             for raw in t.read_text(encoding="utf-8", errors="replace").splitlines():
                 raw = raw.strip()
@@ -101,6 +123,9 @@ def main() -> int:
                         reads[hit.group(1).replace("\\", "/")] += 1
 
     described = catalog()
+    if warn_if_missing(absent, seen):
+        return 1
+
     print(f"{'file read':<28}{'reads':>6}{'pub fns':>9}{'described':>11}{'coverage':>10}")
     print("-" * 64)
     covered_reads = uncovered_reads = 0
