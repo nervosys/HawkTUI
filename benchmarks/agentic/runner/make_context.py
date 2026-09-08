@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -111,8 +112,16 @@ def main() -> int:
     if args.repo:
         REPO = args.repo.resolve()
 
+    # Rebuild the packs, but keep the directory's own .gitignore. It is what
+    # stops ratatui's and superlighttui's licensed docs from being vendored into
+    # this repository, and rmtree'ing it meant every regeneration silently
+    # re-armed that trap for whoever committed next.
+    keep = (CONTEXT / ".gitignore").read_bytes() if (CONTEXT / ".gitignore").is_file() else None
     if CONTEXT.exists():
         shutil.rmtree(CONTEXT)
+    if keep is not None:
+        CONTEXT.mkdir(parents=True, exist_ok=True)
+        (CONTEXT / ".gitignore").write_bytes(keep)
 
     manifest = str((REPO / "Cargo.toml")).replace("\\", "/")
     inventory: dict[str, dict[str, int]] = {}
@@ -123,7 +132,12 @@ def main() -> int:
     # deliberately left out, since those are what a C2+ condition would add and
     # handing them over at C1 would make the conditions differ by less than
     # they claim to.
-    dewey = Path(r"C:/Users/adamm/dev/nervosys/utilities/DeweyGUI")
+    # Not a hardcoded path: that one named a single developer's home directory,
+    # so the DeweyGUI pack silently came out empty for everyone else and the
+    # username rode along into a public repository.
+    dewey = (Path(os.environ["DEWEYGUI_DIR"]).resolve()
+             if os.environ.get("DEWEYGUI_DIR")
+             else (REPO.parent / "DeweyGUI"))
     if (dewey / "README.md").is_file():
         copy(dewey / "README.md", CONTEXT / "deweygui" / "c1" / "README.md")
 
@@ -152,10 +166,11 @@ def main() -> int:
             if (crate / extra).is_dir():
                 copy(crate / extra, CONTEXT / name / "c1" / extra)
 
-    for fw_dir in sorted(CONTEXT.iterdir()):
+    # Directories only: the pack root also holds .gitignore and inventory.json.
+    for fw_dir in sorted(d for d in CONTEXT.iterdir() if d.is_dir()):
         inventory[fw_dir.name] = {
             cond.name: sum(f.stat().st_size for f in cond.rglob("*") if f.is_file())
-            for cond in sorted(fw_dir.iterdir())
+            for cond in sorted(c for c in fw_dir.iterdir() if c.is_dir())
         }
     write(CONTEXT / "inventory.json", json.dumps(inventory, indent=2) + "\n")
 
