@@ -327,8 +327,17 @@ run directory keeps its prompt, transcript and dump for exactly this.
    satisfy `contains` while being unclickable. `runner/selftest_gui.py` covers
    both tasks against synthetic trees in DeweyGUI's snapshot shape.
 
-   Nothing has been run. **Do not put a GUI task and a TUI task in one grid** —
-   the frames are different kinds of output and the comparison would be
+   **Validated against real output, without an agent run.** DeweyGUI ships two
+   reference programs, one correct and one deliberately broken.
+   `benches/agentic/reference` built and driven with `g1-counter`'s own script
+   scores **1.000** for the correct one and **0.000** for the broken one, which
+   fails on the frame count, the missing `inc` id, and every frame that a
+   working click would have produced. So the task, the contract, the tree parser
+   and `has_widget` all agree with a program someone else wrote to a spec
+   written before this task existed.
+
+   No *agent* has been run. **Do not put a GUI task and a TUI task in one grid**
+   — the frames are different kinds of output and the comparison would be
    meaningless; the framework entry says so as well.
 
 6. **Use `--isolate` for anything published.** A scaffolded crate edited
