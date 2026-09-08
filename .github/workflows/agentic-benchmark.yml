@@ -76,12 +76,20 @@ jobs:
           # Present, so run.py uses --bare: no CLAUDE.md discovery, no hooks, no
           # plugins. Those vary between machines and would confound the results.
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Through the environment, not interpolated into the script below.
+          # ${{ }} is substituted before the shell parses the line, so a
+          # dispatch input containing shell syntax would run as code in a job
+          # that holds the API key. Dispatching already needs write access,
+          # so this is a guard rail rather than a hole, but it costs nothing.
+          TASKS: ${{ inputs.tasks || 't2-counter,t3-list,t7-settings' }}
+          CONDITIONS: ${{ inputs.conditions || 'c1,c2' }}
+          REPLICATES: ${{ inputs.replicates || 3 }}
         run: |
           python -u run.py \
-            --tasks "${{ inputs.tasks || 't2-counter,t3-list,t7-settings' }}" \
+            --tasks "$TASKS" \
             --frameworks hawktui \
-            --conditions "${{ inputs.conditions || 'c1,c2' }}" \
-            --replicates "${{ inputs.replicates || 3 }}" \
+            --conditions "$CONDITIONS" \
+            --replicates "$REPLICATES" \
             --out ../results/ci
 
       - name: Re-score from the stored dumps
