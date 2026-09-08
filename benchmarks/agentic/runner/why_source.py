@@ -19,10 +19,23 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 SOURCE_RX = re.compile(r"(?:hawktui-snapshot|HawkTUI)[\\/]+(.*?\.rs)", re.I)
+
+
+def source_rx(source_dir: str):
+    """Matches a read of the framework tree this run was actually given.
+
+    The module-level pattern names hawktui-snapshot and HawkTUI literally, so
+    every DeweyGUI, ratatui and superlighttui source read was invisible to it
+    and the tool reported a confident 0 rather than admitting it could not see.
+    """
+    leaf = (source_dir or "").replace(chr(92), "/").rstrip("/").split("/")[-1]
+    if not leaf:
+        return SOURCE_RX
+    return re.compile(re.escape(leaf) + r"[\/]+(.*?\.rs)", re.I)
 MCP_PREFIX = "mcp__hawktui__"
 
 
-def events(transcript: Path):
+def events(transcript: Path, rx=None):
     """(kind, detail) per tool call, in order."""
     for line in transcript.read_text(encoding="utf-8", errors="replace").splitlines():
         line = line.strip()
@@ -44,7 +57,7 @@ def events(transcript: Path):
                 target = arg.get("name") or arg.get("query") or ""
                 yield ("ontology", f"{name[len(MCP_PREFIX):]}({target})")
                 continue
-            hit = SOURCE_RX.search(payload.replace("\\\\", "/"))
+            hit = (rx or SOURCE_RX).search(payload.replace("\\\\", "/"))
             if hit:
                 yield ("source", hit.group(1).replace("\\", "/"))
 
@@ -75,7 +88,7 @@ def main() -> int:
             t = root / record["label"] / "_transcript.jsonl"
             if not t.is_file():
                 continue
-            seq = list(events(t))
+            seq = list(events(t, source_rx(record.get("source_dir", ""))))
             sequences.append(seq)
             for i, (kind, detail) in enumerate(seq):
                 if kind != "source":
