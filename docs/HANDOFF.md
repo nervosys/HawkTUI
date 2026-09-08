@@ -310,6 +310,14 @@ run directory keeps its prompt, transcript and dump for exactly this.
    purpose. Making it emit a grid means inventing a text renderer for a GPU
    framework. The cheap direction is the reverse: make this verifier's frame
    parser pluggable, since its checks are already regex over frame text.
+   **Done**: `frame_format: "tree"` in a task's `checks.json` keeps the frame
+   splitting, the check vocabulary and the scoring, and drops the two
+   assumptions that do not travel — fixed row count and fixed width. Checks that
+   need columns (`grid_shape`, `border_column`, `line_width`, `display_gap`,
+   `region_contains`, `row_of_delta`) refuse with the reason rather than
+   computing a column number for something that has none. Covered by
+   `runner/selftest_tree.py`. What DeweyGUI still needs is a task set, not
+   harness work.
 
 6. **Use `--isolate` for anything published.** A scaffolded crate edited
    `benchmarks/Cargo.toml` in an earlier grid.
@@ -334,10 +342,13 @@ evidence, that is the failure mode to expect.
 
 ## 6. Open items
 
-- `hawktui` on crates.io is held by another account (a yanked `0.0.0`
-  placeholder). The package publishes as `hawktui-rs`; `[lib] name` stays
-  `hawktui`, so `use hawktui::…` is unchanged. A name-transfer request has not
-  been sent.
+- `hawktui` on crates.io is held by another account. The crates.io API shows
+  one version, `0.0.0`, published 2024-10-08 and yanked four minutes later, with
+  no repository, homepage or documentation set and a description that misspells
+  the name. The package publishes as `hawktui-rs`; `[lib] name` stays `hawktui`,
+  so `use hawktui::…` is unchanged either way. **A request to the current owner
+  has been sent.** If there is no reply, the escalation to `help@crates.io` is
+  drafted and the fallback costs nothing — only the dependency line differs.
 - `cargo publish` has not been run. The crate packages and builds from its own
   tarball as `hawktui-rs 2.0.0`.
 - Phase 1.3 of the DX plan is done. The runtime half of the MCP server is

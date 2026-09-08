@@ -27,14 +27,43 @@ FORM_FEED = "\x0c"
 # ---------------------------------------------------------------- frame model
 
 
-class Frame:
-    """One rendered screen: exactly `h` rows padded to `w` columns."""
+# What one frame is made of. A terminal UI renders a fixed character grid; a
+# GUI toolkit with no cells renders a widget tree, one line per widget, whose
+# line count and line width vary with the interface rather than the screen.
+# DeweyGUI's harness already emits the second over the same `--headless
+# WxH --script --dump` contract, so the difference worth generalising is the
+# frame body, not the command line.
+GRID = "grid"
+TREE = "tree"
 
-    def __init__(self, rows: list[str], w: int, h: int):
+# Checks that mean something only on a character grid, with the reason.
+GRID_ONLY = {
+    "grid_shape": "a widget tree has no fixed row count or width",
+    "border_column": "a widget tree has no columns to align",
+    "line_width": "a widget tree's line width is a property of its content",
+    "display_gap": "a widget tree has no columns to measure between",
+    "region_contains": "a widget tree has no addressable screen regions",
+    "row_of_delta": "a widget tree's row numbers are tree positions, not screen rows",
+}
+
+
+class Frame:
+    """One rendered screen.
+
+    In `grid` format that is exactly `h` rows padded to `w` display columns. In
+    `tree` format it is however many lines the interface produced, left as
+    written: padding them would invent width where the renderer has none.
+    """
+
+    def __init__(self, rows: list[str], w: int, h: int, fmt: str = GRID):
+        self.format = fmt
         self.declared_w = w
         self.declared_h = h
-        # Pad to the declared width in display columns, for the same reason.
-        self.rows = [r + " " * max(0, w - display_width(r)) for r in rows]
+        if fmt == GRID:
+            # Pad to the declared width in display columns, for the same reason.
+            self.rows = [r + " " * max(0, w - display_width(r)) for r in rows]
+        else:
+            self.rows = list(rows)
 
     @property
     def text(self) -> str:
@@ -47,6 +76,8 @@ class Frame:
         return [r[x : x + w] for r in self.rows[y : y + h]]
 
     def shape_ok(self) -> tuple[bool, str]:
+        if self.format != GRID:
+            return True, ""
         if len(self.rows) != self.declared_h:
             return False, f"expected {self.declared_h} rows, got {len(self.rows)}"
         # Width is display columns, not characters. A CJK ideograph is one
@@ -81,7 +112,7 @@ def display_width(text: str) -> int:
     return width
 
 
-def parse_frames(stdout: str, w: int, h: int) -> list[Frame]:
+def parse_frames(stdout: str, w: int, h: int, fmt: str = GRID) -> list[Frame]:
     """Split a dump into frames. Trailing-space trimming is tolerated.
 
     Only the newline that brackets a form feed is removed — never a blank row
@@ -101,7 +132,7 @@ def parse_frames(stdout: str, w: int, h: int) -> list[Frame]:
             continue
         rows = [r.rstrip("\r") for r in chunk.split("\n")]
         if rows:
-            frames.append(Frame(rows, w, h))
+            frames.append(Frame(rows, w, h, fmt))
     return frames
 
 
@@ -123,6 +154,15 @@ def _any_line(lines: list[str], pattern: str) -> bool:
 
 def evaluate(check: dict, frames: list[Frame]) -> tuple[bool, str]:
     kind = check["kind"]
+
+    # A grid-only check against a widget tree is a task-authoring mistake, not
+    # a program failure. Say which, rather than computing a column number for
+    # something that has no columns and failing the run over it.
+    if kind in GRID_ONLY and frames and frames[0].format != GRID:
+        return False, (
+            f"check kind {kind!r} needs a character grid: "
+            f"{GRID_ONLY[kind]}"
+        )
 
     if kind == "frame_count":
         want = check["equals"]
@@ -302,8 +342,9 @@ def run_program(program_dir: Path, grid: dict, script: list[str], timeout: int):
 
 def score(task_dir: Path, stdout: str) -> dict:
     spec = json.loads((task_dir / "checks.json").read_text(encoding="utf-8"))
-    grid = spec["grid"]
-    frames = parse_frames(stdout, grid["w"], grid["h"])
+    fmt = spec.get("frame_format", GRID)
+    grid = spec.get("grid") or {"w": 0, "h": 0}
+    frames = parse_frames(stdout, grid["w"], grid["h"], fmt)
 
     results, earned, total = [], 0.0, 0.0
     contract_failed = not frames
