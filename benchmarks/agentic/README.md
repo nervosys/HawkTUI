@@ -89,6 +89,19 @@ uncontrolled context that varies between machines. Without an API key the
 runner falls back to a normal session and records `bare_mode: false` on every
 run, so results from the two modes are never silently mixed.
 
+## What this runs on your machine
+
+The harness invokes the agent with `bypassPermissions` and builds and executes
+the Rust it writes. That is what the benchmark measures, so it cannot be
+sandboxed away — but it means `run.py` should only be pointed at a machine you
+are willing to hand to an unsupervised agent.
+
+What is in place: each run works in its own directory, `--isolate` puts that
+outside the repository, `--strict-mcp-config` keeps your own MCP servers out of
+the run, and non-essential network traffic is disabled. What is not: the agent
+is not confined to that directory, and nothing inspects the generated code
+before it is compiled and run.
+
 ## Costs
 
 A full grid — 6 tasks × 3 frameworks × 2 conditions (plus 2 Hawk-only

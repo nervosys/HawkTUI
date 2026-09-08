@@ -11,3 +11,9 @@
 # README from a sibling project under the same ownership.
 ratatui/
 superlighttui/
+
+# The ontology-tool pack embeds an absolute --manifest-path, so it is different
+# on every machine and correct on only one. Committing it published a home
+# directory and handed everyone else a pack pointing at a checkout they do not
+# have. make_context.py regenerates it; run.py refuses to run c3 without it.
+hawktui/c3/

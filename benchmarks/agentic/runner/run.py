@@ -349,6 +349,14 @@ def seed_context(workdir: Path, framework: str, condition: str) -> list[str]:
     for level in ("c1", "c2", "c3"):
         src = CONTEXT_DIR / framework / level
         if not src.is_dir():
+            # A missing pack for the condition under test silently downgrades the
+            # run to a weaker condition and reports it under the stronger name.
+            # c3 in particular is machine-specific and not committed, so a fresh
+            # checkout has it only after make_context.py runs.
+            if level == condition:
+                raise SystemExit(
+                    f"context pack {framework}/{level} is missing -- "
+                    f"run `python make_context.py` before the grid")
             continue
         # c2 and c3 are supersets of c1.
         if level != "c1" and level != condition:
