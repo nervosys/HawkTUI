@@ -348,7 +348,21 @@ run directory keeps its prompt, transcript and dump for exactly this.
 
    That discrepancy is worth reporting upstream: their contract and their
    renderer disagree, and an agent that trusts the contract writes a dump their
-   verifier's `has_widget` would reject. **Do not put a GUI task and a TUI task in one grid**
+   verifier's `has_widget` would reject.
+
+   **`g2-todo` piloted clean**, two runs of two at 1.000
+   (`results/gui-pilot-todo/`), including the requirement invented for it: after
+   `clear`, the survivors are re-indexed, so `item-0` reads `Fix wrapping` and
+   `check-0` addresses it. That is the one behaviour a widget tree can express
+   and a character grid cannot — a program keeping stale indices looks right in
+   a screenshot and is broken for anything driving it by id — and two agents
+   read the prompt as intended without prompting.
+
+   One latent ambiguity, harmless so far: the prompt says "one row per item"
+   and both agents emitted flat checkbox/label pairs with no `Row` widget. The
+   checks do not require one, so this passes, but "row" is doing double duty as
+   a layout word and a widget name and should be reworded before the task is
+   used in anger. **Do not put a GUI task and a TUI task in one grid**
    — the frames are different kinds of output and the comparison would be
    meaningless; the framework entry says so as well.
 
