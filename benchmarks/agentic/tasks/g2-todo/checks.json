@@ -1,0 +1,111 @@
+{
+  "id": "g2-todo",
+  "name": "todo",
+  "rung": 2,
+  "frame_format": "tree",
+  "grid": {
+    "w": 320,
+    "h": 240
+  },
+  "script": [
+    "click:check-0",
+    "click:check-2",
+    "click:clear",
+    "key:q"
+  ],
+  "checks": [
+    {
+      "id": "quits",
+      "kind": "frame_count",
+      "equals": 4,
+      "contract": true
+    },
+    {
+      "id": "title",
+      "kind": "contains",
+      "frame": 0,
+      "pattern": "Todo"
+    },
+    {
+      "id": "three-items",
+      "kind": "count_matching_lines",
+      "pattern": "#item-[0-9]",
+      "min": 3,
+      "max": 3
+    },
+    {
+      "id": "items-addressable",
+      "kind": "has_widget",
+      "frame": 0,
+      "agent_id": "item-0"
+    },
+    {
+      "id": "checks-addressable",
+      "kind": "has_widget",
+      "frame": 0,
+      "agent_id": "check-0"
+    },
+    {
+      "id": "clear-addressable",
+      "kind": "has_widget",
+      "frame": 0,
+      "agent_id": "clear"
+    },
+    {
+      "id": "starts-none-done",
+      "kind": "contains",
+      "frame": 0,
+      "pattern": "0 done of 3"
+    },
+    {
+      "id": "one-done",
+      "kind": "contains",
+      "frame": 1,
+      "pattern": "1 done of 3"
+    },
+    {
+      "id": "two-done",
+      "kind": "contains",
+      "frame": 2,
+      "pattern": "2 done of 3"
+    },
+    {
+      "id": "toggle-changes-the-tree",
+      "kind": "frames_differ",
+      "a": 0,
+      "b": 1
+    },
+    {
+      "id": "clear-removes-done",
+      "kind": "contains",
+      "frame": 3,
+      "pattern": "0 done of 1"
+    },
+    {
+      "id": "one-item-left",
+      "kind": "count_matching_lines",
+      "pattern": "#item-[0-9]",
+      "min": 1,
+      "max": 1,
+      "frame": 3
+    },
+    {
+      "id": "survivor-is-reindexed",
+      "kind": "has_widget",
+      "frame": 3,
+      "agent_id": "item-0"
+    },
+    {
+      "id": "survivor-is-the-middle-one",
+      "kind": "contains",
+      "frame": 3,
+      "pattern": "Fix wrapping"
+    },
+    {
+      "id": "done-items-are-gone",
+      "kind": "absent",
+      "frame": 3,
+      "pattern": "Write tests"
+    }
+  ]
+}

@@ -78,7 +78,23 @@ FRAMEWORKS = {
         "ontology": False,
         "registry_dir": "superlighttui-0.23.0",
     },
+    # A GUI framework, not a TUI. Its tasks declare `frame_format: "tree"`
+    # because it renders widgets rather than cells; everything else about the
+    # harness — the command line, the frame splitting, the scoring — is
+    # unchanged. It is not comparable with the TUI frameworks and must never
+    # share a task with them: the verifier would be scoring two different
+    # kinds of output.
+    "deweygui": {
+        "crate": "dewey",
+        "dep": None,             # derived from DEWEYGUI_PATH, like Hawk TUI's
+        "ontology": True,
+        "registry_dir": None,
+        "path_key": "deweygui",
+    },
 }
+
+# The DeweyGUI checkout its scaffolded programs depend on.
+DEWEYGUI_PATH = REPO.parent / "DeweyGUI"
 
 
 # The Hawk TUI tree the scaffolded programs depend on. Overridable with
@@ -99,6 +115,11 @@ def dep_line(framework: str) -> str:
     entry = FRAMEWORKS[framework]
     if entry["registry_dir"] is not None:
         return entry["dep"]
+
+    if entry.get("path_key") == "deweygui":
+        path = str(DEWEYGUI_PATH).replace("\\", "/")
+        return (f'`dewey = {{ package = "deweygui", path = "{path}", '
+                f'default-features = false }}` and `serde_json = "1"`')
 
     manifest = HAWKTUI_PATH / "Cargo.toml"
     package = "hawktui"
@@ -128,6 +149,8 @@ def source_dir(framework: str) -> Path | None:
     advantage that has nothing to do with the ontology.
     """
     entry = FRAMEWORKS[framework]
+    if entry.get("path_key") == "deweygui":
+        return DEWEYGUI_PATH
     if entry["registry_dir"] is None:
         return HAWKTUI_PATH
     for candidate in (Path.home() / ".cargo").glob(f"registry/src/*/{entry['registry_dir']}"):
@@ -223,7 +246,14 @@ def build_prompt(task: str, framework: str, seeded: list[str],
                  source_note: str = "none", condition: str = "c1") -> str:
     fw = FRAMEWORKS[framework]
     prompt = (TASKS_DIR / task / "prompt.md").read_text(encoding="utf-8")
-    contract = (TASKS_DIR / "contract.md").read_text(encoding="utf-8")
+    # A task may carry its own contract. The shared one describes a character
+    # grid, which is wrong for a framework that renders a widget tree, and
+    # splicing the wrong contract into a prompt would measure the agent's
+    # reaction to an impossible instruction.
+    own = TASKS_DIR / task / "contract.md"
+    contract = (own if own.is_file() else TASKS_DIR / "contract.md").read_text(
+        encoding="utf-8"
+    )
 
     # Keep only the normative part of the contract. The surrounding rationale
     # says the program is being benchmarked and scored, which is framing a real

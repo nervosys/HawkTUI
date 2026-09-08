@@ -216,6 +216,19 @@ def evaluate(check: dict, frames: list[Frame]) -> tuple[bool, str]:
             f"row {check['row']} = {row.rstrip()!r} does not match {check['pattern']!r}"
         )
 
+    if kind == "has_widget":
+        # A widget-tree frame addresses widgets by agent id. The point of the
+        # check is that the id exists to be driven, not that the string appears
+        # somewhere: an id in a label's text would satisfy `contains` and could
+        # not be clicked.
+        agent_id = check["agent_id"]
+        rx = re.compile(rf"#{re.escape(agent_id)}(?:\s|$)")
+        hit = next((r for r in frame.rows if rx.search(r)), None)
+        present = sorted(set(re.findall(r"#(\S+)", frame.text)))[:8]
+        return hit is not None, (
+            f"no widget with agent id {agent_id!r}; the frame addresses {present}"
+        )
+
     if kind == "count_matching_lines":
         rx = re.compile(check["pattern"])
         n = sum(1 for r in frame.rows if rx.search(r))
