@@ -805,6 +805,11 @@ def main() -> int:
     ap.add_argument("--target-dir", type=Path, default=None,
                     help="shared CARGO_TARGET_DIR for every run "
                          "(default: <out>/_target)")
+    ap.add_argument("--clean-target", action="store_true",
+                    help="delete the shared build directory when the grid ends. "
+                         "It is regenerable, and keeping it makes the next grid "
+                         "faster, but --isolate grids accumulate it in the temp "
+                         "directory where nothing ever cleans it up.")
     ap.add_argument("--no-prewarm", action="store_true")
     ap.add_argument("--source-note", choices=("none", "forbid", "permit", "redirect"),
                     default=None,
@@ -881,6 +886,21 @@ def main() -> int:
             fh.write(json.dumps(record) + "\n")
 
     print(f"\nwrote {jsonl}")
+
+    # A shared CARGO_TARGET_DIR per grid is what makes replicates cheap, and it
+    # is also invisible: fourteen --isolate grids in one session left 3.1 GB of
+    # build output in the temp directory and filled the disk mid-commit. Say how
+    # much is there and where, every time, so it is a decision rather than a
+    # surprise.
+    if target_dir.is_dir():
+        size = sum(f.stat().st_size for f in target_dir.rglob("*") if f.is_file())
+        if args.clean_target:
+            shutil.rmtree(target_dir, ignore_errors=True)
+            print(f"removed {size / 1e9:.2f} GB of build output at {target_dir}")
+        elif size:
+            print(f"{size / 1e9:.2f} GB of build output remains at {target_dir}\n"
+                  f"  (regenerable; --clean-target removes it when a grid ends, "
+                  f"at the cost of rebuilding for the next one)")
     return 0
 
 
