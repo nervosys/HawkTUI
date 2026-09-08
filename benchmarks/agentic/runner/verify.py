@@ -103,6 +103,11 @@ class Frame:
         return True, ""
 
 
+ZWJ = "‍"
+VARIATION_SELECTORS = ("︎", "️")
+SKIN_TONE_LO, SKIN_TONE_HI = 0x1F3FB, 0x1F3FF
+
+
 def display_width(text: str) -> int:
     """Terminal columns occupied by `text`.
 
@@ -111,8 +116,24 @@ def display_width(text: str) -> int:
     has to convert between them.
     """
     width = 0
+    skip_next = False
     for ch in text:
+        if skip_next:
+            # The codepoint after a ZWJ is part of the same cluster: the family
+            # emoji is one glyph in one cell pair, not three side by side.
+            skip_next = False
+            continue
+        cp = ord(ch)
+        if ch == ZWJ:
+            skip_next = True
+            continue
         if unicodedata.combining(ch):
+            continue
+        if ch in VARIATION_SELECTORS or SKIN_TONE_LO <= cp <= SKIN_TONE_HI:
+            # Modifiers select a presentation for the preceding glyph; they do
+            # not add a cell. Summing them made 👍<tone> four columns wide, so a
+            # correct program that reached for a toned emoji was recorded as
+            # overflowing its row.
             continue
         width += 2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1
     return width
