@@ -10,9 +10,12 @@ A 320×240 logical-pixel window holding, stacked vertically:
 1. a label with agent id `title`, reading `Todo`
 2. a label with agent id `count`, reading `N done of M`, where `M` is the
    number of items and `N` how many are complete
-3. one row per item, in order, each holding
+3. for each item, in order, two widgets:
    - a checkbox or toggle with agent id `check-<index>`, starting unchecked
    - a label with agent id `item-<index>` reading the item's text
+
+   How you group them is up to you — side by side, or inside a container per
+   item. Only the agent ids and their order are checked.
 4. a button with agent id `clear`, reading `Clear done`
 
 The three items are `Write tests`, `Fix wrapping`, `Ship it`, indexed from `0`.

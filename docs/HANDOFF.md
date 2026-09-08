@@ -358,11 +358,14 @@ run directory keeps its prompt, transcript and dump for exactly this.
    a screenshot and is broken for anything driving it by id — and two agents
    read the prompt as intended without prompting.
 
-   One latent ambiguity, harmless so far: the prompt says "one row per item"
-   and both agents emitted flat checkbox/label pairs with no `Row` widget. The
-   checks do not require one, so this passes, but "row" is doing double duty as
-   a layout word and a widget name and should be reworded before the task is
-   used in anger. **Do not put a GUI task and a TUI task in one grid**
+   One latent ambiguity was found and fixed rather than left: the prompt said
+   "one row per item" while both agents emitted flat checkbox/label pairs with
+   no `Row` widget. The checks never required one, so it passed — but "row" was
+   doing double duty as a layout word and a widget name, which is the shape of
+   the defect that invalidated `t15-frame`'s first grid. It now asks for two
+   widgets per item and says grouping is the agent's choice. The two piloted
+   runs still score 1.000 against the reworded task, so the change is a
+   clarification rather than a different task. **Do not put a GUI task and a TUI task in one grid**
    — the frames are different kinds of output and the comparison would be
    meaningless; the framework entry says so as well.
 
