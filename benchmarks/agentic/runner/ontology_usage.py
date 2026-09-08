@@ -71,6 +71,30 @@ def scan(transcript: Path) -> dict:
     return hits
 
 
+# Transcripts are not committed (see results/.gitignore), so a fresh clone has
+# the summary records but none of the per-run detail these tools read. Counting
+# what is missing turns a confident 0% into an honest "no data".
+def transcript_or_none(path, missing: list) -> object:
+    if not path.is_file():
+        missing.append(path.parent.name)
+        return None
+    return path
+
+
+def warn_if_missing(missing: list, total: int) -> bool:
+    """True when there is nothing to analyse. Prints why."""
+    if not missing:
+        return False
+    if len(missing) == total:
+        print(f"no transcripts found for any of the {total} runs.\n"
+              "Transcripts are not committed; re-run the grid, or point this at "
+              "a results directory that still has its per-run subdirectories.")
+        return True
+    print(f"warning: {len(missing)} of {total} runs have no transcript; "
+          f"the numbers below cover the remaining {total - len(missing)}.\n")
+    return False
+
+
 def main() -> int:
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -78,14 +102,23 @@ def main() -> int:
         except AttributeError:
             pass
 
-    paths = [Path(p) for arg in sys.argv[1:] for p in Path().glob(arg)] or \
-            [Path(p) for p in sys.argv[1:]]
+    # Path().glob() raises on an absolute pattern, so only the relative args go
+    # through it. Passing a full path used to end in a NotImplementedError
+    # traceback rather than a result.
+    paths = []
+    for arg in sys.argv[1:]:
+        if Path(arg).is_absolute():
+            paths.append(Path(arg))
+        else:
+            paths.extend(Path().glob(arg)) or paths.append(Path(arg))
     paths = [p for p in paths if p.is_file()]
     if not paths:
         print("usage: ontology_usage.py <runs.rescored.jsonl> [more...]")
         return 2
 
     by_cond: dict[str, list[dict]] = defaultdict(list)
+    missing: list = []
+    seen = 0
     for jsonl in paths:
         root = jsonl.parent
         for line in jsonl.read_text(encoding="utf-8").splitlines():
@@ -94,9 +127,16 @@ def main() -> int:
             record = json.loads(line)
             if record.get("framework") != "hawktui" or record.get("invalid"):
                 continue
-            hits = scan(root / record["label"] / "_transcript.jsonl")
+            t = transcript_or_none(root / record["label"] / "_transcript.jsonl", missing)
+            seen += 1
+            if t is None:
+                continue
+            hits = scan(t)
             hits["label"] = record["label"]
             by_cond[record["condition"]].append(hits)
+
+    if warn_if_missing(missing, seen):
+        return 1
 
     print(f"{'cond':<6}{'runs':>5}{'consulted':>11}{'rate':>7}{'mcp':>7}"
           f"{'api':>7}{'cli':>7}{'pack reads':>12}")

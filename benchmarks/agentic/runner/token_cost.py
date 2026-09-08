@@ -81,6 +81,30 @@ def measure(transcript: Path) -> dict:
     return out
 
 
+# Transcripts are not committed (see results/.gitignore), so a fresh clone has
+# the summary records but none of the per-run detail these tools read. Counting
+# what is missing turns a confident 0% into an honest "no data".
+def transcript_or_none(path, missing: list) -> object:
+    if not path.is_file():
+        missing.append(path.parent.name)
+        return None
+    return path
+
+
+def warn_if_missing(missing: list, total: int) -> bool:
+    """True when there is nothing to analyse. Prints why."""
+    if not missing:
+        return False
+    if len(missing) == total:
+        print(f"no transcripts found for any of the {total} runs.\n"
+              "Transcripts are not committed; re-run the grid, or point this at "
+              "a results directory that still has its per-run subdirectories.")
+        return True
+    print(f"warning: {len(missing)} of {total} runs have no transcript; "
+          f"the numbers below cover the remaining {total - len(missing)}.\n")
+    return False
+
+
 def main() -> int:
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -94,13 +118,19 @@ def main() -> int:
         return 2
 
     runs = []
+    missing: list = []
+    seen = 0
     for jsonl in paths:
         root = jsonl.parent
         for line in jsonl.read_text(encoding="utf-8").splitlines():
             if not line.strip():
                 continue
             record = json.loads(line)
-            m = measure(root / record["label"] / "_transcript.jsonl")
+            t = transcript_or_none(root / record["label"] / "_transcript.jsonl", missing)
+            seen += 1
+            if t is None:
+                continue
+            m = measure(t)
             m["cost"] = float(record.get("cost_usd") or 0)
             m["label"] = record["label"]
             runs.append(m)
@@ -116,6 +146,9 @@ def main() -> int:
     cost = sum(r["cost"] for r in runs) / n
     src_calls = sum(r["source_calls"] for r in runs) / n
     onto_calls = sum(r["onto_calls"] for r in runs) / n
+
+    if warn_if_missing(missing, seen):
+        return 1
 
     print(f"{n} runs, mean per run\n")
     print(f"  source reads        {src_calls:>6.1f} calls  {src_tok:>9,.0f} est. tokens returned")
