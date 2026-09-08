@@ -36,6 +36,12 @@ FORM_FEED = "\x0c"
 GRID = "grid"
 TREE = "tree"
 
+# `Label #title [0,0 240x40]` and the documented `Label title 0,0 240x40`:
+# a widget tree line, which a grid spec can never legitimately produce.
+TREE_SHAPED_RX = re.compile(
+    r"^\s*\w+\s+#?[\w.-]+\s+\[?\d+,\d+\s+\d+x\d+", re.MULTILINE
+)
+
 # Checks that mean something only on a character grid, with the reason.
 GRID_ONLY = {
     "grid_shape": "a widget tree has no fixed row count or width",
@@ -375,6 +381,19 @@ def score(task_dir: Path, stdout: str) -> dict:
 
     results, earned, total = [], 0.0, 0.0
     contract_failed = not frames
+
+    # A GUI task that forgets `frame_format: "tree"` is scored as a grid, fails
+    # its shape contract, and reports "expected N rows, got M" — a true statement
+    # about the wrong thing, which sends the author looking at the agent's output
+    # instead of at their own spec. Name the actual cause.
+    shape_wrong = not frames or not frames[0].shape_ok()[0]
+    if fmt == GRID and shape_wrong and TREE_SHAPED_RX.search(stdout):
+        raise SystemExit(
+            f"task {spec['id']}: the program emitted a widget tree, but this "
+            f"spec has no \"frame_format\": \"tree\", so it was parsed as an "
+            f"{grid['w']}x{grid['h']} character grid. Fix the spec, not the "
+            f"program."
+        )
     for check in spec["checks"]:
         passed, detail = evaluate(check, frames)
         weight = float(check.get("weight", 1))
