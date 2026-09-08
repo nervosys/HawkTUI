@@ -24,8 +24,16 @@ attempt identically. It is injected verbatim into the prompt for every task.
    it, so the frame count proves the quit worked.
 
 A frame is `HeadlessDriver::snapshot()`: one line per widget, in render order,
-`<type> <id> <x>,<y> <w>x<h> <key>=<value> ...`, with properties sorted and
-bounds rounded to whole pixels. Frames are separated by a single form feed
+`<type> #<id> [<x>,<y> <w>x<h>] <key>=<value> ...`, with properties sorted and
+bounds rounded to whole pixels — for example
+
+```
+  Label #title [0,0 240x40] text="Counter"
+```
+
+The id must be the second token on the line, so that a widget can be addressed
+by it. The leading `#` and the brackets are what the renderer emits; a dump that
+writes `<type> <id> <x>,<y> <w>x<h>` instead is also accepted. Frames are separated by a single form feed
 (`\x0c`) on its own line. Exit code 0 on success.
 
 ## Step names

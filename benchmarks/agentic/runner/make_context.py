@@ -118,6 +118,15 @@ def main() -> int:
     inventory: dict[str, dict[str, int]] = {}
 
     print("hawktui")
+    # C1 for DeweyGUI — the same rule as every other framework: what a user
+    # gets from the package, which is its README. Its ontology and MCP docs are
+    # deliberately left out, since those are what a C2+ condition would add and
+    # handing them over at C1 would make the conditions differ by less than
+    # they claim to.
+    dewey = Path(r"C:/Users/adamm/dev/nervosys/utilities/DeweyGUI")
+    if (dewey / "README.md").is_file():
+        copy(dewey / "README.md", CONTEXT / "deweygui" / "c1" / "README.md")
+
     # C1 — exactly what `cargo add hawktui` delivers: the README. `docs/` is in
     # the package `exclude` list, so none of it reaches a user.
     copy(REPO / "README.md", CONTEXT / "hawktui" / "c1" / "README.md")

@@ -1,0 +1,888 @@
+{
+  "BarChart": {
+    "default_role": "DataVisualization",
+    "description": "A bar chart for visualizing categorical data with grouped bars.",
+    "name": "BarChart",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Bar groups, each containing one or more bars.",
+        "name": "groups",
+        "property_type": {
+          "Array": {
+            "Object": []
+          }
+        },
+        "required": true
+      },
+      {
+        "constraints": [
+          {
+            "Min": 1.0
+          }
+        ],
+        "default_value": 3,
+        "description": "Width of each bar in terminal columns.",
+        "name": "bar_width",
+        "property_type": "Integer",
+        "required": false
+      },
+      {
+        "constraints": [],
+        "default_value": "Vertical",
+        "description": "Rendering direction: Vertical or Horizontal.",
+        "name": "direction",
+        "property_type": {
+          "Enum": [
+            "Vertical",
+            "Horizontal"
+          ]
+        },
+        "required": false
+      }
+    ],
+    "tags": [
+      "chart",
+      "bar",
+      "data",
+      "visualization"
+    ],
+    "usage_hint": "Use for categorical comparisons. Each group can have multiple bars for multi-series data."
+  },
+  "Block": {
+    "default_role": "Container",
+    "description": "A container widget with borders, titles, and background styling.",
+    "name": "Block",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Title displayed in the top border.",
+        "name": "title",
+        "property_type": "String",
+        "required": false
+      },
+      {
+        "constraints": [],
+        "default_value": "none",
+        "description": "Which borders to display.",
+        "name": "borders",
+        "property_type": {
+          "Enum": [
+            "none",
+            "all",
+            "top",
+            "bottom",
+            "left",
+            "right"
+          ]
+        },
+        "required": false
+      },
+      {
+        "constraints": [],
+        "default_value": "plain",
+        "description": "Visual style of the border.",
+        "name": "border_type",
+        "property_type": {
+          "Enum": [
+            "plain",
+            "rounded",
+            "double",
+            "thick"
+          ]
+        },
+        "required": false
+      }
+    ],
+    "tags": [
+      "container",
+      "border",
+      "panel"
+    ],
+    "usage_hint": "Block::bordered().title(\"My Panel\")"
+  },
+  "Calendar": {
+    "default_role": "Display",
+    "description": "A month-view calendar grid with day-of-week headers and day highlighting.",
+    "name": "Calendar",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "The year to display.",
+        "name": "year",
+        "property_type": "Integer",
+        "required": true
+      },
+      {
+        "constraints": [
+          {
+            "Min": 1.0
+          },
+          {
+            "Max": 12.0
+          }
+        ],
+        "default_value": null,
+        "description": "The month to display (1-12).",
+        "name": "month",
+        "property_type": "Integer",
+        "required": true
+      }
+    ],
+    "tags": [
+      "calendar",
+      "date",
+      "display"
+    ],
+    "usage_hint": "Calendar::new(2026, 3).show_header(true)"
+  },
+  "CancellableLoader": {
+    "default_role": "StatusBar",
+    "description": "An animated spinner/loader with cancellation support.",
+    "name": "CancellableLoader",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": "",
+        "description": "Text displayed alongside the spinner.",
+        "name": "message",
+        "property_type": "String",
+        "required": false
+      },
+      {
+        "constraints": [],
+        "default_value": false,
+        "description": "Whether cancellation has been requested.",
+        "name": "cancelled",
+        "property_type": "Boolean",
+        "required": false
+      }
+    ],
+    "tags": [
+      "loader",
+      "spinner",
+      "progress",
+      "cancellable"
+    ],
+    "usage_hint": "CancellableLoader::new(\"Processing...\").tick(n)"
+  },
+  "Canvas": {
+    "default_role": "DataVisualization",
+    "description": "A freeform drawing surface using braille characters for sub-cell resolution.",
+    "name": "Canvas",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": [
+          0.0,
+          100.0
+        ],
+        "description": "Horizontal coordinate range [min, max].",
+        "name": "x_bounds",
+        "property_type": {
+          "Array": "Float"
+        },
+        "required": false
+      },
+      {
+        "constraints": [],
+        "default_value": [
+          0.0,
+          100.0
+        ],
+        "description": "Vertical coordinate range [min, max].",
+        "name": "y_bounds",
+        "property_type": {
+          "Array": "Float"
+        },
+        "required": false
+      }
+    ],
+    "tags": [
+      "canvas",
+      "draw",
+      "chart",
+      "braille",
+      "graph"
+    ],
+    "usage_hint": "Canvas::new().x_bounds([0.0, 100.0]).line(CanvasLine { x1: 0.0, y1: 0.0, x2: 100.0, y2: 50.0, color: Color::White })"
+  },
+  "Chart": {
+    "default_role": "DataVisualization",
+    "description": "An XY chart for line and scatter plots with multiple datasets.",
+    "name": "Chart",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Data series to plot, each with points and styling.",
+        "name": "datasets",
+        "property_type": {
+          "Array": {
+            "Object": []
+          }
+        },
+        "required": true
+      },
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "X axis configuration (bounds, labels).",
+        "name": "x_axis",
+        "property_type": {
+          "Object": []
+        },
+        "required": true
+      },
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Y axis configuration (bounds, labels).",
+        "name": "y_axis",
+        "property_type": {
+          "Object": []
+        },
+        "required": true
+      }
+    ],
+    "tags": [
+      "chart",
+      "plot",
+      "line",
+      "scatter",
+      "data",
+      "visualization"
+    ],
+    "usage_hint": "Use for plotting numerical data trends. Braille markers give sub-cell resolution."
+  },
+  "Editor": {
+    "default_role": "Input",
+    "description": "A multi-line text editor with cursor movement, line editing, and scrolling.",
+    "name": "Editor",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": true,
+        "description": "Whether to display line numbers in the gutter.",
+        "name": "show_line_numbers",
+        "property_type": "Boolean",
+        "required": false
+      }
+    ],
+    "tags": [
+      "editor",
+      "text",
+      "input",
+      "multiline",
+      "code"
+    ],
+    "usage_hint": "Editor::new().show_line_numbers(true)"
+  },
+  "Gauge": {
+    "actions": [
+      {
+        "description": "Set the gauge progress ratio.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "set_ratio",
+        "params": [
+          {
+            "default_value": null,
+            "description": "Value between 0.0 and 1.0.",
+            "name": "ratio",
+            "param_type": "Float",
+            "required": true
+          }
+        ],
+        "returns": null,
+        "shortcut": null
+      },
+      {
+        "description": "Get the current progress ratio.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_ratio",
+        "params": [],
+        "returns": "Current ratio as float.",
+        "shortcut": null
+      }
+    ],
+    "default_role": "Progress",
+    "description": "A horizontal progress bar displaying a ratio or percentage.",
+    "name": "Gauge",
+    "properties": [
+      {
+        "constraints": [
+          {
+            "Min": 0.0
+          },
+          {
+            "Max": 1.0
+          }
+        ],
+        "default_value": 0.0,
+        "description": "Progress value between 0.0 and 1.0.",
+        "name": "ratio",
+        "property_type": "Float",
+        "required": true
+      },
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Text displayed over the gauge. Defaults to percentage.",
+        "name": "label",
+        "property_type": "String",
+        "required": false
+      }
+    ],
+    "tags": [
+      "gauge",
+      "progress",
+      "bar",
+      "loading"
+    ],
+    "usage_hint": "Gauge::new().percent(42).label(\"Loading...\")"
+  },
+  "Image": {
+    "default_role": "Display",
+    "description": "An inline image widget using Kitty/iTerm2 graphics protocols.",
+    "name": "Image",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Raw image bytes (e.g., PNG).",
+        "name": "data",
+        "property_type": "String",
+        "required": true
+      },
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "MIME type of the image data (e.g., image/png).",
+        "name": "mime_type",
+        "property_type": "String",
+        "required": true
+      },
+      {
+        "constraints": [],
+        "default_value": "Fallback",
+        "description": "Image protocol: Kitty, ITerm2, Sixel, HalfBlock, or Fallback.",
+        "name": "protocol",
+        "property_type": {
+          "Enum": [
+            "Kitty",
+            "ITerm2",
+            "Sixel",
+            "HalfBlock",
+            "Fallback"
+          ]
+        },
+        "required": false
+      }
+    ],
+    "tags": [
+      "image",
+      "graphics",
+      "visual",
+      "media"
+    ],
+    "usage_hint": "Use Image::detect_protocol() to auto-select the best rendering method."
+  },
+  "Input": {
+    "actions": [
+      {
+        "description": "Set the input text value.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "set_value",
+        "params": [
+          {
+            "default_value": null,
+            "description": "The text to set.",
+            "name": "value",
+            "param_type": "String",
+            "required": true
+          }
+        ],
+        "returns": null,
+        "shortcut": null
+      },
+      {
+        "description": "Get the current input text.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_value",
+        "params": [],
+        "returns": "Current text value.",
+        "shortcut": null
+      },
+      {
+        "description": "Clear the input.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "clear",
+        "params": [],
+        "returns": null,
+        "shortcut": null
+      },
+      {
+        "description": "Insert text at the cursor position.",
+        "idempotent": false,
+        "mutates": true,
+        "name": "insert_text",
+        "params": [
+          {
+            "default_value": null,
+            "description": "Text to insert.",
+            "name": "text",
+            "param_type": "String",
+            "required": true
+          }
+        ],
+        "returns": null,
+        "shortcut": null
+      }
+    ],
+    "default_role": "Input",
+    "description": "A single-line text input field with cursor navigation and editing.",
+    "name": "Input",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Hint text shown when the input is empty.",
+        "name": "placeholder",
+        "property_type": "String",
+        "required": false
+      }
+    ],
+    "tags": [
+      "input",
+      "text",
+      "form",
+      "editable"
+    ],
+    "usage_hint": "Input::new().placeholder(\"Type here...\")"
+  },
+  "LineGauge": {
+    "default_role": "Progress",
+    "description": "A thin, single-line progress bar using line-drawing characters.",
+    "name": "LineGauge",
+    "properties": [
+      {
+        "constraints": [
+          {
+            "Min": 0.0
+          },
+          {
+            "Max": 1.0
+          }
+        ],
+        "default_value": 0.0,
+        "description": "Progress value between 0.0 and 1.0.",
+        "name": "ratio",
+        "property_type": "Float",
+        "required": true
+      },
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Text label displayed before the gauge line.",
+        "name": "label",
+        "property_type": "String",
+        "required": false
+      }
+    ],
+    "tags": [
+      "gauge",
+      "progress",
+      "line",
+      "bar"
+    ],
+    "usage_hint": "LineGauge::new().percent(65).label(\"Progress\")"
+  },
+  "List": {
+    "default_role": "Selection",
+    "description": "A scrollable list with item selection, highlight, and keyboard navigation.",
+    "name": "List",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "The list items to display.",
+        "name": "items",
+        "property_type": {
+          "Array": "String"
+        },
+        "required": true
+      },
+      {
+        "constraints": [],
+        "default_value": ">> ",
+        "description": "Symbol displayed next to the selected item.",
+        "name": "highlight_symbol",
+        "property_type": "String",
+        "required": false
+      }
+    ],
+    "tags": [
+      "list",
+      "selection",
+      "scrollable",
+      "menu"
+    ],
+    "usage_hint": "List::new([\"Item 1\", \"Item 2\"]).highlight_symbol(\">> \")"
+  },
+  "Loader": {
+    "default_role": "StatusBar",
+    "description": "An animated spinner/loader with an optional message.",
+    "name": "Loader",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": "",
+        "description": "Text displayed alongside the spinner.",
+        "name": "message",
+        "property_type": "String",
+        "required": false
+      },
+      {
+        "constraints": [],
+        "default_value": "Braille",
+        "description": "Spinner animation preset: Braille, Line, Dots, or Arc.",
+        "name": "spinner_style",
+        "property_type": "String",
+        "required": false
+      }
+    ],
+    "tags": [
+      "loader",
+      "spinner",
+      "progress",
+      "animation"
+    ],
+    "usage_hint": "Loader::new(\"Loading...\").spinner_style(SpinnerStyle::Braille).tick(n)"
+  },
+  "Markdown": {
+    "default_role": "Display",
+    "description": "Renders Markdown text with headings, bold, italic, code, lists, and blockquotes.",
+    "name": "Markdown",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "The Markdown source text to render.",
+        "name": "source",
+        "property_type": "String",
+        "required": true
+      }
+    ],
+    "tags": [
+      "markdown",
+      "text",
+      "display",
+      "rich-text"
+    ],
+    "usage_hint": "Markdown::new(\"# Hello\\n\\nSome **bold** text\")"
+  },
+  "Paragraph": {
+    "default_role": "Display",
+    "description": "Displays styled text with optional wrapping, scrolling, and alignment.",
+    "name": "Paragraph",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "The text content to display.",
+        "name": "text",
+        "property_type": "String",
+        "required": true
+      },
+      {
+        "constraints": [],
+        "default_value": "none",
+        "description": "Word wrapping mode.",
+        "name": "wrap",
+        "property_type": {
+          "Enum": [
+            "none",
+            "word",
+            "char"
+          ]
+        },
+        "required": false
+      },
+      {
+        "constraints": [],
+        "default_value": "left",
+        "description": "Text alignment.",
+        "name": "alignment",
+        "property_type": {
+          "Enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "required": false
+      },
+      {
+        "constraints": [],
+        "default_value": [
+          0,
+          0
+        ],
+        "description": "Scroll offset (y, x).",
+        "name": "scroll",
+        "property_type": {
+          "Object": []
+        },
+        "required": false
+      }
+    ],
+    "tags": [
+      "text",
+      "display",
+      "paragraph"
+    ],
+    "usage_hint": "Paragraph::new(\"Hello, world!\").centered()"
+  },
+  "Scrollbar": {
+    "default_role": "Scrollable",
+    "description": "A scroll indicator showing viewport position within content.",
+    "name": "Scrollbar",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": "Vertical",
+        "description": "Vertical or Horizontal.",
+        "name": "orientation",
+        "property_type": {
+          "Enum": [
+            "Vertical",
+            "Horizontal"
+          ]
+        },
+        "required": false
+      }
+    ],
+    "tags": [
+      "scrollbar",
+      "scroll",
+      "indicator"
+    ],
+    "usage_hint": "Scrollbar::new(ScrollbarOrientation::Vertical)"
+  },
+  "SelectList": {
+    "actions": [
+      {
+        "description": "Select an item by index.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "select_index",
+        "params": [
+          {
+            "default_value": null,
+            "description": "Zero-based index of the item to select.",
+            "name": "index",
+            "param_type": "Integer",
+            "required": true
+          }
+        ],
+        "returns": null,
+        "shortcut": null
+      },
+      {
+        "description": "Set the filter string for fuzzy matching.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "set_filter",
+        "params": [
+          {
+            "default_value": null,
+            "description": "Substring to filter items by.",
+            "name": "filter",
+            "param_type": "String",
+            "required": true
+          }
+        ],
+        "returns": null,
+        "shortcut": null
+      },
+      {
+        "description": "Get the currently selected item values.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_selected",
+        "params": [],
+        "returns": "Array of selected item values.",
+        "shortcut": null
+      }
+    ],
+    "default_role": "Input",
+    "description": "An interactive select list supporting single or multi-select with filtering.",
+    "name": "SelectList",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": "Single",
+        "description": "Selection mode: Single or Multi.",
+        "name": "mode",
+        "property_type": "String",
+        "required": false
+      },
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "List of selectable items.",
+        "name": "items",
+        "property_type": {
+          "Array": "String"
+        },
+        "required": true
+      }
+    ],
+    "tags": [
+      "select",
+      "list",
+      "input",
+      "menu"
+    ],
+    "usage_hint": "SelectList::new(items).mode(SelectMode::Multi)"
+  },
+  "SettingsList": {
+    "default_role": "Navigation",
+    "description": "An interactive settings list with cycleable key-value pairs.",
+    "name": "SettingsList",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Array of settings, each with label, values, and optional description.",
+        "name": "settings",
+        "property_type": {
+          "Array": {
+            "Object": []
+          }
+        },
+        "required": true
+      }
+    ],
+    "tags": [
+      "settings",
+      "configuration",
+      "form",
+      "key-value"
+    ],
+    "usage_hint": "Navigate with up/down, cycle values with Enter or left/right."
+  },
+  "Sparkline": {
+    "default_role": "DataVisualization",
+    "description": "A compact chart displaying data trends as vertical bars.",
+    "name": "Sparkline",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Array of unsigned integer data points.",
+        "name": "data",
+        "property_type": {
+          "Array": "Integer"
+        },
+        "required": true
+      },
+      {
+        "constraints": [
+          {
+            "Min": 1.0
+          }
+        ],
+        "default_value": null,
+        "description": "Maximum value for scaling. Auto-detected if omitted.",
+        "name": "max",
+        "property_type": "Integer",
+        "required": false
+      }
+    ],
+    "tags": [
+      "sparkline",
+      "chart",
+      "trend",
+      "data"
+    ],
+    "usage_hint": "Sparkline::new(vec![0, 1, 3, 7, 5, 2])"
+  },
+  "Table": {
+    "default_role": "DataVisualization",
+    "description": "A data table with column headers, row selection, and scrolling.",
+    "name": "Table",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Column definitions with headers and widths.",
+        "name": "columns",
+        "property_type": {
+          "Array": {
+            "Object": []
+          }
+        },
+        "required": true
+      },
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Data rows containing cells for each column.",
+        "name": "rows",
+        "property_type": {
+          "Array": {
+            "Array": "String"
+          }
+        },
+        "required": true
+      }
+    ],
+    "tags": [
+      "table",
+      "data",
+      "grid",
+      "columns"
+    ],
+    "usage_hint": "Table::new([TableColumn::new(\"Name\", TableColumnWidth::Fill)], [TableRow::new([\"Alice\"])])"
+  },
+  "Tabs": {
+    "default_role": "Navigation",
+    "description": "A horizontal tab bar for section navigation.",
+    "name": "Tabs",
+    "properties": [
+      {
+        "constraints": [],
+        "default_value": null,
+        "description": "Tab labels.",
+        "name": "titles",
+        "property_type": {
+          "Array": "String"
+        },
+        "required": true
+      },
+      {
+        "constraints": [],
+        "default_value": 0,
+        "description": "Zero-based index of the active tab.",
+        "name": "selected",
+        "property_type": "Integer",
+        "required": false
+      }
+    ],
+    "tags": [
+      "tabs",
+      "navigation",
+      "header"
+    ],
+    "usage_hint": "Tabs::new([\"Tab 1\", \"Tab 2\"]).select(0)"
+  }
+}

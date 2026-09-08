@@ -222,9 +222,23 @@ def evaluate(check: dict, frames: list[Frame]) -> tuple[bool, str]:
         # somewhere: an id in a label's text would satisfy `contains` and could
         # not be clicked.
         agent_id = check["agent_id"]
-        rx = re.compile(rf"#{re.escape(agent_id)}(?:\s|$)")
-        hit = next((r for r in frame.rows if rx.search(r)), None)
-        present = sorted(set(re.findall(r"#(\S+)", frame.text)))[:8]
+
+        def id_of(row: str) -> str | None:
+            """The widget id on a tree line: `<type> [#]<id> ...`.
+
+            DeweyGUI's renderer writes `Label #title [0,0 240x40]`; its own
+            contract documents `<type> <id> <x>,<y> <w>x<h>`, without the hash
+            or the brackets. An agent that follows the documented form is not
+            wrong, so both are accepted — but only in the id position, which is
+            what keeps this from matching an id quoted in a label's text.
+            """
+            parts = row.split()
+            if len(parts) < 2:
+                return None
+            return parts[1].lstrip("#") or None
+
+        hit = next((r for r in frame.rows if id_of(r) == agent_id), None)
+        present = sorted({i for i in (id_of(r) for r in frame.rows) if i})[:8]
         return hit is not None, (
             f"no widget with agent id {agent_id!r}; the frame addresses {present}"
         )

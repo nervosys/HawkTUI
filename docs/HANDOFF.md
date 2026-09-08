@@ -336,7 +336,19 @@ run directory keeps its prompt, transcript and dump for exactly this.
    and `has_widget` all agree with a program someone else wrote to a spec
    written before this task existed.
 
-   No *agent* has been run. **Do not put a GUI task and a TUI task in one grid**
+   **A two-run pilot then found a defect, and it was mine.** DeweyGUI's own
+   contract documents a frame line as `<type> <id> <x>,<y> <w>x<h>`, while its
+   renderer emits `Label #title [0,0 240x40]`. One agent followed the
+   documentation exactly and scored 0.667: `has_widget` had inherited the
+   rendered form. The check now takes the id as the second token on the line
+   with an optional `#`, which still cannot match an id quoted in a label's
+   text, and the contract the tasks carry shows the rendered form with the
+   documented one accepted. Both runs score 1.000 rescored
+   (`results/gui-pilot/`), as does DeweyGUI's own reference program.
+
+   That discrepancy is worth reporting upstream: their contract and their
+   renderer disagree, and an agent that trusts the contract writes a dump their
+   verifier's `has_widget` would reject. **Do not put a GUI task and a TUI task in one grid**
    — the frames are different kinds of output and the comparison would be
    meaningless; the framework entry says so as well.
 
