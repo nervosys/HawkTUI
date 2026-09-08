@@ -35,6 +35,33 @@ measurements. Ten of fourteen items shipped.
 
 ### Solid
 
+**A smaller model breaks the ceiling that structure could not.** Every grid in
+this document scored a median 1.000 because Sonnet does not fail these tasks.
+Haiku does: 6/9 at C1, C2 and C5 alike, with the first three failures in this
+benchmark's history that are not traceable to a harness fault — a gauge 84
+display columns wide in an 80-column terminal, a missing second indicator, and a
+box titled `March 2026` where the prompt says `Calendar`. Model capability is
+the discriminating axis this instrument was missing; task structure is not. See
+`results/haiku-c1`, `results/haiku-c2c5`.
+
+**A small model in the loop loses on three of four axes.** Nine matched runs,
+same tasks and condition, only the model differing: reliability 6/9 against 9/9,
+median input tokens 2.25M against 1.40M, median wall 392s against 136s, median
+cost $0.408 against $0.603. A roughly tenfold per-token discount arrives as 32%,
+because iteration count eats it — median 21 build attempts against 5, worst case
+53 against 7. The mechanism is not weaker reasoning: Haiku reads the framework's
+source in 4 of 9 runs, first read at turn 57, where Sonnet reads in 9 of 9 at
+turn 3. The small model does not look things up; it guesses an import and grinds
+the compiler. 41 of its 68 API errors are E0433, an unresolved path.
+
+**The ontology null holds for a model that needs it.** The seven null grids were
+all Sonnet, which reads source at turn 3 and never needed the help. Haiku, which
+does not, shows the same flat reliability across C1, C2 and C5 — 6/9 in all
+three. The one real movement is that error classes shift rather than shrink:
+E0433 falls 41 -> 25 -> 15 while E0599 rises 12 -> 23 -> 22 and E0425 3 -> 10 -> 14.
+The ontology stops the model inventing imports and it fails one layer later.
+MCP attachment was verified per run: 10 tools offered on all nine C5 runs.
+
 **Structural complexity does not make agents fail.** Twelve rungs from
 hello-world to a four-pane git browser with cross-pane coupling: `score` 1.000
 throughout. Compiler errors are a feedback loop an agent iterates through, not a
@@ -214,8 +241,19 @@ failed to control.
 
 ## 3. Read this before trusting any number
 
-**Twelve harness faults were found in this work, and every one made an agent or
-a competitor look worse than reality. Never once the reverse.**
+**Fifteen harness faults were found in this work. The first twelve all made an
+agent or a competitor look worse than reality, never once the reverse — and that
+one-sidedness was itself reported here as structural. The thirteenth broke it.**
+
+`why_source.py` matched paths by the literal names `hawktui-snapshot` and
+`HawkTUI`, so DeweyGUI's source reads matched nothing and the tool reported a
+confident zero. A framework whose agents never need to read its source looks
+*more* agent-legible, not less. The flattering direction was always available;
+it had simply not been sampled yet, because every earlier fault sat in scoring,
+where the checks encode an author's expectations, rather than in the analysis
+tools, where a hardcoded name silently excludes whatever it does not name. Read
+the earlier claim as a fact about where the faults were found, not about which
+way instruments err.
 
 | Fault | Recorded | Truth |
 |---|---|---|
@@ -233,6 +271,9 @@ a competitor look worse than reality. Never once the reverse.**
 | Crate written to `/tmp`, not `%TEMP%` | `built: false`, 0.00 | 1.000 |
 | MCP attachment never verified | a C5 label | possibly C1 |
 | A four-day-stale `hawktui-mcp` binary | current catalog | an older one |
+| `why_source.py` matched any path under `HawkTUI` | 572 source reads | 421; 261 were the agent re-reading its own `main.rs` |
+| The same literal names hid every other framework | DeweyGUI 0 reads | 47 across 4 runs |
+| Analysis tools read absent transcripts as data | `0% consulted` | nothing was read |
 
 The tenth is the dangerous one and breaks the pattern: it made the *harness*
 look capable rather than making an agent look bad. `--no-source` only dropped
@@ -264,6 +305,13 @@ already narrowed, and the redirect grids hit a floor that the existing C1/C5
 pairs would have predicted for nothing. The free analysis was repeatedly more
 informative than the paid one, and it was repeatedly run second.
 
+**Flagging small n is not the same as not publishing the claim.** A grid of
+three runs per cell showed the ontology taking `t9-atlas` from 2/3 to 0/3, and
+that went into a commit message with a mechanism attached and a caveat about
+sample size. Nine more runs put it at p = 0.580: the task simply ranges 0.385
+to 1.000 under both conditions. The caveat was correct and did not help, because
+the claim was already in the history. Replicate first, then write it down.
+
 **Practical rule: open the frames before believing an unfavourable result.**
 `runner/rescore.py` replays stored dumps through the current verifier, and every
 run directory keeps its prompt, transcript and dump for exactly this.
@@ -272,7 +320,13 @@ run directory keeps its prompt, transcript and dump for exactly this.
 
 ## 4. What I would do next
 
-1. **Stop funding the ontology for authoring.** Seven null grids on outcomes,
+0. **Buy failures before buying anything else.** Nothing in this document
+   could measure an intervention, because at a median 1.000 there was nothing to
+   move. A weaker model produces failures at 1 in 3 for a few dollars a grid,
+   which makes every question in this section answerable for the first time. Run
+   new hypotheses against Haiku, confirm survivors on Sonnet.
+
+1. **Stop funding the ontology for authoring.** Eight null grids on outcomes,
    and now seven matched C1/C5 pairs showing it does not displace source reading
    either. The one rung that looked like an exception does not survive being
    counted alongside the other six. Keep the ontology: it is accurate generated
