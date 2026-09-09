@@ -203,12 +203,20 @@ move whether the agent gets anything right: the same paragraph failed its own
 falsifier on `t16-straddle`. Behaviour and outcome are separate findings and the
 first does not imply the second.
 
-**Four explanations for the wide-glyph failure are eliminated, and the failure
-is deterministic.** Five dumps across four grids and three prompt conditions are
+**Three explanations for the wide-glyph failure are eliminated, a fourth was
+wrongly listed as eliminated, and the failure is deterministic.** Five dumps
+across four grids and three prompt conditions are
 byte-identical — same 27- and 29-column rows, same correct wrap arithmetic
 underneath. Roughly seventy runs at `t16-straddle` rule out:
 
-- *the framework* — both frameworks pass under the prohibition;
+- *the framework* — **not eliminated; this bullet was too strong.** Every
+  observed failure is ratatui: 4/35 against 0/20 Hawk TUI, and 0/10 comparing
+  c1 with c1. That reads as exoneration and is not. At ratatui's own 11.4%
+  rate, drawing zero failures in 10 runs happens 30% of the time, and in 20
+  runs 9% of the time; ruling out a rate that size at 95% takes 25 clean runs
+  and there are 10. Fisher gives p = 0.561 like-for-like — no evidence either
+  way. The framework is the one hypothesis here still standing, and it is
+  standing because nobody powered the test, not because it survived one;
 - *source access* — the arm that removed it fails least often, and an untreated
   run failed having read the source four times;
 - *the ontology* — never consulted by any failing run;
