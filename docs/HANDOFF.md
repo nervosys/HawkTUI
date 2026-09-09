@@ -214,9 +214,12 @@ underneath. Roughly seventy runs at `t16-straddle` rule out:
   TUI failed none, putting it at 0/32 against ratatui's 4/35. Zero in 32 is
   unlikely at ratatui's 11.4% (p = 0.021 against that rate taken as known), but
   ratatui's own rate rests on four events, and the test that respects that —
-  Fisher exact on both cells — gives **p = 0.115**. Suggestive, not
-  significant. Roughly 40 clean Hawk TUI runs would reach p < 0.05 and 50 would
-  make it comfortable; there are 32. The original bullet said this was
+  Fisher exact on both cells — gave p = 0.115 at 32 runs. Ten more were run to
+  the pre-specified target of 40: **Hawk TUI 0/42 against ratatui 4/35, Fisher
+  exact two-sided p = 0.039.** Read that as approximate rather than a clean
+  pre-planned test — the data were examined once at n = 32, so this is a
+  sequential design without correction and the true error rate is somewhat
+  above the nominal 0.039. The original bullet said this was
   eliminated, which it was not; the honest statement is that the framework is
   the only surviving hypothesis and is now mildly supported. See
   `results/hawktui-straddle-12`. Superseded text follows:
