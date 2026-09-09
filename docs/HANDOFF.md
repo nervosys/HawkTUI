@@ -333,7 +333,21 @@ run directory keeps its prompt, transcript and dump for exactly this.
    documentation and it serves the runtime introspection case it was designed
    for. Do not buy more authoring grids expecting it to pay.
 2. **Do not build more structural rungs.** Twelve produced no failures.
-3. **Mine the rendering surface — it is the only productive seam.** All four
+3. **A rung can only fire where the framework does not already solve it.**
+   T17 and T18 are the same grapheme-cluster task with and without technique
+   hints in the prompt; both models scored 1.000 on both, twelve runs, no
+   failures. The hint was not doing the work. Two of the six passing runs never
+   pulled in `unicode-segmentation` at all — they called
+   `hawktui::core::reflow::CharWrapper`, which segments correctly already, and
+   got the answer for free. The framework being right about grapheme clusters is
+   what makes a grapheme-cluster rung unable to measure anything, and that
+   generalises: check what the framework does by default before authoring, or
+   the rung tests whether the agent found the right function. Read the older
+   "rendering surface" advice with that filter applied — the surface is
+   productive where the agent must do the arithmetic itself, which is what
+   T16 asks and T17/T18 accidentally did not.
+
+4. **Mine the rendering surface — it is the only productive seam.** All four
    failures came from it. `t15-frame` produced one on its first grid after
    rewording and `t16-straddle` produced three of fifteen, so the seam yields at
    roughly 1 in 5 rather than 1 in 225. Narrow the way T16 did: the failure is
@@ -341,12 +355,12 @@ run directory keeps its prompt, transcript and dump for exactly this.
    and the arithmetic can disagree. Grapheme clusters, bidirectional text and
    terminal resize are the untried candidates. A rung that never asks the agent
    to place a wide glyph will not fire.
-4. **Decide whether the paragraph is worth twenty runs.** It is the only
+5. **Decide whether the paragraph is worth twenty runs.** It is the only
    surviving candidate for a reliability lever and it currently sits at p = 0.22.
    Twenty prohibition runs against the existing untreated cell settle it. If it
    holds, the lever is a sentence in the prompt — not the ontology, not the API,
    not source access — which is worth knowing precisely because it is cheap.
-5. **DeweyGUI: use its transcripts, do not port the harness.** Two corrections
+6. **DeweyGUI: use its transcripts, do not port the harness.** Two corrections
    to what this document said before anyone read that code.
 
    *It does drive a real agent.* `benches/agentic/runner/run.py:115` shells out

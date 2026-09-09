@@ -84,8 +84,23 @@ def main() -> int:
         except AttributeError:
             pass
 
-    t17 = TASKS / "t17-cluster"
-    print("t17-cluster")
+    for task_id in ("t17-cluster", "t18-cluster-blind"):
+        run_one(TASKS / task_id, task_id)
+
+    print()
+    if selftest.FAILURES:
+        print(f"{len(selftest.FAILURES)} cluster self-test failure(s):")
+        for f in selftest.FAILURES:
+            print(f"  - {f}")
+        return 1
+    print("cluster self-test passed")
+    return 0
+
+
+def run_one(t17: Path, label: str) -> None:
+    """T18 is T17 with the technique hints stripped; identical checks, so the
+    same falsifiers must bite for both or the comparison means nothing."""
+    print(label)
 
     expect("correct", score(t17, frame()), want_score=1.0,
            want_contract_failed=False, want_failed_ids=set())
@@ -129,15 +144,7 @@ def main() -> int:
     # A correct layout that miscounts its own rows fails only the status line.
     expect("miscounts rows", score(t17, frame(rows_value=4)),
            want_failed_ids={"row-count"})
-
-    print()
-    if selftest.FAILURES:
-        print(f"{len(selftest.FAILURES)} cluster self-test failure(s):")
-        for f in selftest.FAILURES:
-            print(f"  - {f}")
-        return 1
-    print("cluster self-test passed")
-    return 0
+    return
 
 
 if __name__ == "__main__":
