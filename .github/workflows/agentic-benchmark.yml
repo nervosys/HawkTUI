@@ -63,8 +63,10 @@ jobs:
         # rest of this job is measuring nothing.
         working-directory: benchmarks/agentic/runner
         run: |
-          python selftest.py
-          python selftest_discovery.py
+          for t in selftest selftest_discovery selftest_complex                    selftest_unicode selftest_wrap selftest_frame                    selftest_straddle selftest_cluster selftest_tree selftest_gui; do
+            echo "--- $t"
+            python "$t.py" || exit 1
+          done
 
       - name: Build the context packs
         working-directory: benchmarks/agentic/runner
