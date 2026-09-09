@@ -337,6 +337,7 @@ impl Discoverable for SelectList {
                 },
             ],
 
+            capabilities: Vec::new(),
             usage_hint: Some("SelectList::new(items).mode(SelectMode::Multi)".into()),
             tags: vec![
                 "select".into(),
@@ -345,6 +346,60 @@ impl Discoverable for SelectList {
                 "menu".into(),
             ],
         }
+    }
+
+    fn action_schema() -> Vec<AgentAction> {
+    vec![
+                AgentAction {
+                    name: "select_index".into(),
+                    description: "Select an item by index.".into(),
+                    params: vec![ActionParam {
+                        name: "index".into(),
+                        description: "Zero-based index of the item to select.".into(),
+                        param_type: ActionParamType::Integer,
+                        required: true,
+                        default_value: None,
+                    }],
+                    returns: None,
+                    mutates: true,
+                    idempotent: true,
+                    shortcut: None,
+                },
+                AgentAction {
+                    name: "set_filter".into(),
+                    description: "Set the filter string for fuzzy matching.".into(),
+                    params: vec![ActionParam {
+                        name: "filter".into(),
+                        description: "Substring to filter items by.".into(),
+                        param_type: ActionParamType::String,
+                        required: true,
+                        default_value: None,
+                    }],
+                    returns: None,
+                    mutates: true,
+                    idempotent: true,
+                    shortcut: None,
+                },
+                AgentAction {
+                    name: "get_selected".into(),
+                    description: "Get the currently selected item values.".into(),
+                    params: vec![],
+                    returns: Some("Array of selected item values.".into()),
+                    mutates: false,
+                    idempotent: true,
+                    shortcut: None,
+                },
+            ]
+    }
+
+    fn capability_kinds() -> Vec<String> {
+        vec![
+            "focusable".to_string(),
+            "selectable".to_string(),
+            "scrollable".to_string(),
+            "searchable".to_string(),
+            "has-key-bindings".to_string(),
+        ]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {
@@ -372,47 +427,7 @@ impl Discoverable for SelectList {
     }
 
     fn actions(&self) -> Vec<AgentAction> {
-        vec![
-            AgentAction {
-                name: "select_index".into(),
-                description: "Select an item by index.".into(),
-                params: vec![ActionParam {
-                    name: "index".into(),
-                    description: "Zero-based index of the item to select.".into(),
-                    param_type: ActionParamType::Integer,
-                    required: true,
-                    default_value: None,
-                }],
-                returns: None,
-                mutates: true,
-                idempotent: true,
-                shortcut: None,
-            },
-            AgentAction {
-                name: "set_filter".into(),
-                description: "Set the filter string for fuzzy matching.".into(),
-                params: vec![ActionParam {
-                    name: "filter".into(),
-                    description: "Substring to filter items by.".into(),
-                    param_type: ActionParamType::String,
-                    required: true,
-                    default_value: None,
-                }],
-                returns: None,
-                mutates: true,
-                idempotent: true,
-                shortcut: None,
-            },
-            AgentAction {
-                name: "get_selected".into(),
-                description: "Get the currently selected item values.".into(),
-                params: vec![],
-                returns: Some("Array of selected item values.".into()),
-                mutates: false,
-                idempotent: true,
-                shortcut: None,
-            },
-        ]
+        Self::action_schema()
     }
 
     fn semantic_role(&self) -> SemanticRole {

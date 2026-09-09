@@ -475,6 +475,7 @@ impl Discoverable for Image {
             ],
             actions: vec![],
 
+            capabilities: Vec::new(),
             usage_hint: Some(
                 "Use Image::detect_protocol() to auto-select the best rendering method.".into(),
             ),

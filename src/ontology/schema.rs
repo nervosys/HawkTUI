@@ -14,6 +14,13 @@ pub struct WidgetSchema {
     /// Actions that agents can invoke on this widget type (INJ-2).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub actions: Vec<super::AgentAction>,
+    /// Capability kinds this widget type can exhibit (INJ-2).
+    ///
+    /// Instance capabilities carry live data — `Selectable` knows how many
+    /// items there are — so the schema advertises the kinds and an agent reads
+    /// `agent_state` for the values.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub capabilities: Vec<String>,
     /// Brief usage example for agents.
     pub usage_hint: Option<String>,
     /// Tags for fuzzy search (e.g., ["text", "display", "paragraph"]).

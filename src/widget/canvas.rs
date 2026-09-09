@@ -772,6 +772,7 @@ impl Discoverable for Canvas {
             ],
             actions: vec![],
 
+            capabilities: Vec::new(),
             usage_hint: Some(
                 "Canvas::new().x_bounds([0.0, 100.0]).line(CanvasLine { x1: 0.0, y1: 0.0, \
                  x2: 100.0, y2: 50.0, color: Color::White })"

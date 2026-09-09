@@ -588,6 +588,7 @@ impl Discoverable for Chart {
             ],
             actions: vec![],
 
+            capabilities: Vec::new(),
             usage_hint: Some(
                 "Use for plotting numerical data trends. Braille markers give sub-cell resolution."
                     .into(),

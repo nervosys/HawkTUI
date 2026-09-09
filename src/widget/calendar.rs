@@ -226,6 +226,7 @@ impl Discoverable for Calendar {
             ],
             actions: vec![],
 
+            capabilities: Vec::new(),
             usage_hint: Some("Calendar::new(2026, 3).show_header(true)".into()),
             tags: vec!["calendar".into(), "date".into(), "display".into()],
         }

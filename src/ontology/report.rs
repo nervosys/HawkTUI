@@ -123,6 +123,10 @@ pub fn schema(registry: &OntologyRegistry, name: &str) -> Option<String> {
         }
     }
 
+    if !schema.capabilities.is_empty() {
+        let _ = writeln!(out, "\ncapabilities:\n  {}", schema.capabilities.join(", "));
+    }
+
     if let Some(hint) = &schema.usage_hint {
         let _ = writeln!(out, "\nusage:\n  {hint}");
     }

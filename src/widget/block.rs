@@ -375,6 +375,7 @@ impl Discoverable for Block {
             ],
             actions: vec![],
 
+            capabilities: Vec::new(),
             usage_hint: Some("Block::bordered().title(\"My Panel\")".into()),
             tags: vec!["container".into(), "border".into(), "panel".into()],
         }

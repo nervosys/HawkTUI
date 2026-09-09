@@ -43,8 +43,28 @@ pub trait Discoverable {
         Self: Sized;
 
     /// Returns the capabilities of this specific widget instance.
-    /// Returns the capabilities of this specific widget instance.
     fn capabilities(&self) -> Vec<AgentCapability>;
+
+    /// The actions this widget *type* exposes.
+    ///
+    /// `schema()` is static, so the registry never sees an instance and cannot
+    /// ask it what it can do. Before this existed, the catalog an agent queried
+    /// reported no actions for eighteen of twenty-one widgets while the code
+    /// implemented them, and no capabilities for any.
+    fn action_schema() -> Vec<AgentAction>
+    where
+        Self: Sized,
+    {
+        Vec::new()
+    }
+
+    /// The capability kinds this widget *type* can exhibit.
+    fn capability_kinds() -> Vec<String>
+    where
+        Self: Sized,
+    {
+        Vec::new()
+    }
 
     /// Returns the actions available on this specific widget instance.
     fn actions(&self) -> Vec<AgentAction>;

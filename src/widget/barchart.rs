@@ -466,6 +466,7 @@ impl Discoverable for BarChart {
             ],
             actions: vec![],
 
+            capabilities: Vec::new(),
             usage_hint: Some("Use for categorical comparisons. Each group can have multiple bars for multi-series data.".into()),
             tags: vec!["chart".into(), "bar".into(), "data".into(), "visualization".into()],
         }

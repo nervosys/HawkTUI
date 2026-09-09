@@ -182,6 +182,7 @@ impl Discoverable for Gauge {
                 },
             ],
 
+            capabilities: Vec::new(),
             usage_hint: Some("Gauge::new().percent(42).label(\"Loading...\")".into()),
             tags: vec![
                 "gauge".into(),
@@ -190,6 +191,41 @@ impl Discoverable for Gauge {
                 "loading".into(),
             ],
         }
+    }
+
+    fn action_schema() -> Vec<AgentAction> {
+    vec![
+                AgentAction {
+                    name: "set_ratio".into(),
+                    description: "Set the gauge progress ratio.".into(),
+                    params: vec![ActionParam {
+                        name: "ratio".into(),
+                        description: "Value between 0.0 and 1.0.".into(),
+                        param_type: ActionParamType::Float,
+                        required: true,
+                        default_value: None,
+                    }],
+                    returns: None,
+                    mutates: true,
+                    idempotent: true,
+                    shortcut: None,
+                },
+                AgentAction {
+                    name: "get_ratio".into(),
+                    description: "Get the current progress ratio.".into(),
+                    params: vec![],
+                    returns: Some("Current ratio as float.".into()),
+                    mutates: false,
+                    idempotent: true,
+                    shortcut: None,
+                },
+            ]
+    }
+
+    fn capability_kinds() -> Vec<String> {
+        vec![
+            "range-editable".to_string(),
+        ]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {
@@ -201,32 +237,7 @@ impl Discoverable for Gauge {
     }
 
     fn actions(&self) -> Vec<AgentAction> {
-        vec![
-            AgentAction {
-                name: "set_ratio".into(),
-                description: "Set the gauge progress ratio.".into(),
-                params: vec![ActionParam {
-                    name: "ratio".into(),
-                    description: "Value between 0.0 and 1.0.".into(),
-                    param_type: ActionParamType::Float,
-                    required: true,
-                    default_value: None,
-                }],
-                returns: None,
-                mutates: true,
-                idempotent: true,
-                shortcut: None,
-            },
-            AgentAction {
-                name: "get_ratio".into(),
-                description: "Get the current progress ratio.".into(),
-                params: vec![],
-                returns: Some("Current ratio as float.".into()),
-                mutates: false,
-                idempotent: true,
-                shortcut: None,
-            },
-        ]
+        Self::action_schema()
     }
 
     fn semantic_role(&self) -> SemanticRole {

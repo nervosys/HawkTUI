@@ -141,6 +141,7 @@ impl Discoverable for Loader {
             ],
             actions: vec![],
 
+            capabilities: Vec::new(),
             usage_hint: Some(
                 "Loader::new(\"Loading...\").spinner_style(SpinnerStyle::Braille).tick(n)".into(),
             ),
@@ -151,6 +152,12 @@ impl Discoverable for Loader {
                 "animation".into(),
             ],
         }
+    }
+
+    fn capability_kinds() -> Vec<String> {
+        vec![
+            "animated".to_string(),
+        ]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {

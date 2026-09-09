@@ -29,7 +29,14 @@ impl OntologyRegistry {
 
     /// Register a discoverable widget type (convenience).
     pub fn register<W: Discoverable>(&mut self) {
-        self.register_schema(W::schema());
+        let mut schema = W::schema();
+        if schema.actions.is_empty() {
+            schema.actions = W::action_schema();
+        }
+        if schema.capabilities.is_empty() {
+            schema.capabilities = W::capability_kinds();
+        }
+        self.register_schema(schema);
     }
 
     /// List all registered widget type names.

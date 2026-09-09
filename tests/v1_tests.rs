@@ -532,6 +532,7 @@ mod tests {
                 default_role: role,
                 properties: vec![],
                 actions: vec![],
+                capabilities: Vec::new(),
                 usage_hint: None,
                 tags: tags.iter().map(|s| s.to_string()).collect(),
             }

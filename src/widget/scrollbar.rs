@@ -286,9 +286,16 @@ impl Discoverable for Scrollbar {
             }],
             actions: vec![],
 
+            capabilities: Vec::new(),
             usage_hint: Some("Scrollbar::new(ScrollbarOrientation::Vertical)".into()),
             tags: vec!["scrollbar".into(), "scroll".into(), "indicator".into()],
         }
+    }
+
+    fn capability_kinds() -> Vec<String> {
+        vec![
+            "scrollable".to_string(),
+        ]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {
