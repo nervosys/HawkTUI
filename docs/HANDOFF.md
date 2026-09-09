@@ -209,28 +209,24 @@ across four grids and three prompt conditions are
 byte-identical — same 27- and 29-column rows, same correct wrap arithmetic
 underneath. Roughly seventy runs at `t16-straddle` rule out:
 
-- *the framework* — **not eliminated, and now the leading explanation, though
-  still not established.** Twelve fresh Sonnet runs at `t16-straddle` on Hawk
-  TUI failed none, putting it at 0/32 against ratatui's 4/35. Zero in 32 is
-  unlikely at ratatui's 11.4% (p = 0.021 against that rate taken as known), but
-  ratatui's own rate rests on four events, and the test that respects that —
-  Fisher exact on both cells — gave p = 0.115 at 32 runs. Ten more were run to
-  the pre-specified target of 40: **Hawk TUI 0/42 against ratatui 4/35, Fisher
-  exact two-sided p = 0.039.** Read that as approximate rather than a clean
-  pre-planned test — the data were examined once at n = 32, so this is a
-  sequential design without correction and the true error rate is somewhat
-  above the nominal 0.039. The original bullet said this was
-  eliminated, which it was not; the honest statement is that the framework is
-  the only surviving hypothesis and is now mildly supported. See
-  `results/hawktui-straddle-12`. Superseded text follows:
-  ~~this bullet was too strong~~ Every
-  observed failure is ratatui: 4/35 against 0/20 Hawk TUI, and 0/10 comparing
-  c1 with c1. That reads as exoneration and is not. At ratatui's own 11.4%
-  rate, drawing zero failures in 10 runs happens 30% of the time, and in 20
-  runs 9% of the time; ruling out a rate that size at 95% takes 25 clean runs
-  and there are 10. Fisher gives p = 0.561 like-for-like — no evidence either
-  way. The framework is the one hypothesis here still standing, and it is
-  standing because nobody powered the test, not because it survived one;
+- *the framework* — **the surviving explanation, and now weakly supported.**
+  The original bullet called this eliminated, on the grounds that both
+  frameworks pass under the prohibition. That was never what the data said:
+  every observed failure is ratatui's, and zero failures in ten Hawk TUI runs
+  is what an 11.4% rate produces 30% of the time. Twenty-two fresh Sonnet runs
+  were added, to a target of 40 named before they were run.
+
+  **Hawk TUI 0/42, ratatui 4/35, Fisher exact two-sided p = 0.039.**
+
+  Read it as approximate. The data were examined once at n = 32, so this is a
+  sequential design without correction and the real error rate sits somewhat
+  above the nominal figure. And the claim is narrow: two frameworks differ on
+  *one task*. It does not say Hawk TUI is more agent-legible, and roughly
+  seventy runs have failed to find the mechanism — the failing agents inject a
+  space after each wide character, and nothing measured predicts which runs
+  do. It is, even so, the first result here in which framework design appears
+  to change an agent outcome. See `results/hawktui-straddle-12` and
+  `results/hawktui-straddle-10`;
 - *source access* — the arm that removed it fails least often, and an untreated
   run failed having read the source four times;
 - *the ontology* — never consulted by any failing run;
