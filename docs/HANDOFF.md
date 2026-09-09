@@ -362,8 +362,23 @@ run directory keeps its prompt, transcript and dump for exactly this.
    which makes every question in this section answerable for the first time. Run
    new hypotheses against Haiku, confirm survivors on Sonnet.
 
-1. **The nine nulls measured a catalog that was mostly empty, against a
-   baseline that was mostly missing. Re-run one before concluding anything.**
+1. **Settled: the tenth null is the fair one.** ~~The nine nulls measured a
+   catalog that was mostly empty, against a baseline that was mostly
+   missing.~~ Both faults were fixed and the grid was re-run: C1 with the six
+   documents a user actually receives, C5 adding an ontology carrying 30
+   actions and 14 capability sets, nine Haiku runs each, same tree and tasks
+   and replicates. **6/9 against 6/9, Fisher p = 1.000.** The scores are almost
+   the same list. `E0433` fell 28 to 23 — a quarter of the reduction the same
+   comparison used to show, because a C1 that ships `llms.txt` and the protocol
+   docs already answers most import questions. The earlier `E0433` wins were
+   largely the ontology repairing a baseline the harness had broken.
+
+   That is the result the previous nine could not deliver, and it points the
+   same way: a populated ontology, measured against a fair baseline, on the
+   model that actually fails these tasks, changes nothing about outcomes. See
+   `results/haiku-fair-c1c5`.
+
+2. **The earlier nulls, for the record.**
    Two faults found after those grids change what they tested. The catalog an
    agent queried named no actions for 18 of 21 widgets and no capabilities for
    any, because `schema()` is static and could not reach the instance methods
@@ -372,16 +387,16 @@ run directory keeps its prompt, transcript and dump for exactly this.
    protocol docs. The nulls are not overturned — a thin baseline makes uplift
    *easier* to see, and the actions were always readable in the source — but
    "the ontology does not help" was never a test of the ontology this crate now
-   publishes. One C1-vs-C5 grid on Haiku settles it.
+   publishes. That grid has now been run — see item 1 — and they hold.
 
-2. **Stop funding the ontology for authoring.** Nine null grids on outcomes,
+3. **Stop funding the ontology for authoring.** Ten null grids on outcomes,
    and now seven matched C1/C5 pairs showing it does not displace source reading
    either. The one rung that looked like an exception does not survive being
    counted alongside the other six. Keep the ontology: it is accurate generated
    documentation and it serves the runtime introspection case it was designed
    for. Do not buy more authoring grids expecting it to pay.
-3. **Do not build more structural rungs.** Twelve produced no failures.
-4. **A rung can only fire where the framework does not already solve it.**
+4. **Do not build more structural rungs.** Twelve produced no failures.
+5. **A rung can only fire where the framework does not already solve it.**
    T17 and T18 are the same grapheme-cluster task with and without technique
    hints in the prompt; both models scored 1.000 on both, twelve runs, no
    failures. The hint was not doing the work. Two of the six passing runs never
@@ -395,7 +410,7 @@ run directory keeps its prompt, transcript and dump for exactly this.
    productive where the agent must do the arithmetic itself, which is what
    T16 asks and T17/T18 accidentally did not.
 
-5. **Mine the rendering surface — it is the only productive seam.** All four
+6. **Mine the rendering surface — it is the only productive seam.** All four
    failures came from it. `t15-frame` produced one on its first grid after
    rewording and `t16-straddle` produced three of fifteen, so the seam yields at
    roughly 1 in 5 rather than 1 in 225. Narrow the way T16 did: the failure is
@@ -403,12 +418,12 @@ run directory keeps its prompt, transcript and dump for exactly this.
    and the arithmetic can disagree. Grapheme clusters, bidirectional text and
    terminal resize are the untried candidates. A rung that never asks the agent
    to place a wide glyph will not fire.
-6. **Decide whether the paragraph is worth twenty runs.** It is the only
+7. **Decide whether the paragraph is worth twenty runs.** It is the only
    surviving candidate for a reliability lever and it currently sits at p = 0.22.
    Twenty prohibition runs against the existing untreated cell settle it. If it
    holds, the lever is a sentence in the prompt — not the ontology, not the API,
    not source access — which is worth knowing precisely because it is cheap.
-7. **DeweyGUI: use its transcripts, do not port the harness.** Two corrections
+8. **DeweyGUI: use its transcripts, do not port the harness.** Two corrections
    to what this document said before anyone read that code.
 
    *It does drive a real agent.* `benches/agentic/runner/run.py:115` shells out
@@ -485,7 +500,7 @@ run directory keeps its prompt, transcript and dump for exactly this.
    — the frames are different kinds of output and the comparison would be
    meaningless; the framework entry says so as well.
 
-8. **Use `--isolate` for anything published.** A scaffolded crate edited
+9. **Use `--isolate` for anything published.** A scaffolded crate edited
    `benchmarks/Cargo.toml` in an earlier grid.
 
 ---
