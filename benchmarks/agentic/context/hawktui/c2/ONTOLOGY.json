@@ -140,6 +140,20 @@
     "usage_hint": "Calendar::new(2026, 3).show_header(true)"
   },
   "CancellableLoader": {
+    "actions": [
+      {
+        "description": "Cancel the running operation.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "cancel",
+        "params": [],
+        "returns": null,
+        "shortcut": "Esc"
+      }
+    ],
+    "capabilities": [
+      "animated"
+    ],
     "default_role": "StatusBar",
     "description": "An animated spinner/loader with cancellation support.",
     "name": "CancellableLoader",
@@ -259,6 +273,58 @@
     "usage_hint": "Use for plotting numerical data trends. Braille markers give sub-cell resolution."
   },
   "Editor": {
+    "actions": [
+      {
+        "description": "Replace the entire editor content.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "set_text",
+        "params": [
+          {
+            "default_value": null,
+            "description": "The text to set.",
+            "name": "text",
+            "param_type": "String",
+            "required": true
+          }
+        ],
+        "returns": null,
+        "shortcut": null
+      },
+      {
+        "description": "Get the full editor text content.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_text",
+        "params": [],
+        "returns": "The editor text as a string.",
+        "shortcut": null
+      },
+      {
+        "description": "Insert text at the current cursor position.",
+        "idempotent": false,
+        "mutates": true,
+        "name": "insert_text",
+        "params": [
+          {
+            "default_value": null,
+            "description": "The text to insert.",
+            "name": "text",
+            "param_type": "String",
+            "required": true
+          }
+        ],
+        "returns": null,
+        "shortcut": null
+      }
+    ],
+    "capabilities": [
+      "focusable",
+      "text-input",
+      "scrollable",
+      "copyable",
+      "has-key-bindings"
+    ],
     "default_role": "Input",
     "description": "A multi-line text editor with cursor movement, line editing, and scrolling.",
     "name": "Editor",
@@ -309,6 +375,9 @@
         "returns": "Current ratio as float.",
         "shortcut": null
       }
+    ],
+    "capabilities": [
+      "range-editable"
     ],
     "default_role": "Progress",
     "description": "A horizontal progress bar displaying a ratio or percentage.",
@@ -447,6 +516,12 @@
         "shortcut": null
       }
     ],
+    "capabilities": [
+      "focusable",
+      "text-input",
+      "copyable",
+      "has-key-bindings"
+    ],
     "default_role": "Input",
     "description": "A single-line text input field with cursor navigation and editing.",
     "name": "Input",
@@ -469,6 +544,20 @@
     "usage_hint": "Input::new().placeholder(\"Type here...\")"
   },
   "LineGauge": {
+    "actions": [
+      {
+        "description": "Set the progress ratio.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "set_progress",
+        "params": [],
+        "returns": null,
+        "shortcut": null
+      }
+    ],
+    "capabilities": [
+      "range-editable"
+    ],
     "default_role": "Progress",
     "description": "A thin, single-line progress bar using line-drawing characters.",
     "name": "LineGauge",
@@ -506,6 +595,67 @@
     "usage_hint": "LineGauge::new().percent(65).label(\"Progress\")"
   },
   "List": {
+    "actions": [
+      {
+        "description": "Select an item by index.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "select",
+        "params": [
+          {
+            "default_value": null,
+            "description": "Zero-based item index.",
+            "name": "index",
+            "param_type": "Index",
+            "required": true
+          }
+        ],
+        "returns": "The selected item text.",
+        "shortcut": null
+      },
+      {
+        "description": "Move selection to the next item.",
+        "idempotent": false,
+        "mutates": true,
+        "name": "select_next",
+        "params": [],
+        "returns": null,
+        "shortcut": "Down"
+      },
+      {
+        "description": "Move selection to the previous item.",
+        "idempotent": false,
+        "mutates": true,
+        "name": "select_previous",
+        "params": [],
+        "returns": null,
+        "shortcut": "Up"
+      },
+      {
+        "description": "Get all list item texts.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_items",
+        "params": [],
+        "returns": "Array of item texts.",
+        "shortcut": null
+      },
+      {
+        "description": "Get the currently selected item index and text.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_selected",
+        "params": [],
+        "returns": "Object with index and text, or null.",
+        "shortcut": null
+      }
+    ],
+    "capabilities": [
+      "focusable",
+      "scrollable",
+      "selectable",
+      "has-key-bindings"
+    ],
     "default_role": "Selection",
     "description": "A scrollable list with item selection, highlight, and keyboard navigation.",
     "name": "List",
@@ -538,6 +688,9 @@
     "usage_hint": "List::new([\"Item 1\", \"Item 2\"]).highlight_symbol(\">> \")"
   },
   "Loader": {
+    "capabilities": [
+      "animated"
+    ],
     "default_role": "StatusBar",
     "description": "An animated spinner/loader with an optional message.",
     "name": "Loader",
@@ -568,6 +721,20 @@
     "usage_hint": "Loader::new(\"Loading...\").spinner_style(SpinnerStyle::Braille).tick(n)"
   },
   "Markdown": {
+    "actions": [
+      {
+        "description": "Get the Markdown source text.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_source",
+        "params": [],
+        "returns": "The Markdown source string.",
+        "shortcut": null
+      }
+    ],
+    "capabilities": [
+      "scrollable"
+    ],
     "default_role": "Display",
     "description": "Renders Markdown text with headings, bold, italic, code, lists, and blockquotes.",
     "name": "Markdown",
@@ -590,6 +757,45 @@
     "usage_hint": "Markdown::new(\"# Hello\\n\\nSome **bold** text\")"
   },
   "Paragraph": {
+    "actions": [
+      {
+        "description": "Scroll to a specific position.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "scroll_to",
+        "params": [
+          {
+            "default_value": 0,
+            "description": "Vertical scroll offset.",
+            "name": "y",
+            "param_type": "Integer",
+            "required": false
+          },
+          {
+            "default_value": 0,
+            "description": "Horizontal scroll offset.",
+            "name": "x",
+            "param_type": "Integer",
+            "required": false
+          }
+        ],
+        "returns": null,
+        "shortcut": null
+      },
+      {
+        "description": "Get the full text content.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_text",
+        "params": [],
+        "returns": "Full text content as string.",
+        "shortcut": null
+      }
+    ],
+    "capabilities": [
+      "scrollable",
+      "copyable"
+    ],
     "default_role": "Display",
     "description": "Displays styled text with optional wrapping, scrolling, and alignment.",
     "name": "Paragraph",
@@ -652,6 +858,9 @@
     "usage_hint": "Paragraph::new(\"Hello, world!\").centered()"
   },
   "Scrollbar": {
+    "capabilities": [
+      "scrollable"
+    ],
     "default_role": "Scrollable",
     "description": "A scroll indicator showing viewport position within content.",
     "name": "Scrollbar",
@@ -723,6 +932,13 @@
         "shortcut": null
       }
     ],
+    "capabilities": [
+      "focusable",
+      "selectable",
+      "scrollable",
+      "searchable",
+      "has-key-bindings"
+    ],
     "default_role": "Input",
     "description": "An interactive select list supporting single or multi-select with filtering.",
     "name": "SelectList",
@@ -755,6 +971,46 @@
     "usage_hint": "SelectList::new(items).mode(SelectMode::Multi)"
   },
   "SettingsList": {
+    "actions": [
+      {
+        "description": "Cycle the focused setting to its next value.",
+        "idempotent": false,
+        "mutates": true,
+        "name": "cycle_next",
+        "params": [
+          {
+            "default_value": null,
+            "description": "Setting index to cycle (defaults to cursor position).",
+            "name": "index",
+            "param_type": "Index",
+            "required": false
+          }
+        ],
+        "returns": "The new value after cycling.",
+        "shortcut": "Enter"
+      },
+      {
+        "description": "Cycle the focused setting to its previous value.",
+        "idempotent": false,
+        "mutates": true,
+        "name": "cycle_prev",
+        "params": [
+          {
+            "default_value": null,
+            "description": "Setting index to cycle.",
+            "name": "index",
+            "param_type": "Index",
+            "required": false
+          }
+        ],
+        "returns": "The new value after cycling.",
+        "shortcut": null
+      }
+    ],
+    "capabilities": [
+      "focusable",
+      "selectable"
+    ],
     "default_role": "Navigation",
     "description": "An interactive settings list with cycleable key-value pairs.",
     "name": "SettingsList",
@@ -781,6 +1037,17 @@
     "usage_hint": "Navigate with up/down, cycle values with Enter or left/right."
   },
   "Sparkline": {
+    "actions": [
+      {
+        "description": "Get the sparkline data points.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_data",
+        "params": [],
+        "returns": "Array of integers.",
+        "shortcut": null
+      }
+    ],
     "default_role": "DataVisualization",
     "description": "A compact chart displaying data trends as vertical bars.",
     "name": "Sparkline",
@@ -817,6 +1084,65 @@
     "usage_hint": "Sparkline::new(vec![0, 1, 3, 7, 5, 2])"
   },
   "Table": {
+    "actions": [
+      {
+        "description": "Select a row by index.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "select_row",
+        "params": [
+          {
+            "default_value": null,
+            "description": "Zero-based row index.",
+            "name": "index",
+            "param_type": "Index",
+            "required": true
+          }
+        ],
+        "returns": "The selected row data.",
+        "shortcut": null
+      },
+      {
+        "description": "Get the value of a specific cell.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_cell",
+        "params": [
+          {
+            "default_value": null,
+            "description": "Zero-based row index.",
+            "name": "row",
+            "param_type": "Index",
+            "required": true
+          },
+          {
+            "default_value": null,
+            "description": "Zero-based column index.",
+            "name": "column",
+            "param_type": "Index",
+            "required": true
+          }
+        ],
+        "returns": "Cell text content.",
+        "shortcut": null
+      },
+      {
+        "description": "Get the total number of rows.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_row_count",
+        "params": [],
+        "returns": "Row count as integer.",
+        "shortcut": null
+      }
+    ],
+    "capabilities": [
+      "focusable",
+      "scrollable",
+      "selectable",
+      "sortable",
+      "has-key-bindings"
+    ],
     "default_role": "DataVisualization",
     "description": "A data table with column headers, row selection, and scrolling.",
     "name": "Table",
@@ -855,6 +1181,39 @@
     "usage_hint": "Table::new([TableColumn::new(\"Name\", TableColumnWidth::Fill)], [TableRow::new([\"Alice\"])])"
   },
   "Tabs": {
+    "actions": [
+      {
+        "description": "Switch to a tab by index.",
+        "idempotent": true,
+        "mutates": true,
+        "name": "select_tab",
+        "params": [
+          {
+            "default_value": null,
+            "description": "Zero-based tab index.",
+            "name": "index",
+            "param_type": "Index",
+            "required": true
+          }
+        ],
+        "returns": null,
+        "shortcut": null
+      },
+      {
+        "description": "Get all tab titles.",
+        "idempotent": true,
+        "mutates": false,
+        "name": "get_tabs",
+        "params": [],
+        "returns": "Array of tab title strings.",
+        "shortcut": null
+      }
+    ],
+    "capabilities": [
+      "focusable",
+      "selectable",
+      "has-key-bindings"
+    ],
     "default_role": "Navigation",
     "description": "A horizontal tab bar for section navigation.",
     "name": "Tabs",

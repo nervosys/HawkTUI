@@ -49,6 +49,48 @@ def find_crate(name: str) -> Path | None:
     return None
 
 
+
+def packaged_files() -> list[str]:
+    """Non-source files `cargo package` would ship, as repo-relative paths.
+
+    Asking cargo keeps C1 honest by construction: change `exclude` or add a
+    doc, and the pack follows without anyone remembering to edit this file.
+    """
+    proc = subprocess.run(
+        ["cargo", "package", "--list", "--allow-dirty"],
+        cwd=REPO, capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    if proc.returncode != 0:
+        sys.exit("cargo package --list failed: " + proc.stderr)
+    skip_prefix = ("src/", "tests/", "benches/", "examples/", ".cargo_vcs_info",
+                   "Cargo.lock", "Cargo.toml.orig", ".gitignore", ".well-known/")
+    # Two exclusions beyond "not documentation".
+    #
+    # The benchmark's own write-ups are in the published crate, so a real user
+    # does get them, but handing an agent the document that names the tasks,
+    # the failure modes and how the checks score would measure reading
+    # comprehension of this benchmark rather than authoring ability.
+    #
+    # Machine config is not documentation: Cargo.toml, deny.toml and the
+    # licence teach an author nothing and the agent writes its own manifest.
+    contaminating = {
+        "docs/HANDOFF.md",
+        "docs/AGENTIC-BENCHMARKS.md",
+        "docs/BENCHMARKS.md",
+    }
+    not_docs = {"Cargo.toml", "deny.toml", "LICENSE", "CHANGELOG.md",
+                "CONTRIBUTING.md", "SECURITY.md", "ROADMAP.md"}
+    out = []
+    for line in proc.stdout.splitlines():
+        rel = line.strip().replace("\\", "/")
+        if not rel or rel.startswith(skip_prefix):
+            continue
+        if rel in contaminating or rel in not_docs:
+            continue
+        if (REPO / rel).is_file():
+            out.append(rel)
+    return out
+
 def ontology(*args: str) -> str:
     proc = subprocess.run(
         ["cargo", "run", "--quiet", "--example", "ontology_query", "--", *args],
@@ -141,9 +183,16 @@ def main() -> int:
     if (dewey / "README.md").is_file():
         copy(dewey / "README.md", CONTEXT / "deweygui" / "c1" / "README.md")
 
-    # C1 — exactly what `cargo add hawktui` delivers: the README. `docs/` is in
-    # the package `exclude` list, so none of it reaches a user.
-    copy(REPO / "README.md", CONTEXT / "hawktui" / "c1" / "README.md")
+    # C1 — exactly what `cargo add hawktui` delivers, taken from cargo rather
+    # than guessed. The guess was wrong: this said "`docs/` is in the package
+    # `exclude` list, so none of it reaches a user" and shipped the README
+    # alone, while the published crate carries llms.txt, AGENTS.md and six
+    # docs/*.md — 21 non-source files. A user got twenty of them and the
+    # benchmark's agent got none, so C1 understated Hawk TUI against
+    # competitors whose packs are built from what *they* ship, and left the
+    # agent with the source as the only place to look.
+    for rel in packaged_files():
+        copy(REPO / rel, CONTEXT / "hawktui" / "c1" / rel)
     # C2 — the ontology as a static pack.
     write(CONTEXT / "hawktui" / "c2" / "ONTOLOGY.json", ontology("export"))
     write(CONTEXT / "hawktui" / "c2" / "ONTOLOGY.md", ontology("digest"))
