@@ -209,7 +209,18 @@ across four grids and three prompt conditions are
 byte-identical — same 27- and 29-column rows, same correct wrap arithmetic
 underneath. Roughly seventy runs at `t16-straddle` rule out:
 
-- *the framework* — **not eliminated; this bullet was too strong.** Every
+- *the framework* — **not eliminated, and now the leading explanation, though
+  still not established.** Twelve fresh Sonnet runs at `t16-straddle` on Hawk
+  TUI failed none, putting it at 0/32 against ratatui's 4/35. Zero in 32 is
+  unlikely at ratatui's 11.4% (p = 0.021 against that rate taken as known), but
+  ratatui's own rate rests on four events, and the test that respects that —
+  Fisher exact on both cells — gives **p = 0.115**. Suggestive, not
+  significant. Roughly 40 clean Hawk TUI runs would reach p < 0.05 and 50 would
+  make it comfortable; there are 32. The original bullet said this was
+  eliminated, which it was not; the honest statement is that the framework is
+  the only surviving hypothesis and is now mildly supported. See
+  `results/hawktui-straddle-12`. Superseded text follows:
+  ~~this bullet was too strong~~ Every
   observed failure is ratatui: 4/35 against 0/20 Hawk TUI, and 0/10 comparing
   c1 with c1. That reads as exoneration and is not. At ratatui's own 11.4%
   rate, drawing zero failures in 10 runs happens 30% of the time, and in 20
