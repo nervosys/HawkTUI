@@ -62,6 +62,23 @@ E0433 falls 41 -> 25 -> 15 while E0599 rises 12 -> 23 -> 22 and E0425 3 -> 10 ->
 The ontology stops the model inventing imports and it fails one layer later.
 MCP attachment was verified per run: 10 tools offered on all nine C5 runs.
 
+**A prompt paragraph is the strongest behavioural lever here, and an outcome
+null.** Nine C5 Haiku runs with `--source-note redirect` against nine plain C5
+runs, same tasks and replicates. It does not change *whether* the agent
+consults — that was already 8/9 with the tools merely attached — it changes how
+hard: MCP calls 52 → 91, source reading 44% → 22%, API errors 66 → 34. Perfect
+scores 6/9 → 5/9, Fisher exact p = 1.000. Cost fell 18%. See
+`results/haiku-redirect`.
+
+**Putting the ontology in the doc comments is a ninth null.** Eighteen Haiku
+runs, two arms one commit apart: +286 lines of generated doc comment across 21
+widget files, nothing else. 5/9 → 4/9 perfect, p = 1.000; API errors 61 → 38 and
+E0433 30 → 17, the same shape every delivery produces. Read it with the
+treatment-check attached: only 5 of 9 treated runs ever opened a
+`src/widget/*.rs` file, because source reading is universal on Sonnet and 44% on
+Haiku. The idea was justified with a Sonnet number and tested on Haiku. It is
+untested, not refuted. See `results/doc-ontology-ab`.
+
 **Structural complexity does not make agents fail.** Twelve rungs from
 hello-world to a four-pane git browser with cross-pane coupling: `score` 1.000
 throughout. Compiler errors are a feedback loop an agent iterates through, not a
@@ -241,7 +258,7 @@ failed to control.
 
 ## 3. Read this before trusting any number
 
-**Fifteen harness faults were found in this work. The first twelve all made an
+**Sixteen harness faults were found in this work. The first twelve all made an
 agent or a competitor look worse than reality, never once the reverse — and that
 one-sidedness was itself reported here as structural. The thirteenth broke it.**
 
@@ -274,6 +291,7 @@ way instruments err.
 | `why_source.py` matched any path under `HawkTUI` | 572 source reads | 421; 261 were the agent re-reading its own `main.rs` |
 | The same literal names hid every other framework | DeweyGUI 0 reads | 47 across 4 runs |
 | Analysis tools read absent transcripts as data | `0% consulted` | nothing was read |
+| `display_width` summed codepoints, not clusters | 👨‍👩‍👧 = 8 columns | 2; latent, never fired |
 
 The tenth is the dangerous one and breaks the pattern: it made the *harness*
 look capable rather than making an agent look bad. `--no-source` only dropped
@@ -305,6 +323,14 @@ already narrowed, and the redirect grids hit a floor that the existing C1/C5
 pairs would have predicted for nothing. The free analysis was repeatedly more
 informative than the paid one, and it was repeatedly run second.
 
+**Check that the number you are reasoning from applies to the model you are
+testing.** The doc-comment ontology was designed on "agents read the source in
+100% of runs, first read at turn 3" and then measured on Haiku, which reads
+source in 44% of runs, first read at turn 57 — a figure established three grids
+earlier in the same session. A third of the treated arm never saw the treatment.
+Every behavioural rate in this document is now model-specific; none of them
+transfer, and the older ones were all measured on Sonnet.
+
 **Flagging small n is not the same as not publishing the claim.** A grid of
 three runs per cell showed the ontology taking `t9-atlas` from 2/3 to 0/3, and
 that went into a commit message with a mechanism attached and a caveat about
@@ -326,7 +352,7 @@ run directory keeps its prompt, transcript and dump for exactly this.
    which makes every question in this section answerable for the first time. Run
    new hypotheses against Haiku, confirm survivors on Sonnet.
 
-1. **Stop funding the ontology for authoring.** Eight null grids on outcomes,
+1. **Stop funding the ontology for authoring.** Nine null grids on outcomes,
    and now seven matched C1/C5 pairs showing it does not displace source reading
    either. The one rung that looked like an exception does not survive being
    counted alongside the other six. Keep the ontology: it is accurate generated
