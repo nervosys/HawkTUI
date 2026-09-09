@@ -6,9 +6,15 @@
 [![MSRV](https://img.shields.io/badge/MSRV-1.80-blue.svg)](https://releases.rs/docs/1.80.0/)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-**A rendering engine measurably faster than ratatui — and a machine-readable widget ontology that lets agents drive your app through structured calls instead of screen-scraping.**
+**A rendering engine measurably faster than ratatui, which agents get right more often — and a machine-readable widget ontology that lets agents drive your app through structured calls instead of screen-scraping.**
 
 Hawk TUI combines the best of modern TUI frameworks (ratatui, bubbletea, ink, etc) with a structured metadata layer that lets AI agents discover, inspect, and interact with every widget in your application — no hardcoded assumptions, no trial-and-error.
+
+Agents author correct programs against it: 142 of 142 across every task both it
+and ratatui have run, against ratatui's 59 of 65 (p = 0.0008), with all six of
+those failures in display-width handling. The benchmark is ours and says so —
+see [Agent authoring correctness](#agent-authoring-correctness) for the result
+and the three reasons to discount it.
 
 Speed is not a side effect here: on an identical full redraw loop Hawk TUI sustains **4.3× the frames per second of ratatui** at 92 % of the memory, and it is the fastest of the three frameworks in all sixteen measured workloads — by 1.7× to 17×. See [Performance](#performance) for the numbers and how to reproduce them.
 
@@ -508,12 +514,52 @@ far better represented in a model's training data, which no framework feature
 can fix quickly — but it is the current state of things and worth knowing before
 you choose.
 
+### Agent authoring correctness
+
+Cost is one axis; whether the program is right is the other. Across every task
+both frameworks have run — ten of them, from a four-pane git browser to
+wrapping double-width text in a 20-column terminal, all on the same model:
+
+| Framework | Programs correct | Where it failed |
+|---|---|---|
+| **Hawk TUI** | **142 of 142** | — |
+| ratatui 0.29 | 59 of 65 | display width, every time |
+
+Fisher exact, two-sided: **p = 0.0008**.
+
+All six ratatui failures are the same class. Asked to wrap text containing CJK
+or emoji, the agent puts a space after each wide character so that it will "be"
+two columns, producing rows 27 and 29 columns wide on a 20-column screen. On the
+task that isolates it, `t16-straddle`, Hawk TUI is 0 failures in 42 runs against
+ratatui's 4 in 35 (p = 0.039).
+
+Three things worth knowing before you weigh that:
+
+- **This benchmark is ours.** The tasks and the checks were written here, and a
+  self-authored instrument is exactly the kind that flatters its author. Eighteen
+  harness faults have been found and fixed so far, and all but two of them made
+  an agent or a competitor look worse than reality. The wide-glyph result is the
+  sturdiest part, because injecting spaces between glyphs is wrong under any
+  reading of the prompt rather than a judgement call encoded in a check.
+- **Hawk TUI won these runs short-handed.** Until recently the harness gave
+  Hawk TUI agents its README alone while ratatui agents got its ninety example
+  programs — a bug in our own packaging, now fixed. The comparison above ran
+  with Hawk TUI on a twentieth of the documentation.
+- **We cannot explain it.** Roughly seventy runs have failed to identify why
+  agents reach for the space-padding trick against one framework and not the
+  other. Nothing measured predicts which runs do it.
+
 See [docs/HANDOFF.md](docs/HANDOFF.md) for the state of this work, what is
-solid, and the ten harness faults found while producing it.
+solid, and the eighteen harness faults found while producing it.
 
 The same study found that supplying the ontology to the authoring agent made
 **no measurable difference** on any pre-registered metric, at every quality
-level and through every delivery mechanism tried. The reason is that the agent
+level and through every delivery mechanism tried — as a file, as MCP tools, as a
+prompt instruction, as doc comments on the types, and as an import map. Ten
+grids. The most recent is the one that counts: a catalog carrying all 30 widget
+actions and 14 capability sets, against a baseline shipping every document a
+real user receives, on the model that actually fails these tasks — 6 of 9 either
+way, p = 1.000. The reason is that the agent
 mostly did not consult it: it read the framework's source instead, in 100 % of
 Hawk TUI runs, 16–22 times each. The one thing shown to change that is a
 paragraph in the prompt — which is a finding about prompts, not about
