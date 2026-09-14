@@ -196,9 +196,14 @@ impl<M: Model> RpcTransport<M> {
             }
             Command::AgentAction {
                 agent_id: _,
-                action: _,
-                params: _,
-            } => {}
+                action,
+                params,
+            } => {
+                if let Some(msg) = self.model.handle_action(&action, &params) {
+                    let cmd = self.model.update(msg);
+                    self.process_command(cmd);
+                }
+            }
             Command::Task(_) => {}
         }
     }

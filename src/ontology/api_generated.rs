@@ -860,6 +860,7 @@ pub static API: &[ApiType] = &[
             ApiFn { name: "handle_event", signature: "fn handle_event(&self, event: Event) -> Option<Self::Msg>", role: "required", summary: "" },
             ApiFn { name: "init", signature: "fn init(&self) -> Command<Self::Msg>", role: "provided", summary: "" },
             ApiFn { name: "register_ontology", signature: "fn register_ontology(&self, _registry: &mut OntologyRegistry)", role: "provided", summary: "" },
+            ApiFn { name: "handle_action", signature: "fn handle_action(&self, _action: &str, _params: &serde_json::Value) -> Option<Self::Msg>", role: "provided", summary: "" },
         ],
     },
     ApiType {
@@ -1423,7 +1424,7 @@ pub static API: &[ApiType] = &[
     },
 ];
 
-/// Everything `use hawktui::prelude::*` brings into scope (31 items).
+/// Everything `use hawktui::prelude::*` brings into scope (32 items).
 pub static PRELUDE: &[&str] = &[
     "Alignment",
     "Animation",
@@ -1447,6 +1448,7 @@ pub static PRELUDE: &[&str] = &[
     "Modifier",
     "MouseButton",
     "MouseEvent",
+    "Position",
     "Rect",
     "Result",
     "Span",

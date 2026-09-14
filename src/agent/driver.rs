@@ -77,21 +77,31 @@ impl<M: Model> HeadlessDriver<M> {
 
     /// Process a single agent request and return the response.
     pub fn process_request(&mut self, request: &AgentRequest) -> AgentResponse {
-        let (response, should_quit) = self.session.process_request(request, &self.ontology);
+        let (mut response, should_quit) = self.session.process_request(request, &self.ontology);
 
-        // Handle execute_action by dispatching through the model
-        if let AgentRequest::ExecuteAction {
-            agent_id,
-            action,
-            params,
-        } = request
-        {
-            let cmd = Command::AgentAction {
-                agent_id: agent_id.clone(),
-                action: action.clone(),
-                params: params.clone(),
-            };
-            self.process_command(cmd);
+        // Deliver execute_action to the model, and report what actually
+        // happened. The session can only say the request was well-formed and
+        // names a real widget; whether the program does anything with it is
+        // known here and nowhere else. Reporting success for an action no model
+        // handles is how this went unnoticed: the answer was
+        // `success: true, status: "dispatched"` while nothing changed.
+        if let AgentRequest::ExecuteAction { action, params, .. } = request {
+            if response.success {
+                match self.model.handle_action(action, params) {
+                    Some(msg) => {
+                        let cmd = self.model.update(msg);
+                        self.process_command(cmd);
+                        if let Some(data) = response.data.as_mut() {
+                            data["status"] = serde_json::json!("applied");
+                        }
+                    }
+                    None => {
+                        response = AgentResponse::err(format!(
+                            "The model does not handle the action {action:?};                              implement Model::handle_action to make it operable"
+                        ));
+                    }
+                }
+            }
         }
 
         // Handle injected events

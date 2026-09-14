@@ -237,6 +237,10 @@ mod tests {
                 },
                 &reg,
             );
+            // This is the session layer, which validates and forwards; it
+            // cannot know whether a model acted. That is exactly why asserting
+            // only on this response is not enough, and why the end-to-end
+            // behaviour is covered in tests/agent_action_tests.rs.
             assert!(resp.success);
             assert_eq!(resp.data.unwrap()["status"], "dispatched");
         }

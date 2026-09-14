@@ -87,6 +87,23 @@ pub trait Model: Sized {
 
     /// Called when the agent ontology is exported. Override to customize the registry.
     fn register_ontology(&self, _registry: &mut OntologyRegistry) {}
+
+    /// Convert an agent action into an application message.
+    ///
+    /// This is the counterpart to [`handle_event`](Self::handle_event) for the
+    /// agent protocol: `execute_action` reaches a program through here, and a
+    /// program that does not implement it is not agent-operable through
+    /// actions, only through injected events.
+    ///
+    /// Returning `None` means the model does not handle that action, and the
+    /// caller reports the request as unhandled rather than as done. Before this
+    /// existed, `Command::AgentAction` was constructed by the driver and the
+    /// RPC transport and then dropped by every consumer, so `execute_action`
+    /// answered `success: true, status: "dispatched"` while the model never
+    /// changed.
+    fn handle_action(&self, _action: &str, _params: &serde_json::Value) -> Option<Self::Msg> {
+        None
+    }
 }
 
 /// Configuration for the [`Program`] runner.
@@ -265,11 +282,17 @@ impl<M: Model, B: Backend> Program<M, B> {
             }
             Command::AgentAction {
                 agent_id: _,
-                action: _,
-                params: _,
+                action,
+                params,
             } => {
-                // Agent actions are dispatched through the ontology UI tree
-                // The model should handle these in its update function
+                // Deliver the action to the model. The previous comment here
+                // said the model "should handle these in its update function",
+                // but nothing routed them there and the arm was empty, so every
+                // execute_action was a silent no-op.
+                if let Some(msg) = self.model.handle_action(&action, &params) {
+                    let cmd = self.model.update(msg);
+                    self.process_command(cmd);
+                }
             }
             Command::Task(task) => {
                 // Spawn the task on a background thread; the resulting message

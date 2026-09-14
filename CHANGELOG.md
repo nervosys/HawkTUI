@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **`execute_action` now changes the program.** It answered
+  `success: true, status: "dispatched"` and did nothing. `Command::AgentAction`
+  was built by the headless driver and the RPC transport and then matched by an
+  empty arm in all three consumers, under a comment saying the model "should
+  handle these in its update function" — a route that did not exist, because
+  `Model` had no hook to deliver an action to. Reported by a consumer building
+  against 2.0.0. **A Hawk TUI program was operable by injected events and not by
+  actions, which is half of what the agent protocol claims.**
+- **`Model::handle_action`** is the missing hook: the counterpart to
+  `handle_event` for the agent protocol, defaulting to `None`. Existing models
+  compile unchanged and report actions as unhandled until they implement it.
+- **An unhandled action is now reported as unhandled** rather than as success.
+  The session can only say a request is well-formed and names a real widget;
+  whether the program acts on it is known only at the driver, which now says so.
+- **The authoring catalog dropped every type whose methods are all `const fn`.**
+  `FN_RX` matched `pub fn` only, and a type with no functions is filtered out
+  entirely, so `Position`, `Margin`, `Size`, `Modifier` and `KeyModifiers`
+  were absent. 93 types to 99. `Position` is the argument to `Buffer::cell`,
+  so the catalog was missing the type needed to read a cell.
+
+### Added
+
+- **`Position` is in the prelude.** `Buffer::cell` takes one, so reading a cell
+  required an import that reading a size did not.
+
 ## [2.0.0] - 2026-09-02
 
 ### Changed

@@ -195,7 +195,10 @@ pub mod prelude {
     pub use crate::backend::Backend;
     pub use crate::core::buffer::Buffer;
     pub use crate::core::cell::Cell;
-    pub use crate::core::rect::Rect;
+    // `Buffer::cell` takes a `Position`, so reading a cell needed an import
+    // that reading a size did not. A first run against the published crate
+    // hit E0433 on its second line for exactly this.
+    pub use crate::core::rect::{Position, Rect};
     pub use crate::core::style::{Color, Modifier, Style, Stylize};
     pub use crate::core::text::{Line, Span, Text};
     pub use crate::error::{Error, Result};
