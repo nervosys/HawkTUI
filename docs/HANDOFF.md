@@ -533,15 +533,21 @@ evidence, that is the failure mode to expect.
 
 ## 6. Open items
 
-- `hawktui` on crates.io is held by another account. The crates.io API shows
-  one version, `0.0.0`, published 2024-10-08 and yanked four minutes later, with
-  no repository, homepage or documentation set and a description that misspells
-  the name. The package publishes as `hawktui-rs`; `[lib] name` stays `hawktui`,
-  so `use hawktui::…` is unchanged either way. **A request to the current owner
-  has been sent.** If there is no reply, the escalation to `help@crates.io` is
-  drafted and the fallback costs nothing — only the dependency line differs.
-- `cargo publish` has not been run. The crate packages and builds from its own
-  tarball as `hawktui-rs 2.0.0`.
+- **Published as `majestic-hawktui 2.0.0` on 2026-09-14.** The whole `hawktui*`
+  namespace is refused by crates.io: both `hawktui` and `hawktui-rs` return
+  `400 cannot upload a crate with a reserved name`, while the API reports both
+  as not existing. `hawktui` itself holds one version, `0.0.0`, published
+  2024-10-08 and yanked four minutes later, with no repository, homepage or
+  documentation and a description that misspells the name — the likely origin of
+  the reservation. `[lib] name` stays `hawktui`, so `use hawktui::…` is
+  unchanged; only the dependency line differs. Reclaiming `hawktui` still needs
+  `help@crates.io`, and if it is ever released the package can be republished
+  under it.
+- Publishing pileups: each failed `cargo publish` left a verification build
+  holding the package-cache and target locks, and later attempts blocked on them
+  indefinitely, exiting without ever reaching the upload. If a publish stalls at
+  "Blocking waiting for file lock", clear the orphaned `cargo`/`rustc`
+  processes before retrying rather than launching another.
 - Phase 1.3 of the DX plan is done. The runtime half of the MCP server is
   wired: `McpServer::with_runtime` takes any `RuntimeTarget`, implemented for
   `HeadlessDriver`, and adds `get_tree`, `get_state`, `execute_action` and

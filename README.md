@@ -31,27 +31,28 @@ An agent connecting to a Hawk TUI app can ask: *"What widgets exist? What can I 
 ## Installation
 
 ```sh
-cargo add hawktui-rs
+cargo add majestic-hawktui
 ```
 
 Or add it manually:
 
 ```toml
 [dependencies]
-hawktui-rs = "2"
+majestic-hawktui = "2"
 ```
 
 For headless / agent-only builds, drop the terminal backend:
 
 ```toml
 [dependencies]
-hawktui-rs = { version = "2", default-features = false }
+majestic-hawktui = { version = "2", default-features = false }
 ```
 
-**The package is `hawktui-rs`; the import is `hawktui`.** You write
-`use hawktui::prelude::*` either way. The crates.io name `hawktui` is held by an
-unrelated account — one `0.0.0` version, yanked, published in 2024 with no
-repository — so the package ships under `hawktui-rs` until that is released.
+**The package is `majestic-hawktui`; the import is `hawktui`.** You write
+`use hawktui::prelude::*` either way. crates.io refuses every `hawktui*` name
+with "cannot upload a crate with a reserved name" — `hawktui` itself holds one
+yanked `0.0.0` from 2024 with no repository — so the package ships under
+`majestic-hawktui`.
 
 **Minimum supported Rust version:** 1.80
 
@@ -66,7 +67,7 @@ republishing a different API as 1.0.0, would have been the confusing option.
 
 ```diff
 -louietui = "1"
-+hawktui-rs = "2"
++majestic-hawktui = "2"
 ```
 
 ```diff

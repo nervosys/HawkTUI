@@ -1,12 +1,12 @@
 [package]
-# The crates.io name `hawktui` is held by an unrelated account: a single
-# 0.0.0 version, yanked, published 2024-10-08 with no repository. Until that is
-# released or transferred, the package publishes as `hawktui-rs`.
+# crates.io refuses every `hawktui*` name with "cannot upload a crate with a
+# reserved name" — `hawktui` itself holds one yanked 0.0.0 from 2024-10-08 with
+# no repository, and `hawktui-rs` is refused the same way. The package therefore
+# publishes as `majestic-hawktui`.
 #
 # The library name below stays `hawktui`, so users still write
 # `use hawktui::...` regardless — the same split `louietui`/`louie` already had.
-# Reverting is a one-line change here plus the install lines in README.md.
-name = "hawktui-rs"
+name = "majestic-hawktui"
 version = "2.0.0"
 edition = "2021"
 authors = ["Nervosys"]

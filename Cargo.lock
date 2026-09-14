@@ -316,22 +316,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
 
 [[package]]
-name = "hawktui-rs"
-version = "2.0.0"
-dependencies = [
- "criterion",
- "crossterm",
- "pretty_assertions",
- "proptest",
- "serde",
- "serde_json",
- "tracing",
- "tracing-subscriber",
- "unicode-segmentation",
- "unicode-width",
-]
-
-[[package]]
 name = "heck"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -441,6 +425,22 @@ name = "log"
 version = "0.4.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
+
+[[package]]
+name = "majestic-hawktui"
+version = "2.0.0"
+dependencies = [
+ "criterion",
+ "crossterm",
+ "pretty_assertions",
+ "proptest",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
+ "unicode-segmentation",
+ "unicode-width",
+]
 
 [[package]]
 name = "matchers"
