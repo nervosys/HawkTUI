@@ -150,45 +150,51 @@ const RUNTIME_TOOLS: &[RuntimeTool] = &[
         description: "The current state of one widget in the running application — what a \
                       list has selected, what an input contains. Reads live state, not the \
                       schema; get_widget_schema describes the type instead.",
-        schema: || json!({
-            "type": "object",
-            "properties": { "agent_id": { "type": "string", "description": "agent_id from get_tree." } },
-            "required": ["agent_id"],
-            "additionalProperties": false,
-        }),
+        schema: || {
+            json!({
+                "type": "object",
+                "properties": { "agent_id": { "type": "string", "description": "agent_id from get_tree." } },
+                "required": ["agent_id"],
+                "additionalProperties": false,
+            })
+        },
     },
     RuntimeTool {
         name: "execute_action",
         description: "Run one of a widget's declared actions in the running application. \
                       The actions a widget accepts, and their parameters, come from \
                       get_widget_schema.",
-        schema: || json!({
-            "type": "object",
-            "properties": {
-                "agent_id": { "type": "string", "description": "agent_id from get_tree." },
-                "action": { "type": "string", "description": "Action name from the widget's schema." },
-                "params": { "type": "object", "description": "Action parameters, if it takes any." },
-            },
-            "required": ["agent_id", "action"],
-            "additionalProperties": false,
-        }),
+        schema: || {
+            json!({
+                "type": "object",
+                "properties": {
+                    "agent_id": { "type": "string", "description": "agent_id from get_tree." },
+                    "action": { "type": "string", "description": "Action name from the widget's schema." },
+                    "params": { "type": "object", "description": "Action parameters, if it takes any." },
+                },
+                "required": ["agent_id", "action"],
+                "additionalProperties": false,
+            })
+        },
     },
     RuntimeTool {
         name: "inject_event",
         description: "Send a key or mouse event to the running application, as though a \
                       user had produced it. Use this to drive the program through its own \
                       event loop when no declared action does what you need.",
-        schema: || json!({
-            "type": "object",
-            "properties": {
-                "event": {
-                    "type": "object",
-                    "description": "e.g. {\"kind\":\"key\",\"code\":\"Down\"}.",
+        schema: || {
+            json!({
+                "type": "object",
+                "properties": {
+                    "event": {
+                        "type": "object",
+                        "description": "e.g. {\"kind\":\"key\",\"code\":\"Down\"}.",
+                    },
                 },
-            },
-            "required": ["event"],
-            "additionalProperties": false,
-        }),
+                "required": ["event"],
+                "additionalProperties": false,
+            })
+        },
     },
 ];
 

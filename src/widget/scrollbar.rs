@@ -293,9 +293,7 @@ impl Discoverable for Scrollbar {
     }
 
     fn capability_kinds() -> Vec<String> {
-        vec![
-            "scrollable".to_string(),
-        ]
+        vec!["scrollable".to_string()]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {

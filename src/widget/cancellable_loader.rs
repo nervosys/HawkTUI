@@ -171,21 +171,19 @@ impl Discoverable for CancellableLoader {
     }
 
     fn action_schema() -> Vec<AgentAction> {
-    vec![AgentAction {
-                name: "cancel".into(),
-                description: "Cancel the running operation.".into(),
-                params: vec![],
-                returns: None,
-                mutates: true,
-                idempotent: true,
-                shortcut: Some("Esc".into()),
-            }]
+        vec![AgentAction {
+            name: "cancel".into(),
+            description: "Cancel the running operation.".into(),
+            params: vec![],
+            returns: None,
+            mutates: true,
+            idempotent: true,
+            shortcut: Some("Esc".into()),
+        }]
     }
 
     fn capability_kinds() -> Vec<String> {
-        vec![
-            "animated".to_string(),
-        ]
+        vec!["animated".to_string()]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {

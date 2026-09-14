@@ -321,21 +321,19 @@ impl Discoverable for Markdown {
     }
 
     fn action_schema() -> Vec<AgentAction> {
-    vec![AgentAction {
-                name: "get_source".into(),
-                description: "Get the Markdown source text.".into(),
-                params: vec![],
-                returns: Some("The Markdown source string.".into()),
-                mutates: false,
-                idempotent: true,
-                shortcut: None,
-            }]
+        vec![AgentAction {
+            name: "get_source".into(),
+            description: "Get the Markdown source text.".into(),
+            params: vec![],
+            returns: Some("The Markdown source string.".into()),
+            mutates: false,
+            idempotent: true,
+            shortcut: None,
+        }]
     }
 
     fn capability_kinds() -> Vec<String> {
-        vec![
-            "scrollable".to_string(),
-        ]
+        vec!["scrollable".to_string()]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {

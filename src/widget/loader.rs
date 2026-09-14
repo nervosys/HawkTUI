@@ -155,9 +155,7 @@ impl Discoverable for Loader {
     }
 
     fn capability_kinds() -> Vec<String> {
-        vec![
-            "animated".to_string(),
-        ]
+        vec!["animated".to_string()]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {

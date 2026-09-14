@@ -189,32 +189,32 @@ impl Discoverable for Tabs {
     }
 
     fn action_schema() -> Vec<AgentAction> {
-    vec![
-                AgentAction {
-                    name: "select_tab".into(),
-                    description: "Switch to a tab by index.".into(),
-                    params: vec![crate::ontology::ActionParam {
-                        name: "index".into(),
-                        description: "Zero-based tab index.".into(),
-                        param_type: crate::ontology::ActionParamType::Index,
-                        required: true,
-                        default_value: None,
-                    }],
-                    returns: None,
-                    mutates: true,
-                    idempotent: true,
-                    shortcut: None,
-                },
-                AgentAction {
-                    name: "get_tabs".into(),
-                    description: "Get all tab titles.".into(),
-                    params: vec![],
-                    returns: Some("Array of tab title strings.".into()),
-                    mutates: false,
-                    idempotent: true,
-                    shortcut: None,
-                },
-            ]
+        vec![
+            AgentAction {
+                name: "select_tab".into(),
+                description: "Switch to a tab by index.".into(),
+                params: vec![crate::ontology::ActionParam {
+                    name: "index".into(),
+                    description: "Zero-based tab index.".into(),
+                    param_type: crate::ontology::ActionParamType::Index,
+                    required: true,
+                    default_value: None,
+                }],
+                returns: None,
+                mutates: true,
+                idempotent: true,
+                shortcut: None,
+            },
+            AgentAction {
+                name: "get_tabs".into(),
+                description: "Get all tab titles.".into(),
+                params: vec![],
+                returns: Some("Array of tab title strings.".into()),
+                mutates: false,
+                idempotent: true,
+                shortcut: None,
+            },
+        ]
     }
 
     fn capability_kinds() -> Vec<String> {

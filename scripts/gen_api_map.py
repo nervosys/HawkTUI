@@ -23,6 +23,8 @@ staleness check stays fast.
 from __future__ import annotations
 
 import argparse
+import subprocess
+import tempfile
 import re
 import sys
 from collections import defaultdict
@@ -87,7 +89,7 @@ def block() -> list[str]:
 def import_test() -> str:
     uses = NL.join(
         f"    #[allow(unused_imports)]{NL}    use {module}::{name};"
-        for name, module, _ in sorted(entries())
+        for module, name in sorted((m, n) for n, m, _ in entries())
     )
     head = [
         "//! Every path in the import map in `src/lib.rs` must actually import.",
@@ -99,7 +101,25 @@ def import_test() -> str:
         "#[test]",
         "fn every_mapped_path_resolves() {",
     ]
-    return NL.join(head) + NL + uses + NL + "}" + NL
+    return rustfmt(NL.join(head) + NL + uses + NL + "}" + NL)
+
+
+def rustfmt(source: str) -> str:
+    """Return `source` as rustfmt would write it.
+
+    rustfmt orders `use` statements by its own collation — submodules before
+    types at the same level — which is not a plain sort of the path. Rather
+    than reimplement that and drift from it, let rustfmt be the authority, so
+    `cargo fmt --check` and this generator can never undo each other.
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        f = Path(tmp) / "gen.rs"
+        f.write_text(source, encoding="utf-8")
+        proc = subprocess.run(["rustfmt", "--edition", "2021", str(f)],
+                              capture_output=True, text=True)
+        if proc.returncode != 0:
+            sys.exit("rustfmt failed on the generated import test: " + proc.stderr)
+        return f.read_text(encoding="utf-8")
 
 
 def main() -> int:

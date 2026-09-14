@@ -374,45 +374,42 @@ impl Discoverable for SettingsList {
     }
 
     fn action_schema() -> Vec<AgentAction> {
-    vec![
-                AgentAction {
-                    name: "cycle_next".into(),
-                    description: "Cycle the focused setting to its next value.".into(),
-                    params: vec![ActionParam {
-                        name: "index".into(),
-                        description: "Setting index to cycle (defaults to cursor position).".into(),
-                        param_type: ActionParamType::Index,
-                        required: false,
-                        default_value: None,
-                    }],
-                    returns: Some("The new value after cycling.".into()),
-                    mutates: true,
-                    idempotent: false,
-                    shortcut: Some("Enter".into()),
-                },
-                AgentAction {
-                    name: "cycle_prev".into(),
-                    description: "Cycle the focused setting to its previous value.".into(),
-                    params: vec![ActionParam {
-                        name: "index".into(),
-                        description: "Setting index to cycle.".into(),
-                        param_type: ActionParamType::Index,
-                        required: false,
-                        default_value: None,
-                    }],
-                    returns: Some("The new value after cycling.".into()),
-                    mutates: true,
-                    idempotent: false,
-                    shortcut: None,
-                },
-            ]
+        vec![
+            AgentAction {
+                name: "cycle_next".into(),
+                description: "Cycle the focused setting to its next value.".into(),
+                params: vec![ActionParam {
+                    name: "index".into(),
+                    description: "Setting index to cycle (defaults to cursor position).".into(),
+                    param_type: ActionParamType::Index,
+                    required: false,
+                    default_value: None,
+                }],
+                returns: Some("The new value after cycling.".into()),
+                mutates: true,
+                idempotent: false,
+                shortcut: Some("Enter".into()),
+            },
+            AgentAction {
+                name: "cycle_prev".into(),
+                description: "Cycle the focused setting to its previous value.".into(),
+                params: vec![ActionParam {
+                    name: "index".into(),
+                    description: "Setting index to cycle.".into(),
+                    param_type: ActionParamType::Index,
+                    required: false,
+                    default_value: None,
+                }],
+                returns: Some("The new value after cycling.".into()),
+                mutates: true,
+                idempotent: false,
+                shortcut: None,
+            },
+        ]
     }
 
     fn capability_kinds() -> Vec<String> {
-        vec![
-            "focusable".to_string(),
-            "selectable".to_string(),
-        ]
+        vec!["focusable".to_string(), "selectable".to_string()]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {

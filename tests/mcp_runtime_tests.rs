@@ -125,7 +125,10 @@ fn calling_a_runtime_tool_without_a_runtime_is_a_tool_error_not_a_protocol_error
             "params":{"name":"get_tree","arguments":{}}}"#,
     );
 
-    assert!(response.get("error").is_none(), "should not be a protocol error");
+    assert!(
+        response.get("error").is_none(),
+        "should not be a protocol error"
+    );
     assert_eq!(response["result"]["isError"], Value::Bool(true));
     let text = response["result"]["content"][0]["text"]
         .as_str()
@@ -188,7 +191,10 @@ fn a_malformed_runtime_argument_is_a_protocol_error() {
 #[test]
 fn every_runtime_tool_declares_a_schema() {
     let mut server = McpServer::new().with_runtime(Box::new(driver()));
-    let listed = call(&mut server, r#"{"jsonrpc":"2.0","id":6,"method":"tools/list"}"#);
+    let listed = call(
+        &mut server,
+        r#"{"jsonrpc":"2.0","id":6,"method":"tools/list"}"#,
+    );
 
     for tool in listed["result"]["tools"].as_array().expect("array") {
         let name = tool["name"].as_str().unwrap_or_default();

@@ -208,21 +208,19 @@ impl Discoverable for LineGauge {
     }
 
     fn action_schema() -> Vec<AgentAction> {
-    vec![AgentAction {
-                name: "set_progress".into(),
-                description: "Set the progress ratio.".into(),
-                params: vec![],
-                returns: None,
-                mutates: true,
-                idempotent: true,
-                shortcut: None,
-            }]
+        vec![AgentAction {
+            name: "set_progress".into(),
+            description: "Set the progress ratio.".into(),
+            params: vec![],
+            returns: None,
+            mutates: true,
+            idempotent: true,
+            shortcut: None,
+        }]
     }
 
     fn capability_kinds() -> Vec<String> {
-        vec![
-            "range-editable".to_string(),
-        ]
+        vec!["range-editable".to_string()]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {

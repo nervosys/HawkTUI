@@ -235,48 +235,45 @@ impl Discoverable for Paragraph {
     }
 
     fn action_schema() -> Vec<AgentAction> {
-    vec![
-                AgentAction {
-                    name: "scroll_to".into(),
-                    description: "Scroll to a specific position.".into(),
-                    params: vec![
-                        crate::ontology::ActionParam {
-                            name: "y".into(),
-                            description: "Vertical scroll offset.".into(),
-                            param_type: crate::ontology::ActionParamType::Integer,
-                            required: false,
-                            default_value: Some(serde_json::json!(0)),
-                        },
-                        crate::ontology::ActionParam {
-                            name: "x".into(),
-                            description: "Horizontal scroll offset.".into(),
-                            param_type: crate::ontology::ActionParamType::Integer,
-                            required: false,
-                            default_value: Some(serde_json::json!(0)),
-                        },
-                    ],
-                    returns: None,
-                    mutates: true,
-                    idempotent: true,
-                    shortcut: None,
-                },
-                AgentAction {
-                    name: "get_text".into(),
-                    description: "Get the full text content.".into(),
-                    params: vec![],
-                    returns: Some("Full text content as string.".into()),
-                    mutates: false,
-                    idempotent: true,
-                    shortcut: None,
-                },
-            ]
+        vec![
+            AgentAction {
+                name: "scroll_to".into(),
+                description: "Scroll to a specific position.".into(),
+                params: vec![
+                    crate::ontology::ActionParam {
+                        name: "y".into(),
+                        description: "Vertical scroll offset.".into(),
+                        param_type: crate::ontology::ActionParamType::Integer,
+                        required: false,
+                        default_value: Some(serde_json::json!(0)),
+                    },
+                    crate::ontology::ActionParam {
+                        name: "x".into(),
+                        description: "Horizontal scroll offset.".into(),
+                        param_type: crate::ontology::ActionParamType::Integer,
+                        required: false,
+                        default_value: Some(serde_json::json!(0)),
+                    },
+                ],
+                returns: None,
+                mutates: true,
+                idempotent: true,
+                shortcut: None,
+            },
+            AgentAction {
+                name: "get_text".into(),
+                description: "Get the full text content.".into(),
+                params: vec![],
+                returns: Some("Full text content as string.".into()),
+                mutates: false,
+                idempotent: true,
+                shortcut: None,
+            },
+        ]
     }
 
     fn capability_kinds() -> Vec<String> {
-        vec![
-            "scrollable".to_string(),
-            "copyable".to_string(),
-        ]
+        vec!["scrollable".to_string(), "copyable".to_string()]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {

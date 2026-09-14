@@ -360,56 +360,56 @@ impl Discoverable for Table {
     }
 
     fn action_schema() -> Vec<AgentAction> {
-    vec![
-                AgentAction {
-                    name: "select_row".into(),
-                    description: "Select a row by index.".into(),
-                    params: vec![ActionParam {
-                        name: "index".into(),
+        vec![
+            AgentAction {
+                name: "select_row".into(),
+                description: "Select a row by index.".into(),
+                params: vec![ActionParam {
+                    name: "index".into(),
+                    description: "Zero-based row index.".into(),
+                    param_type: ActionParamType::Index,
+                    required: true,
+                    default_value: None,
+                }],
+                returns: Some("The selected row data.".into()),
+                mutates: true,
+                idempotent: true,
+                shortcut: None,
+            },
+            AgentAction {
+                name: "get_cell".into(),
+                description: "Get the value of a specific cell.".into(),
+                params: vec![
+                    ActionParam {
+                        name: "row".into(),
                         description: "Zero-based row index.".into(),
                         param_type: ActionParamType::Index,
                         required: true,
                         default_value: None,
-                    }],
-                    returns: Some("The selected row data.".into()),
-                    mutates: true,
-                    idempotent: true,
-                    shortcut: None,
-                },
-                AgentAction {
-                    name: "get_cell".into(),
-                    description: "Get the value of a specific cell.".into(),
-                    params: vec![
-                        ActionParam {
-                            name: "row".into(),
-                            description: "Zero-based row index.".into(),
-                            param_type: ActionParamType::Index,
-                            required: true,
-                            default_value: None,
-                        },
-                        ActionParam {
-                            name: "column".into(),
-                            description: "Zero-based column index.".into(),
-                            param_type: ActionParamType::Index,
-                            required: true,
-                            default_value: None,
-                        },
-                    ],
-                    returns: Some("Cell text content.".into()),
-                    mutates: false,
-                    idempotent: true,
-                    shortcut: None,
-                },
-                AgentAction {
-                    name: "get_row_count".into(),
-                    description: "Get the total number of rows.".into(),
-                    params: vec![],
-                    returns: Some("Row count as integer.".into()),
-                    mutates: false,
-                    idempotent: true,
-                    shortcut: None,
-                },
-            ]
+                    },
+                    ActionParam {
+                        name: "column".into(),
+                        description: "Zero-based column index.".into(),
+                        param_type: ActionParamType::Index,
+                        required: true,
+                        default_value: None,
+                    },
+                ],
+                returns: Some("Cell text content.".into()),
+                mutates: false,
+                idempotent: true,
+                shortcut: None,
+            },
+            AgentAction {
+                name: "get_row_count".into(),
+                description: "Get the total number of rows.".into(),
+                params: vec![],
+                returns: Some("Row count as integer.".into()),
+                mutates: false,
+                idempotent: true,
+                shortcut: None,
+            },
+        ]
     }
 
     fn capability_kinds() -> Vec<String> {

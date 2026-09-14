@@ -20,7 +20,10 @@ use hawktui::widget::select_list::{SelectItem, SelectList};
 fn assert_actions_match<W: Discoverable>(instance: &W, name: &str) {
     let declared: Vec<String> = W::action_schema().iter().map(|a| a.name.clone()).collect();
     let actual: Vec<String> = instance.actions().iter().map(|a| a.name.clone()).collect();
-    assert_eq!(declared, actual, "{name}: action_schema() disagrees with actions()");
+    assert_eq!(
+        declared, actual,
+        "{name}: action_schema() disagrees with actions()"
+    );
 }
 
 /// Declared capability kinds must be the kinds an instance exhibits.
@@ -32,7 +35,10 @@ fn assert_capabilities_match<W: Discoverable>(instance: &W, name: &str) {
         .map(|c| c.name().to_string())
         .collect();
     actual.dedup();
-    assert_eq!(declared, actual, "{name}: capability_kinds() disagrees with capabilities()");
+    assert_eq!(
+        declared, actual,
+        "{name}: capability_kinds() disagrees with capabilities()"
+    );
 }
 
 #[test]
@@ -43,8 +49,14 @@ fn declarations_match_instances() {
     assert_capabilities_match(&Input::default(), "Input");
     assert_actions_match(&Gauge::new(), "Gauge");
     assert_capabilities_match(&Gauge::new(), "Gauge");
-    assert_actions_match(&SelectList::new(vec![SelectItem::new("a", "a")]), "SelectList");
-    assert_capabilities_match(&SelectList::new(vec![SelectItem::new("a", "a")]), "SelectList");
+    assert_actions_match(
+        &SelectList::new(vec![SelectItem::new("a", "a")]),
+        "SelectList",
+    );
+    assert_capabilities_match(
+        &SelectList::new(vec![SelectItem::new("a", "a")]),
+        "SelectList",
+    );
 }
 
 /// The registry must serve the merged schema, not the bare literal.

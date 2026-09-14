@@ -7,13 +7,77 @@
 #[test]
 fn every_mapped_path_resolves() {
     #[allow(unused_imports)]
+    use hawktui::agent::driver::HeadlessDriver;
+    #[allow(unused_imports)]
     use hawktui::agent::session::AgentSession;
+    #[allow(unused_imports)]
+    use hawktui::backend::test::TestBackend;
+    #[allow(unused_imports)]
+    use hawktui::backend::Backend;
+    #[allow(unused_imports)]
+    use hawktui::core::buffer::Buffer;
+    #[allow(unused_imports)]
+    use hawktui::core::cell::Cell;
+    #[allow(unused_imports)]
+    use hawktui::core::rect::Rect;
+    #[allow(unused_imports)]
+    use hawktui::core::style::Color;
+    #[allow(unused_imports)]
+    use hawktui::core::style::Style;
+    #[allow(unused_imports)]
+    use hawktui::core::style::Stylize;
+    #[allow(unused_imports)]
+    use hawktui::core::symbol::Symbol;
     #[allow(unused_imports)]
     use hawktui::core::text::Alignment;
     #[allow(unused_imports)]
-    use hawktui::widget::chart::Axis;
+    use hawktui::core::text::Line;
     #[allow(unused_imports)]
-    use hawktui::backend::Backend;
+    use hawktui::core::text::Span;
+    #[allow(unused_imports)]
+    use hawktui::core::text::Text;
+    #[allow(unused_imports)]
+    use hawktui::event::Event;
+    #[allow(unused_imports)]
+    use hawktui::event::HitMap;
+    #[allow(unused_imports)]
+    use hawktui::event::KeyCode;
+    #[allow(unused_imports)]
+    use hawktui::event::KeyEvent;
+    #[allow(unused_imports)]
+    use hawktui::event::KeyEventKind;
+    #[allow(unused_imports)]
+    use hawktui::event::MouseButton;
+    #[allow(unused_imports)]
+    use hawktui::event::MouseEvent;
+    #[allow(unused_imports)]
+    use hawktui::event::MouseEventKind;
+    #[allow(unused_imports)]
+    use hawktui::focus::FocusManager;
+    #[allow(unused_imports)]
+    use hawktui::layout::Constraint;
+    #[allow(unused_imports)]
+    use hawktui::layout::Direction;
+    #[allow(unused_imports)]
+    use hawktui::layout::Flex;
+    #[allow(unused_imports)]
+    use hawktui::layout::Layout;
+    #[allow(unused_imports)]
+    use hawktui::overlay::ModalBox;
+    #[allow(unused_imports)]
+    use hawktui::overlay::OverlayStack;
+    #[allow(unused_imports)]
+    use hawktui::runtime::Command;
+    #[allow(unused_imports)]
+    use hawktui::runtime::Model;
+    #[allow(unused_imports)]
+    use hawktui::runtime::Program;
+    #[allow(unused_imports)]
+    use hawktui::terminal::Frame;
+    #[allow(unused_imports)]
+    use hawktui::terminal::Terminal;
+    #[allow(unused_imports)]
+    use hawktui::testing::Harness;
     #[allow(unused_imports)]
     use hawktui::widget::barchart::Bar;
     #[allow(unused_imports)]
@@ -27,73 +91,51 @@ fn every_mapped_path_resolves() {
     #[allow(unused_imports)]
     use hawktui::widget::block::BorderType;
     #[allow(unused_imports)]
-    use hawktui::widget::canvas::BrailleGrid;
-    #[allow(unused_imports)]
-    use hawktui::core::buffer::Buffer;
-    #[allow(unused_imports)]
     use hawktui::widget::calendar::Calendar;
     #[allow(unused_imports)]
     use hawktui::widget::cancellable_loader::CancellableLoader;
+    #[allow(unused_imports)]
+    use hawktui::widget::canvas::BrailleGrid;
     #[allow(unused_imports)]
     use hawktui::widget::canvas::Canvas;
     #[allow(unused_imports)]
     use hawktui::widget::canvas::CanvasMap;
     #[allow(unused_imports)]
-    use hawktui::core::cell::Cell;
+    use hawktui::widget::canvas::MapData;
+    #[allow(unused_imports)]
+    use hawktui::widget::canvas::MapResolution;
+    #[allow(unused_imports)]
+    use hawktui::widget::canvas::Painter;
+    #[allow(unused_imports)]
+    use hawktui::widget::canvas::Shape;
+    #[allow(unused_imports)]
+    use hawktui::widget::chart::Axis;
     #[allow(unused_imports)]
     use hawktui::widget::chart::Chart;
     #[allow(unused_imports)]
-    use hawktui::core::style::Color;
-    #[allow(unused_imports)]
-    use hawktui::runtime::Command;
-    #[allow(unused_imports)]
-    use hawktui::layout::Constraint;
-    #[allow(unused_imports)]
     use hawktui::widget::chart::Dataset;
     #[allow(unused_imports)]
-    use hawktui::layout::Direction;
+    use hawktui::widget::chart::GraphType;
+    #[allow(unused_imports)]
+    use hawktui::widget::chart::LegendPosition;
+    #[allow(unused_imports)]
+    use hawktui::widget::chart::Marker;
     #[allow(unused_imports)]
     use hawktui::widget::editor::Editor;
     #[allow(unused_imports)]
     use hawktui::widget::editor::EditorState;
     #[allow(unused_imports)]
-    use hawktui::event::Event;
-    #[allow(unused_imports)]
-    use hawktui::layout::Flex;
-    #[allow(unused_imports)]
-    use hawktui::focus::FocusManager;
-    #[allow(unused_imports)]
-    use hawktui::terminal::Frame;
-    #[allow(unused_imports)]
     use hawktui::widget::gauge::Gauge;
-    #[allow(unused_imports)]
-    use hawktui::widget::chart::GraphType;
-    #[allow(unused_imports)]
-    use hawktui::testing::Harness;
-    #[allow(unused_imports)]
-    use hawktui::agent::driver::HeadlessDriver;
-    #[allow(unused_imports)]
-    use hawktui::event::HitMap;
     #[allow(unused_imports)]
     use hawktui::widget::image::Image;
     #[allow(unused_imports)]
     use hawktui::widget::image::ImageProtocol;
     #[allow(unused_imports)]
+    use hawktui::widget::image::Pixels;
+    #[allow(unused_imports)]
     use hawktui::widget::input::Input;
     #[allow(unused_imports)]
     use hawktui::widget::input::InputState;
-    #[allow(unused_imports)]
-    use hawktui::event::KeyCode;
-    #[allow(unused_imports)]
-    use hawktui::event::KeyEvent;
-    #[allow(unused_imports)]
-    use hawktui::event::KeyEventKind;
-    #[allow(unused_imports)]
-    use hawktui::layout::Layout;
-    #[allow(unused_imports)]
-    use hawktui::widget::chart::LegendPosition;
-    #[allow(unused_imports)]
-    use hawktui::core::text::Line;
     #[allow(unused_imports)]
     use hawktui::widget::line_gauge::LineGauge;
     #[allow(unused_imports)]
@@ -107,35 +149,13 @@ fn every_mapped_path_resolves() {
     #[allow(unused_imports)]
     use hawktui::widget::loader::Loader;
     #[allow(unused_imports)]
-    use hawktui::widget::canvas::MapData;
-    #[allow(unused_imports)]
-    use hawktui::widget::canvas::MapResolution;
+    use hawktui::widget::loader::SpinnerStyle;
     #[allow(unused_imports)]
     use hawktui::widget::markdown::Markdown;
     #[allow(unused_imports)]
-    use hawktui::widget::chart::Marker;
-    #[allow(unused_imports)]
-    use hawktui::overlay::ModalBox;
-    #[allow(unused_imports)]
-    use hawktui::runtime::Model;
-    #[allow(unused_imports)]
-    use hawktui::event::MouseButton;
-    #[allow(unused_imports)]
-    use hawktui::event::MouseEvent;
-    #[allow(unused_imports)]
-    use hawktui::event::MouseEventKind;
-    #[allow(unused_imports)]
-    use hawktui::overlay::OverlayStack;
-    #[allow(unused_imports)]
-    use hawktui::widget::canvas::Painter;
-    #[allow(unused_imports)]
     use hawktui::widget::paragraph::Paragraph;
     #[allow(unused_imports)]
-    use hawktui::widget::image::Pixels;
-    #[allow(unused_imports)]
-    use hawktui::runtime::Program;
-    #[allow(unused_imports)]
-    use hawktui::core::rect::Rect;
+    use hawktui::widget::paragraph::Wrap;
     #[allow(unused_imports)]
     use hawktui::widget::scrollbar::Scrollbar;
     #[allow(unused_imports)]
@@ -157,21 +177,9 @@ fn every_mapped_path_resolves() {
     #[allow(unused_imports)]
     use hawktui::widget::settings_list::SettingsListState;
     #[allow(unused_imports)]
-    use hawktui::widget::canvas::Shape;
-    #[allow(unused_imports)]
-    use hawktui::core::text::Span;
-    #[allow(unused_imports)]
     use hawktui::widget::sparkline::Sparkline;
     #[allow(unused_imports)]
     use hawktui::widget::sparkline::SparklineDirection;
-    #[allow(unused_imports)]
-    use hawktui::widget::loader::SpinnerStyle;
-    #[allow(unused_imports)]
-    use hawktui::core::style::Style;
-    #[allow(unused_imports)]
-    use hawktui::core::style::Stylize;
-    #[allow(unused_imports)]
-    use hawktui::core::symbol::Symbol;
     #[allow(unused_imports)]
     use hawktui::widget::table::Table;
     #[allow(unused_imports)]
@@ -184,12 +192,4 @@ fn every_mapped_path_resolves() {
     use hawktui::widget::table::TableState;
     #[allow(unused_imports)]
     use hawktui::widget::tabs::Tabs;
-    #[allow(unused_imports)]
-    use hawktui::terminal::Terminal;
-    #[allow(unused_imports)]
-    use hawktui::backend::test::TestBackend;
-    #[allow(unused_imports)]
-    use hawktui::core::text::Text;
-    #[allow(unused_imports)]
-    use hawktui::widget::paragraph::Wrap;
 }

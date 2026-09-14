@@ -292,56 +292,56 @@ impl Discoverable for Input {
     }
 
     fn action_schema() -> Vec<AgentAction> {
-    vec![
-                AgentAction {
-                    name: "set_value".into(),
-                    description: "Set the input text value.".into(),
-                    params: vec![ActionParam {
-                        name: "value".into(),
-                        description: "The text to set.".into(),
-                        param_type: ActionParamType::String,
-                        required: true,
-                        default_value: None,
-                    }],
-                    returns: None,
-                    mutates: true,
-                    idempotent: true,
-                    shortcut: None,
-                },
-                AgentAction {
-                    name: "get_value".into(),
-                    description: "Get the current input text.".into(),
-                    params: vec![],
-                    returns: Some("Current text value.".into()),
-                    mutates: false,
-                    idempotent: true,
-                    shortcut: None,
-                },
-                AgentAction {
-                    name: "clear".into(),
-                    description: "Clear the input.".into(),
-                    params: vec![],
-                    returns: None,
-                    mutates: true,
-                    idempotent: true,
-                    shortcut: None,
-                },
-                AgentAction {
-                    name: "insert_text".into(),
-                    description: "Insert text at the cursor position.".into(),
-                    params: vec![ActionParam {
-                        name: "text".into(),
-                        description: "Text to insert.".into(),
-                        param_type: ActionParamType::String,
-                        required: true,
-                        default_value: None,
-                    }],
-                    returns: None,
-                    mutates: true,
-                    idempotent: false,
-                    shortcut: None,
-                },
-            ]
+        vec![
+            AgentAction {
+                name: "set_value".into(),
+                description: "Set the input text value.".into(),
+                params: vec![ActionParam {
+                    name: "value".into(),
+                    description: "The text to set.".into(),
+                    param_type: ActionParamType::String,
+                    required: true,
+                    default_value: None,
+                }],
+                returns: None,
+                mutates: true,
+                idempotent: true,
+                shortcut: None,
+            },
+            AgentAction {
+                name: "get_value".into(),
+                description: "Get the current input text.".into(),
+                params: vec![],
+                returns: Some("Current text value.".into()),
+                mutates: false,
+                idempotent: true,
+                shortcut: None,
+            },
+            AgentAction {
+                name: "clear".into(),
+                description: "Clear the input.".into(),
+                params: vec![],
+                returns: None,
+                mutates: true,
+                idempotent: true,
+                shortcut: None,
+            },
+            AgentAction {
+                name: "insert_text".into(),
+                description: "Insert text at the cursor position.".into(),
+                params: vec![ActionParam {
+                    name: "text".into(),
+                    description: "Text to insert.".into(),
+                    param_type: ActionParamType::String,
+                    required: true,
+                    default_value: None,
+                }],
+                returns: None,
+                mutates: true,
+                idempotent: false,
+                shortcut: None,
+            },
+        ]
     }
 
     fn capability_kinds() -> Vec<String> {

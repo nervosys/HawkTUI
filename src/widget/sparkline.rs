@@ -190,15 +190,15 @@ impl Discoverable for Sparkline {
     }
 
     fn action_schema() -> Vec<AgentAction> {
-    vec![AgentAction {
-                name: "get_data".into(),
-                description: "Get the sparkline data points.".into(),
-                params: vec![],
-                returns: Some("Array of integers.".into()),
-                mutates: false,
-                idempotent: true,
-                shortcut: None,
-            }]
+        vec![AgentAction {
+            name: "get_data".into(),
+            description: "Get the sparkline data points.".into(),
+            params: vec![],
+            returns: Some("Array of integers.".into()),
+            mutates: false,
+            idempotent: true,
+            shortcut: None,
+        }]
     }
 
     fn capabilities(&self) -> Vec<AgentCapability> {

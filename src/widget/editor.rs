@@ -428,47 +428,47 @@ impl Discoverable for Editor {
     }
 
     fn action_schema() -> Vec<AgentAction> {
-    vec![
-                AgentAction {
-                    name: "set_text".into(),
-                    description: "Replace the entire editor content.".into(),
-                    params: vec![ActionParam {
-                        name: "text".into(),
-                        description: "The text to set.".into(),
-                        param_type: ActionParamType::String,
-                        required: true,
-                        default_value: None,
-                    }],
-                    returns: None,
-                    mutates: true,
-                    idempotent: true,
-                    shortcut: None,
-                },
-                AgentAction {
-                    name: "get_text".into(),
-                    description: "Get the full editor text content.".into(),
-                    params: vec![],
-                    returns: Some("The editor text as a string.".into()),
-                    mutates: false,
-                    idempotent: true,
-                    shortcut: None,
-                },
-                AgentAction {
-                    name: "insert_text".into(),
-                    description: "Insert text at the current cursor position.".into(),
-                    params: vec![ActionParam {
-                        name: "text".into(),
-                        description: "The text to insert.".into(),
-                        param_type: ActionParamType::String,
-                        required: true,
-                        default_value: None,
-                    }],
-                    returns: None,
-                    mutates: true,
-                    idempotent: false,
-                    shortcut: None,
-                },
-            ]
+        vec![
+            AgentAction {
+                name: "set_text".into(),
+                description: "Replace the entire editor content.".into(),
+                params: vec![ActionParam {
+                    name: "text".into(),
+                    description: "The text to set.".into(),
+                    param_type: ActionParamType::String,
+                    required: true,
+                    default_value: None,
+                }],
+                returns: None,
+                mutates: true,
+                idempotent: true,
+                shortcut: None,
+            },
+            AgentAction {
+                name: "get_text".into(),
+                description: "Get the full editor text content.".into(),
+                params: vec![],
+                returns: Some("The editor text as a string.".into()),
+                mutates: false,
+                idempotent: true,
+                shortcut: None,
+            },
+            AgentAction {
+                name: "insert_text".into(),
+                description: "Insert text at the current cursor position.".into(),
+                params: vec![ActionParam {
+                    name: "text".into(),
+                    description: "The text to insert.".into(),
+                    param_type: ActionParamType::String,
+                    required: true,
+                    default_value: None,
+                }],
+                returns: None,
+                mutates: true,
+                idempotent: false,
+                shortcut: None,
+            },
+        ]
     }
 
     fn capability_kinds() -> Vec<String> {
