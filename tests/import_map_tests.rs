@@ -19,9 +19,17 @@ fn every_mapped_path_resolves() {
     #[allow(unused_imports)]
     use hawktui::core::cell::Cell;
     #[allow(unused_imports)]
+    use hawktui::core::rect::Margin;
+    #[allow(unused_imports)]
+    use hawktui::core::rect::Position;
+    #[allow(unused_imports)]
     use hawktui::core::rect::Rect;
     #[allow(unused_imports)]
+    use hawktui::core::rect::Size;
+    #[allow(unused_imports)]
     use hawktui::core::style::Color;
+    #[allow(unused_imports)]
+    use hawktui::core::style::Modifier;
     #[allow(unused_imports)]
     use hawktui::core::style::Style;
     #[allow(unused_imports)]
@@ -46,6 +54,8 @@ fn every_mapped_path_resolves() {
     use hawktui::event::KeyEvent;
     #[allow(unused_imports)]
     use hawktui::event::KeyEventKind;
+    #[allow(unused_imports)]
+    use hawktui::event::KeyModifiers;
     #[allow(unused_imports)]
     use hawktui::event::MouseButton;
     #[allow(unused_imports)]
@@ -90,6 +100,8 @@ fn every_mapped_path_resolves() {
     use hawktui::widget::block::Block;
     #[allow(unused_imports)]
     use hawktui::widget::block::BorderType;
+    #[allow(unused_imports)]
+    use hawktui::widget::block::Borders;
     #[allow(unused_imports)]
     use hawktui::widget::calendar::Calendar;
     #[allow(unused_imports)]

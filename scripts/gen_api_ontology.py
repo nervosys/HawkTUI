@@ -63,7 +63,14 @@ DOC_RX = re.compile(r"^\s*///\s?(.*)$")
 IMPL_RX = re.compile(r"^\s*impl(?:<[^>]*>)?\s+([A-Za-z_][\w:]*)(?:<[^>]*>)?\s*\{")
 TRAIT_IMPL_RX = re.compile(
     r"^\s*impl(?:<[^>]*>)?\s+([A-Za-z_][\w:]*)(?:<[^>]*>)?\s+for\s+([A-Za-z_]\w*)")
-FN_RX = re.compile(r"^\s*pub fn\s+(\w+)\s*(?:<[^>]*>)?\s*\(")
+# `pub const fn` is still a public function. Matching only `pub fn` dropped
+# every type whose methods are all const: Position, Offset, Margin and Size
+# vanished from the catalog entirely, because a type with no functions is
+# filtered out below. Position is the argument to `Buffer::cell`, so the
+# catalog was missing the type an author needs to read a cell.
+FN_RX = re.compile(
+    r"^\s*pub (?:const |async |unsafe )*fn\s+(\w+)\s*(?:<[^>]*>)?\s*\("
+)
 STRUCT_RX = re.compile(r"^\s*pub struct\s+(\w+)")
 ENUM_RX = re.compile(r"^\s*pub enum\s+(\w+)")
 TRAIT_RX = re.compile(r"^\s*pub trait\s+(\w+)")

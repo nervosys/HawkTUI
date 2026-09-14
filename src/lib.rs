@@ -120,7 +120,7 @@
 //!
 //! ## Import map
 //!
-//! Every public type in the crate (93 of them) and the path it is
+//! Every public type in the crate (99 of them) and the path it is
 //! imported from. An unresolved path is the most common compile error
 //! against this crate, and it is a lookup rather than a reasoning
 //! problem, so the lookup lives here.
@@ -133,11 +133,11 @@
 //! | `hawktui::backend::test` | `TestBackend` |
 //! | `hawktui::core::buffer` | `Buffer` |
 //! | `hawktui::core::cell` | `Cell` |
-//! | `hawktui::core::rect` | `Rect` |
-//! | `hawktui::core::style` | `Color`, `Style`, `Stylize` |
+//! | `hawktui::core::rect` | `Margin`, `Position`, `Rect`, `Size` |
+//! | `hawktui::core::style` | `Color`, `Modifier`, `Style`, `Stylize` |
 //! | `hawktui::core::symbol` | `Symbol` |
 //! | `hawktui::core::text` | `Alignment`, `Line`, `Span`, `Text` |
-//! | `hawktui::event` | `Event`, `HitMap`, `KeyCode`, `KeyEvent`, `KeyEventKind`, `MouseButton`, `MouseEvent`, `MouseEventKind` |
+//! | `hawktui::event` | `Event`, `HitMap`, `KeyCode`, `KeyEvent`, `KeyEventKind`, `KeyModifiers`, `MouseButton`, `MouseEvent`, `MouseEventKind` |
 //! | `hawktui::focus` | `FocusManager` |
 //! | `hawktui::layout` | `Constraint`, `Direction`, `Flex`, `Layout` |
 //! | `hawktui::overlay` | `ModalBox`, `OverlayStack` |
@@ -145,7 +145,7 @@
 //! | `hawktui::terminal` | `Frame`, `Terminal` |
 //! | `hawktui::testing` | `Harness` |
 //! | `hawktui::widget::barchart` | `Bar`, `BarChart`, `BarDirection`, `BarGroup` |
-//! | `hawktui::widget::block` | `Block`, `BorderType` |
+//! | `hawktui::widget::block` | `Block`, `BorderType`, `Borders` |
 //! | `hawktui::widget::calendar` | `Calendar` |
 //! | `hawktui::widget::cancellable_loader` | `CancellableLoader` |
 //! | `hawktui::widget::canvas` | `BrailleGrid`, `Canvas`, `CanvasMap`, `MapData`, `MapResolution`, `Painter`, `Shape` |

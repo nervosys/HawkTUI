@@ -6,7 +6,7 @@
 
 use super::api::{ApiFn, ApiKind, ApiType};
 
-/// Every public type an author builds a program out of (93 of them).
+/// Every public type an author builds a program out of (99 of them).
 pub static API: &[ApiType] = &[
     ApiType {
         name: "AgentSession",
@@ -153,6 +153,16 @@ pub static API: &[ApiType] = &[
         summary: "Border type for blocks.",
         variants: &["Plain", "Rounded", "Double", "Thick", "QuadrantInside", "QuadrantOutside"],
         functions: &[
+        ],
+    },
+    ApiType {
+        name: "Borders",
+        module: "hawktui::widget::block",
+        kind: ApiKind::Struct,
+        summary: "Which borders to display.",
+        variants: &[],
+        functions: &[
+            ApiFn { name: "contains", signature: "pub const fn contains(self, other: Self) -> bool", role: "builder", summary: "" },
         ],
     },
     ApiType {
@@ -614,6 +624,19 @@ pub static API: &[ApiType] = &[
         ],
     },
     ApiType {
+        name: "KeyModifiers",
+        module: "hawktui::event",
+        kind: ApiKind::Struct,
+        summary: "Key modifier flags.",
+        variants: &[],
+        functions: &[
+            ApiFn { name: "empty", signature: "pub const fn empty() -> Self", role: "constructor", summary: "Create an empty modifier set." },
+            ApiFn { name: "contains", signature: "pub const fn contains(self, other: Self) -> bool", role: "builder", summary: "Whether `self` contains all bits in `other`." },
+            ApiFn { name: "is_empty", signature: "pub const fn is_empty(self) -> bool", role: "builder", summary: "Whether no modifiers are active." },
+            ApiFn { name: "union", signature: "pub const fn union(self, other: Self) -> Self", role: "builder", summary: "Combine two modifier sets." },
+        ],
+    },
+    ApiType {
         name: "Layout",
         module: "hawktui::layout",
         kind: ApiKind::Struct,
@@ -774,6 +797,18 @@ pub static API: &[ApiType] = &[
         ],
     },
     ApiType {
+        name: "Margin",
+        module: "hawktui::core::rect",
+        kind: ApiKind::Struct,
+        summary: "Margin/padding specification.",
+        variants: &[],
+        functions: &[
+            ApiFn { name: "uniform", signature: "pub const fn uniform(value: u16) -> Self", role: "constructor", summary: "Uniform margin on all sides." },
+            ApiFn { name: "symmetric", signature: "pub const fn symmetric(vertical: u16, horizontal: u16) -> Self", role: "constructor", summary: "Symmetric margin (vertical, horizontal)." },
+            ApiFn { name: "new", signature: "pub const fn new(top: u16, right: u16, bottom: u16, left: u16) -> Self", role: "constructor", summary: "Individual sides." },
+        ],
+    },
+    ApiType {
         name: "Markdown",
         module: "hawktui::widget::markdown",
         kind: ApiKind::Widget,
@@ -825,6 +860,20 @@ pub static API: &[ApiType] = &[
             ApiFn { name: "handle_event", signature: "fn handle_event(&self, event: Event) -> Option<Self::Msg>", role: "required", summary: "" },
             ApiFn { name: "init", signature: "fn init(&self) -> Command<Self::Msg>", role: "provided", summary: "" },
             ApiFn { name: "register_ontology", signature: "fn register_ontology(&self, _registry: &mut OntologyRegistry)", role: "provided", summary: "" },
+        ],
+    },
+    ApiType {
+        name: "Modifier",
+        module: "hawktui::core::style",
+        kind: ApiKind::Struct,
+        summary: "Text modifiers (bitflags).",
+        variants: &[],
+        functions: &[
+            ApiFn { name: "empty", signature: "pub const fn empty() -> Self", role: "constructor", summary: "" },
+            ApiFn { name: "contains", signature: "pub const fn contains(self, other: Self) -> bool", role: "builder", summary: "" },
+            ApiFn { name: "union", signature: "pub const fn union(self, other: Self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "difference", signature: "pub const fn difference(self, other: Self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "is_empty", signature: "pub const fn is_empty(self) -> bool", role: "builder", summary: "" },
         ],
     },
     ApiType {
@@ -923,6 +972,16 @@ pub static API: &[ApiType] = &[
         ],
     },
     ApiType {
+        name: "Position",
+        module: "hawktui::core::rect",
+        kind: ApiKind::Struct,
+        summary: "A position in terminal coordinates.",
+        variants: &[],
+        functions: &[
+            ApiFn { name: "new", signature: "pub const fn new(x: u16, y: u16) -> Self", role: "constructor", summary: "" },
+        ],
+    },
+    ApiType {
         name: "Program",
         module: "hawktui::runtime",
         kind: ApiKind::Struct,
@@ -943,6 +1002,14 @@ pub static API: &[ApiType] = &[
         summary: "A rectangular area in terminal coordinates.",
         variants: &[],
         functions: &[
+            ApiFn { name: "new", signature: "pub const fn new(x: u16, y: u16, width: u16, height: u16) -> Self", role: "constructor", summary: "" },
+            ApiFn { name: "area", signature: "pub const fn area(&self) -> u32", role: "method", summary: "Total number of cells in this rectangle." },
+            ApiFn { name: "is_empty", signature: "pub const fn is_empty(&self) -> bool", role: "method", summary: "Whether this rectangle has zero area." },
+            ApiFn { name: "left", signature: "pub const fn left(&self) -> u16", role: "method", summary: "The leftmost column." },
+            ApiFn { name: "right", signature: "pub const fn right(&self) -> u16", role: "method", summary: "The rightmost column (exclusive)." },
+            ApiFn { name: "top", signature: "pub const fn top(&self) -> u16", role: "method", summary: "The topmost row." },
+            ApiFn { name: "bottom", signature: "pub const fn bottom(&self) -> u16", role: "method", summary: "The bottommost row (exclusive)." },
+            ApiFn { name: "center", signature: "pub const fn center(&self) -> Position", role: "method", summary: "The center position." },
             ApiFn { name: "intersection", signature: "pub fn intersection(&self, other: Rect) -> Rect", role: "method", summary: "Returns the intersection of two rectangles." },
             ApiFn { name: "union", signature: "pub fn union(&self, other: Rect) -> Rect", role: "method", summary: "Returns the smallest rectangle that contains both." },
             ApiFn { name: "contains", signature: "pub fn contains(&self, pos: Position) -> bool", role: "method", summary: "Whether this rectangle contains a position." },
@@ -1097,6 +1164,16 @@ pub static API: &[ApiType] = &[
         ],
     },
     ApiType {
+        name: "Size",
+        module: "hawktui::core::rect",
+        kind: ApiKind::Struct,
+        summary: "Size in columns and rows.",
+        variants: &[],
+        functions: &[
+            ApiFn { name: "new", signature: "pub const fn new(width: u16, height: u16) -> Self", role: "constructor", summary: "" },
+        ],
+    },
+    ApiType {
         name: "Span",
         module: "hawktui::core::text",
         kind: ApiKind::Struct,
@@ -1149,6 +1226,24 @@ pub static API: &[ApiType] = &[
         summary: "Complete styling specification for a terminal cell.",
         variants: &[],
         functions: &[
+            ApiFn { name: "new", signature: "pub const fn new() -> Self", role: "constructor", summary: "" },
+            ApiFn { name: "reset", signature: "pub const fn reset() -> Self", role: "constructor", summary: "Reset all style fields." },
+            ApiFn { name: "fg", signature: "pub const fn fg(mut self, color: Color) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "bg", signature: "pub const fn bg(mut self, color: Color) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "underline_color", signature: "pub const fn underline_color(mut self, color: Color) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "bold", signature: "pub const fn bold(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "dim", signature: "pub const fn dim(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "italic", signature: "pub const fn italic(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "underlined", signature: "pub const fn underlined(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "reversed", signature: "pub const fn reversed(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "crossed_out", signature: "pub const fn crossed_out(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "hidden", signature: "pub const fn hidden(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "slow_blink", signature: "pub const fn slow_blink(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "rapid_blink", signature: "pub const fn rapid_blink(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "overlined", signature: "pub const fn overlined(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "not_bold", signature: "pub const fn not_bold(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "not_italic", signature: "pub const fn not_italic(mut self) -> Self", role: "builder", summary: "" },
+            ApiFn { name: "not_underlined", signature: "pub const fn not_underlined(mut self) -> Self", role: "builder", summary: "" },
             ApiFn { name: "patch", signature: "pub fn patch(mut self, other: Style) -> Self", role: "builder", summary: "Merge another style on top of this one." },
         ],
     },
@@ -1191,6 +1286,7 @@ pub static API: &[ApiType] = &[
         variants: &[],
         functions: &[
             ApiFn { name: "new", signature: "pub fn new(s: &str) -> Self", role: "constructor", summary: "Store a grapheme cluster, interning it if it exceeds the inline capacity." },
+            ApiFn { name: "from_ascii", signature: "pub const fn from_ascii(byte: u8) -> Self", role: "constructor", summary: "Store a single ASCII byte. Branch-free and always inline." },
             ApiFn { name: "from_char", signature: "pub fn from_char(ch: char) -> Self", role: "constructor", summary: "Store a single `char` — always inline, never allocates." },
             ApiFn { name: "as_str", signature: "pub fn as_str(&self) -> &str", role: "method", summary: "The cluster as a string slice." },
             ApiFn { name: "is_empty", signature: "pub fn is_empty(&self) -> bool", role: "method", summary: "Whether this symbol holds no content (a wide-grapheme continuation cell)." },

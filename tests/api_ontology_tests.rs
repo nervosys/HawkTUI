@@ -167,9 +167,16 @@ fn signatures_are_complete_enough_to_call() {
                 f.signature
             );
             // Inherent functions are `pub fn`; trait methods are declared
-            // without `pub`, because visibility comes from the trait.
+            // without `pub`, because visibility comes from the trait. Either
+            // may carry `const`, `async` or `unsafe` — `Position::new` is a
+            // `pub const fn`, and requiring a bare `pub fn` here is what let
+            // the catalog drop it and three sibling types silently.
             assert!(
-                f.signature.starts_with("pub fn ") || f.signature.starts_with("fn "),
+                f.signature.starts_with("pub ")
+                    || f.signature.starts_with("fn ")
+                    || f.signature.starts_with("const ")
+                    || f.signature.starts_with("async ")
+                    || f.signature.starts_with("unsafe "),
                 "{}::{} signature is malformed: {:?}",
                 ty.name,
                 f.name,
