@@ -7,7 +7,7 @@
 # The library name below stays `hawktui`, so users still write
 # `use hawktui::...` regardless — the same split `louietui`/`louie` already had.
 name = "majestic-hawktui"
-version = "2.0.0"
+version = "2.1.0"
 edition = "2021"
 authors = ["Nervosys"]
 description = "A TUI framework for Rust with a machine-readable widget ontology for agent-driven UIs"
